@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBackground } from '../contexts/BackgroundContext';
-import { OnboardingState, Theme, OnboardingSlide } from '../types';
 import OnboardingSlider from '../components/onboarding/OnboardingSlider';
 import '../styles/onboarding.css';
 
-const OnboardingPage: React.FC = () => {
+const OnboardingPage = () => {
   const navigate = useNavigate();
   const { changeBackground, availableBackgrounds } = useBackground();
   
-  const [state, setState] = useState<OnboardingState>({
+  const [state, setState] = useState({
     currentSlide: 1,
     selectedTheme: 'default',
     isCompleted: false
   });
 
   // Dados dos slides
-  const slides: OnboardingSlide[] = [
+  const slides = [
     {
       id: 1,
       title: 'A tela em branco. O maior inimigo da criatividade.',
@@ -54,11 +53,11 @@ const OnboardingPage: React.FC = () => {
     handleComplete();
   };
 
-  const handleDotClick = (slideIndex: number) => {
+  const handleDotClick = (slideIndex) => {
     setState(prev => ({ ...prev, currentSlide: slideIndex }));
   };
 
-  const handleThemeSelect = (themeId: string) => {
+  const handleThemeSelect = (themeId) => {
     setState(prev => ({ ...prev, selectedTheme: themeId }));
     changeBackground(themeId);
   };
