@@ -75,14 +75,6 @@ const OnboardingPage = () => {
     navigate('/home'); // ou rota apropriada
   };
 
-  // Verificar se onboarding já foi concluído
-  useEffect(() => {
-    const isCompleted = localStorage.getItem('trendlyai-onboarding-completed');
-    if (isCompleted) {
-      navigate('/home'); // ou rota apropriada
-    }
-  }, [navigate]);
-
   return (
     <div className="onboarding-container">
       <OnboardingSlider
