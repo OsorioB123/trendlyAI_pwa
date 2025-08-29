@@ -6,6 +6,7 @@ import SignUpPage from './pages/SignUpPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import LinkSentPage from './pages/LinkSentPage';
 import OnboardingPage from './pages/OnboardingPage';
+import HomePage from './pages/HomePage';
 import './App.css';
 
 function App() {
@@ -21,8 +22,8 @@ function App() {
             <Route path="/link-sent" element={<LinkSentPage />} />
             {/* Permitir acesso direto ao onboarding para testes */}
             <Route path="/onboarding" element={<OnboardingPage />} />
-            {/* Rota temporária para home - será implementada futuramente */}
-            <Route path="/home" element={<div className="min-h-screen bg-black text-white flex items-center justify-center"><h1>Home - Em breve!</h1></div>} />
+            {/* Página Home implementada */}
+            <Route path="/home" element={<HomePage />} />
           </Routes>
         </div>
       </Router>
