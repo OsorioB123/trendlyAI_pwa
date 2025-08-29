@@ -1,8 +1,7 @@
 import React from 'react';
 import { ArrowRight, Check } from 'lucide-react';
-import { OnboardingControlsProps } from '../../types';
 
-const OnboardingControls: React.FC<OnboardingControlsProps> = ({
+const OnboardingControls = ({
   currentSlide,
   totalSlides,
   onNext,

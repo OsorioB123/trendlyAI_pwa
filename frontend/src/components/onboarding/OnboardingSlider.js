@@ -1,22 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowRight, Check } from 'lucide-react';
-import { OnboardingSlide, Theme } from '../../types';
 import ThemeSelector from './ThemeSelector';
 import SlideContent from './SlideContent';
 import OnboardingControls from './OnboardingControls';
 
-interface OnboardingSliderProps {
-  slides: OnboardingSlide[];
-  themes: Theme[];
-  currentSlide: number;
-  selectedTheme: string;
-  onNext: () => void;
-  onSkip: () => void;
-  onDotClick: (slideIndex: number) => void;
-  onThemeSelect: (themeId: string) => void;
-}
-
-const OnboardingSlider: React.FC<OnboardingSliderProps> = ({
+const OnboardingSlider = ({
   slides,
   themes,
   currentSlide,

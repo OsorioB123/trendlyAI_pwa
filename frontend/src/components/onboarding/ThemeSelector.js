@@ -1,14 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Check } from 'lucide-react';
-import { ThemeSelectorProps } from '../../types';
 
-const ThemeSelector: React.FC<ThemeSelectorProps> = ({
+const ThemeSelector = ({
   themes,
   selectedTheme,
   onThemeSelect
 }) => {
-  const galleryRef = useRef<HTMLDivElement>(null);
-  const [isIntersecting, setIsIntersecting] = useState<Record<string, boolean>>({});
+  const galleryRef = useRef(null);
+  const [isIntersecting, setIsIntersecting] = useState({});
 
   useEffect(() => {
     // Configurar Intersection Observer para mobile
@@ -44,12 +43,12 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({
     }
   }, [onThemeSelect]);
 
-  const handleThemeClick = (themeId: string) => {
+  const handleThemeClick = (themeId) => {
     onThemeSelect(themeId);
     
     // Scroll suave no mobile
     if (window.innerWidth < 1024) {
-      const sphere = document.querySelector(`[data-theme-id="${themeId}"]`) as HTMLElement;
+      const sphere = document.querySelector(`[data-theme-id="${themeId}"]`);
       sphere?.parentElement?.scrollIntoView({ 
         behavior: 'smooth', 
         inline: 'center' 
@@ -88,7 +87,7 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({
                   data-theme-id={theme.id}
                   style={{
                     '--sphere-bg': `url(${theme.value})`
-                  } as React.CSSProperties}
+                  }}
                   onClick={() => handleThemeClick(theme.id)}
                 >
                   <div className="check-icon">

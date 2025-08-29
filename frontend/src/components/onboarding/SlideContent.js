@@ -1,9 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { SlideProps } from '../../types';
 
-const SlideContent: React.FC<SlideProps> = ({ slide, isActive }) => {
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const descriptionRef = useRef<HTMLParagraphElement>(null);
+const SlideContent = ({ slide, isActive }) => {
+  const titleRef = useRef(null);
+  const descriptionRef = useRef(null);
 
   useEffect(() => {
     if (isActive) {
