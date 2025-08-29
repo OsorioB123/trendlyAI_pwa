@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Lock } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout';
 
 const LoginPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -18,13 +19,35 @@ const LoginPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: Implementar lógica de login
+    // TODO: Implementar lógica de login real
     console.log('Login attempt:', formData);
+    
+    // Simular login bem-sucedido
+    localStorage.setItem('trendlyai-user-authenticated', 'true');
+    
+    // Verificar se precisa mostrar onboarding
+    const isOnboardingCompleted = localStorage.getItem('trendlyai-onboarding-completed');
+    if (!isOnboardingCompleted) {
+      navigate('/onboarding');
+    } else {
+      navigate('/home');
+    }
   };
 
   const handleGoogleLogin = () => {
-    // TODO: Implementar login com Google
+    // TODO: Implementar login com Google real
     console.log('Google login attempt');
+    
+    // Simular login bem-sucedido
+    localStorage.setItem('trendlyai-user-authenticated', 'true');
+    
+    // Verificar se precisa mostrar onboarding
+    const isOnboardingCompleted = localStorage.getItem('trendlyai-onboarding-completed');
+    if (!isOnboardingCompleted) {
+      navigate('/onboarding');
+    } else {
+      navigate('/home');
+    }
   };
 
   return (
