@@ -9,29 +9,17 @@ import OnboardingPage from './pages/OnboardingPage';
 import './App.css';
 
 function App() {
-  // Verificar se é o primeiro acesso para mostrar onboarding
-  const checkFirstAccess = () => {
-    const isOnboardingCompleted = localStorage.getItem('trendlyai-onboarding-completed');
-    const hasAuthenticated = localStorage.getItem('trendlyai-user-authenticated');
-    
-    // Se nunca fez onboarding E está autenticado, mostrar onboarding
-    if (!isOnboardingCompleted && hasAuthenticated) {
-      return '/onboarding';
-    }
-    
-    return '/login';
-  };
-
   return (
     <BackgroundProvider>
       <Router>
         <div className="App">
           <Routes>
-            <Route path="/" element={<Navigate to={checkFirstAccess()} replace />} />
+            <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/link-sent" element={<LinkSentPage />} />
+            {/* Permitir acesso direto ao onboarding para testes */}
             <Route path="/onboarding" element={<OnboardingPage />} />
             {/* Rota temporária para home - será implementada futuramente */}
             <Route path="/home" element={<div className="min-h-screen bg-black text-white flex items-center justify-center"><h1>Home - Em breve!</h1></div>} />
