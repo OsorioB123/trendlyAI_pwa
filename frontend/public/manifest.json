@@ -1,0 +1,26 @@
+{
+  "short_name": "TrendlyAI",
+  "name": "TrendlyAI - Plataforma de IA para Criadores",
+  "description": "Plataforma de Inteligência Artificial para Criadores de Conteúdo",
+  "icons": [
+    {
+      "src": "https://i.ibb.co/DfMChfL8/Trendly-AI-branco.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://i.ibb.co/DfMChfL8/Trendly-AI-branco.webp", 
+      "sizes": "512x512",
+      "type": "image/webp"
+    }
+  ],
+  "start_url": "/login",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "pt-BR",
+  "categories": ["productivity", "education", "utilities"]
+}
