@@ -258,9 +258,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Header Components"
-    - "Home Page"
-    - "Chat Page"
+    - "PaywallModal Component"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
