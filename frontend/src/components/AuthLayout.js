@@ -6,18 +6,19 @@ const AuthLayout = ({ children }) => {
 
   return (
     <div 
-      className="min-h-screen flex items-center justify-center bg-black text-white font-inter antialiased selection:bg-white/10 selection:text-white auth-background"
+      className="auth-background min-h-screen relative"
+      style={{
+        backgroundImage: `url("${currentBackground.value}")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
     >
-      {/* Background personalizado */}
-      <div 
-        className="fixed top-0 w-full h-screen bg-cover bg-center -z-10"
-        style={{ 
-          backgroundImage: `url("${currentBackground.value}?w=800&q=80")` 
-        }}
-      />
+      {/* Background overlay for better readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
       
-      {/* Conteúdo da página */}
-      <main className="w-full max-w-md px-4">
+      <main className="relative z-10 flex min-h-screen items-center justify-center px-4 py-8">
         {children}
       </main>
     </div>
