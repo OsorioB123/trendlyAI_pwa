@@ -83,6 +83,7 @@ const MOCK_TOOLS = [
 ];
 
 const HomePage = () => {
+  const navigate = useNavigate();
   const { currentBackground } = useBackground();
   const [greeting, setGreeting] = useState('Boa tarde, Sofia');
   const [commandInput, setCommandInput] = useState('');
