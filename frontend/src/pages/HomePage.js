@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Send, ArrowRight } from 'lucide-react';
 import { useBackground } from '../contexts/BackgroundContext';
+import Header from '../components/layout/Header';
+import { HeaderVariant } from '../types/header';
 import TrackCard from '../components/cards/TrackCard';
 import ToolCard from '../components/cards/ToolCard';
 import Carousel from '../components/common/Carousel';
