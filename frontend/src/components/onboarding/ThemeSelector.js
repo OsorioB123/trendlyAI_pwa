@@ -10,49 +10,28 @@ const ThemeSelector = ({
   const [isIntersecting, setIsIntersecting] = useState({});
 
   useEffect(() => {
-    // Configurar Intersection Observer para mobile
-    if (window.innerWidth < 1024) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach(entry => {
-            const themeId = entry.target.getAttribute('data-theme-id');
-            if (themeId) {
-              setIsIntersecting(prev => ({
-                ...prev,
-                [themeId]: entry.isIntersecting
-              }));
-
-              if (entry.isIntersecting && entry.intersectionRatio >= 0.8) {
-                onThemeSelect(themeId);
-              }
-            }
-          });
-        },
-        {
-          root: galleryRef.current,
-          rootMargin: '0px',
-          threshold: 0.8
-        }
-      );
-
-      // Observar todas as esferas de tema
-      const spheres = galleryRef.current?.querySelectorAll('.theme-sphere');
-      spheres?.forEach(sphere => observer.observe(sphere));
-
-      return () => observer.disconnect();
-    }
-  }, [onThemeSelect]);
+    // Simplified mobile handling - remove auto-selection on intersection
+    // Only handle manual clicks
+  }, []);
 
   const handleThemeClick = (themeId) => {
+    // Apply theme selection immediately
     onThemeSelect(themeId);
     
-    // Scroll suave no mobile
+    // Scroll suave no mobile para centralizar o tema selecionado
     if (window.innerWidth < 1024) {
       const sphere = document.querySelector(`[data-theme-id="${themeId}"]`);
-      sphere?.parentElement?.scrollIntoView({ 
-        behavior: 'smooth', 
-        inline: 'center' 
-      });
+      if (sphere && galleryRef.current) {
+        const container = galleryRef.current;
+        const sphereRect = sphere.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        const scrollLeft = sphereRect.left - containerRect.left - (containerRect.width / 2) + (sphereRect.width / 2);
+        
+        container.scrollTo({
+          left: container.scrollLeft + scrollLeft,
+          behavior: 'smooth'
+        });
+      }
     }
   };
 
@@ -81,9 +60,7 @@ const ThemeSelector = ({
                 <button
                   className={`theme-sphere ${
                     selectedTheme === theme.id ? 'is-selected' : ''
-                  } ${
-                    window.innerWidth >= 1024 || isIntersecting[theme.id] ? 'is-in-view' : ''
-                  }`}
+                  } is-in-view`}
                   data-theme-id={theme.id}
                   style={{
                     '--sphere-bg': `url(${theme.value})`
