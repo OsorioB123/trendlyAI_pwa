@@ -284,10 +284,13 @@ const HomePage = () => {
             <section className="animate-entry delay-4 mb-20">
               <div className="flex flex-wrap justify-between items-baseline mb-4 gap-y-2">
                 <h2 className="text-xl font-medium tracking-tight font-geist">Ferramentas recomendadas pra você</h2>
-                <a href="#" className="flex items-center gap-2 text-sm font-medium text-white/80 hover:text-white transition-colors">
+                <button 
+                  onClick={() => navigate('/tools')}
+                  className="flex items-center gap-2 text-sm font-medium text-white/80 hover:text-white transition-colors"
+                >
                   <span>Ver todos</span>
                   <ArrowRight className="w-4 h-4" />
-                </a>
+                </button>
               </div>
               <Carousel>
                 {MOCK_TOOLS.map((tool) => (
