@@ -325,6 +325,13 @@ const HomePage = () => {
           </div>
         </div>
       </main>
+
+      {/* Tool Modal */}
+      <ToolModal 
+        tool={selectedTool}
+        isOpen={showToolModal}
+        onClose={closeToolModal}
+      />
     </div>
   );
 };
