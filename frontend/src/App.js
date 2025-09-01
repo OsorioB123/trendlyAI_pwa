@@ -25,6 +25,8 @@ function App() {
             <Route path="/onboarding" element={<OnboardingPage />} />
             {/* Página Home implementada */}
             <Route path="/home" element={<HomePage />} />
+            {/* Chat Page */}
+            <Route path="/chat" element={<ChatPage />} />
           </Routes>
         </div>
       </Router>
