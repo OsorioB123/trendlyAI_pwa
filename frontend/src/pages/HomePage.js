@@ -147,7 +147,8 @@ const HomePage = () => {
 
   const handleToolClick = (tool) => {
     console.log('Tool clicked:', tool);
-    // TODO: Abrir modal da ferramenta
+    setSelectedTool(tool);
+    setShowToolModal(true);
   };
 
   const handleToolFavorite = (tool) => {
