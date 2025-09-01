@@ -58,7 +58,7 @@ const SettingsPage = () => {
   const handleThemeChange = (themeId) => {
     const theme = availableBackgrounds.find(bg => bg.id === themeId);
     if (theme) {
-      setCurrentBackground(theme);
+      changeBackground(themeId);
       showToastMessage('Ambiente atualizado.');
     }
   };
