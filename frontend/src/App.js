@@ -22,6 +22,7 @@ function App() {
   return (
     <BackgroundProvider>
       <Router>
+        <ScrollToTop />
         <div className="App">
           <Routes>
             <Route path="/" element={<Navigate to="/login" replace />} />
