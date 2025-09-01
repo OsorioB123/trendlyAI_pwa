@@ -41,20 +41,17 @@ const OnboardingSlider = ({
   };
 
   return (
-    <>
-      {/* Background dinâmico */}
-      <div
-        className="slide-background active"
-        style={{ 
-          backgroundImage: `url('${getCurrentBackground()}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      />
-
+    <div
+      className="onboarding-slider fixed inset-0 z-10"
+      style={{ 
+        backgroundImage: `url('${getCurrentBackground()}')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
       {/* Overlay gradiente */}
-      <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
+      <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
       {/* Conteúdo principal */}
       <main className="absolute inset-0 z-10 flex flex-col justify-end px-6 sm:px-8 pb-10">
