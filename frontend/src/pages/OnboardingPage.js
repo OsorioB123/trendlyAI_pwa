@@ -6,11 +6,11 @@ import '../styles/onboarding.css';
 
 const OnboardingPage = () => {
   const navigate = useNavigate();
-  const { changeBackground, availableBackgrounds } = useBackground();
+  const { currentBackground, changeBackground, availableBackgrounds } = useBackground();
   
   const [state, setState] = useState({
     currentSlide: 1,
-    selectedTheme: 'default',
+    selectedTheme: currentBackground.id,
     isCompleted: false
   });
 
@@ -59,6 +59,7 @@ const OnboardingPage = () => {
 
   const handleThemeSelect = (themeId) => {
     setState(prev => ({ ...prev, selectedTheme: themeId }));
+    // Aplicar mudança de background imediatamente
     changeBackground(themeId);
   };
 
@@ -66,13 +67,13 @@ const OnboardingPage = () => {
     // Salvar que o onboarding foi concluído
     localStorage.setItem('trendlyai-onboarding-completed', 'true');
     
-    // Aplicar tema selecionado
+    // Garantir que o tema selecionado está aplicado
     changeBackground(state.selectedTheme);
     
     console.log(`Onboarding concluído! Tema selecionado: ${state.selectedTheme}`);
     
-    // Navegar para a próxima página (será definida futuramente)
-    navigate('/home'); // ou rota apropriada
+    // Navegar para home
+    navigate('/home');
   };
 
   return (
@@ -82,6 +83,7 @@ const OnboardingPage = () => {
         themes={availableBackgrounds}
         currentSlide={state.currentSlide}
         selectedTheme={state.selectedTheme}
+        currentBackground={currentBackground}
         onNext={handleNext}
         onSkip={handleSkip}
         onDotClick={handleDotClick}
