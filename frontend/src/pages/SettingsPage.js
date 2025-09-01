@@ -16,7 +16,7 @@ import ThemeSelector from '../components/onboarding/ThemeSelector';
 
 const SettingsPage = () => {
   const navigate = useNavigate();
-  const { currentBackground, setCurrentBackground, availableBackgrounds } = useBackground();
+  const { currentBackground, changeBackground, availableBackgrounds } = useBackground();
   const [activeTab, setActiveTab] = useState('profile');
   const [profileData, setProfileData] = useState({
     name: 'Sofia',
