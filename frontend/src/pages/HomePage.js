@@ -6,6 +6,7 @@ import Header from '../components/layout/Header';
 import { HeaderVariant } from '../types/header';
 import TrackCard from '../components/cards/TrackCard';
 import ToolCard from '../components/cards/ToolCard';
+import ToolModal from '../components/modals/ToolModal';
 import Carousel from '../components/common/Carousel';
 import '../styles/home.css';
 
