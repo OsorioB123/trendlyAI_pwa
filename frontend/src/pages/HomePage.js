@@ -164,6 +164,11 @@ const HomePage = () => {
     }
   };
 
+  const closeToolModal = () => {
+    setShowToolModal(false);
+    setSelectedTool(null);
+  };
+
   return (
     <div 
       className="home-container"
