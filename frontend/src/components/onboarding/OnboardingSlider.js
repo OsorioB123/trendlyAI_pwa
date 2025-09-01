@@ -85,7 +85,7 @@ const OnboardingSlider = ({
           isLastSlide={currentSlide === slides.length}
         />
       </main>
-    </>
+    </div>
   );
 };
 
