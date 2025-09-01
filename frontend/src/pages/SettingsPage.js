@@ -352,9 +352,9 @@ const SettingsPage = () => {
 
           {/* Tabs */}
           <div className="w-full overflow-x-auto mb-10 opacity-0 animate-fade-in" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
-            <div className="relative inline-flex p-1 border-radius bg-white/5 border border-white/10 rounded-xl">
+            <div className="relative inline-flex p-1 bg-white/5 border border-white/10 rounded-xl overflow-hidden">
               <div 
-                className="absolute top-1 h-10 bg-white/10 border border-white/10 rounded-lg transition-all duration-300"
+                className="absolute top-1 h-10 bg-white/10 border border-white/10 rounded-lg transition-all duration-300 z-0"
                 style={{
                   width: `${100/tabs.length}%`,
                   transform: `translateX(${tabs.findIndex(tab => tab.id === activeTab) * 100}%)`
@@ -366,7 +366,7 @@ const SettingsPage = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`relative z-10 flex items-center gap-2 px-6 py-3 font-medium transition-colors text-sm ${
+                    className={`relative z-10 flex items-center gap-2 px-6 py-3 font-medium transition-colors text-sm rounded-lg ${
                       activeTab === tab.id ? 'text-white' : 'text-white/60 hover:text-white'
                     }`}
                   >
