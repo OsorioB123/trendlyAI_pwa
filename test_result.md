@@ -307,6 +307,18 @@ frontend:
         agent: "testing"
         comment: "✅ ENHANCED HELP CENTER PAGE FULLY FUNCTIONAL: All requirements verified - Page loads with 'A Salina é sua primeira guia' header section. 'Falar com a Salina' button found and ready for /chat navigation. FAQ tabs working perfectly (4 tabs found) with switching between categories (Primeiros Passos, Assinatura, Ferramentas, Questões Técnicas). FAQ accordion expand/collapse functionality working (3 items found and tested). Chat widget 'Iniciar Conversa com um Especialista' button opens widget successfully with close button and backdrop dismissal working. All animations and visual effects working perfectly."
 
+  - task: "HomePage Navigation Fix"
+    implemented: true
+    working: true  
+    file: "/app/frontend/src/pages/HomePage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "NAVIGATION BUG FIXED: Corrected HomePage 'Ver todos' buttons that were using broken anchor links. Replaced all <a href='#'> elements with proper React Router navigation using useNavigate hook. Now clicking 'Ver todos' in track sections navigates to /tracks, and 'Ver todos' in tools section navigates to /tools. Also improved track card navigation to go to specific track detail pages (/track/:id). All navigation from HomePage now working correctly."
+
   - task: "Track Detail Page Implementation"
     implemented: true
     working: true  
