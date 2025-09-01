@@ -410,7 +410,7 @@ const AllToolsPage = () => {
                 <ChevronDown className={`w-4 h-4 transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`} />
               </button>
               {showCategoryDropdown && (
-                <div className="control-panel-dropdown absolute top-full left-0 mt-2 w-full z-50 bg-[rgba(30,31,35,0.97)] backdrop-blur-3xl border border-white/18 shadow-[0_16px_48px_rgba(0,0,0,0.5)] rounded-xl p-2">
+                <div className="control-panel-dropdown absolute top-full left-0 mt-2 w-full z-50 bg-[rgba(30,31,35,0.98)] backdrop-blur-3xl border border-white/20 shadow-[0_16px_48px_rgba(0,0,0,0.6)] rounded-xl p-2">
                   {categories.map(category => (
                     <button 
                       key={category}
