@@ -9,6 +9,7 @@ const OnboardingSlider = ({
   themes,
   currentSlide,
   selectedTheme,
+  currentBackground,
   onNext,
   onSkip,
   onDotClick,
@@ -23,29 +24,34 @@ const OnboardingSlider = ({
     }
   }, [currentSlide, themesInitialized]);
 
+  // Determinar o background atual baseado no slide
+  const getCurrentBackground = () => {
+    const currentSlideData = slides.find(s => s.id === currentSlide);
+    
+    if (currentSlide === 3) {
+      // No slide 3, usar o background selecionado
+      return currentBackground?.value || 'https://i.ibb.co/Tx5Xxb2P/grad-1.webp';
+    } else if (currentSlideData?.backgroundImage) {
+      // Slides 1, 2, 4 usam imagens específicas
+      return currentSlideData.backgroundImage;
+    }
+    
+    // Fallback para o background padrão
+    return 'https://i.ibb.co/Tx5Xxb2P/grad-1.webp';
+  };
+
   return (
     <>
-      {/* Background Images para slides 1, 2 e 4 */}
-      {slides.map((slide) => (
-        slide.backgroundImage && slide.id !== 3 && (
-          <div
-            key={`slide-bg-${slide.id}`}
-            className={`slide-background ${currentSlide === slide.id ? 'active' : ''}`}
-            style={{ backgroundImage: `url('${slide.backgroundImage}')` }}
-          />
-        )
-      ))}
-
-      {/* Container de backgrounds para slide 3 */}
-      <div className={`background-container ${currentSlide === 3 ? '' : 'hidden'}`}>
-        {currentSlide === 3 && themes.map((theme) => (
-          <div
-            key={`bg-${theme.id}`}
-            className={`background-layer ${selectedTheme === theme.id ? 'is-active' : ''}`}
-            style={{ backgroundImage: `url(${theme.value})` }}
-          />
-        ))}
-      </div>
+      {/* Background dinâmico */}
+      <div
+        className="slide-background active"
+        style={{ 
+          backgroundImage: `url('${getCurrentBackground()}')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      />
 
       {/* Overlay gradiente */}
       <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
