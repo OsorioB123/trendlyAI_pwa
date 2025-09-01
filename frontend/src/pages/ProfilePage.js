@@ -132,8 +132,9 @@ const ProfilePage = () => {
                 <div className="mt-6 p-4 bg-black/20 rounded-xl border border-white/10">
                   <h3 className="text-white font-semibold mb-4">Escolha seu tema</h3>
                   <ThemeSelector 
+                    themes={availableBackgrounds}
                     onThemeSelect={handleThemeChange}
-                    selectedTheme={currentBackground}
+                    selectedTheme={currentBackground.id}
                   />
                 </div>
               )}
