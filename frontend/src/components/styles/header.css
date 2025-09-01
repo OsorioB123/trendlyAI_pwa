@@ -1,0 +1,128 @@
+/* TrendlyAI Header Styles */
+
+:root {
+  --brand-pink: #bf4ea1;
+  --brand-mint: #9df4e9;
+  --brand-gold: #2fd159;
+  --brand-blue: #0091FF;
+  --brand-blue-rgb: 0, 145, 255;
+  --grad-primary: linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-mint) 100%);
+}
+
+/* Liquid Glass Effects */
+.liquid-glass {
+  backdrop-filter: blur(20px);
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+.liquid-glass-pill {
+  backdrop-filter: blur(20px);
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.liquid-glass-pill:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.liquid-glass-opaque {
+  backdrop-filter: blur(24px);
+  background-color: rgba(30, 30, 40, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+}
+
+/* Dropdown Animations */
+.dropdown-menu {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top right;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Menu Items */
+.menu-item:hover, 
+.notification-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(4px);
+  transition: all 0.2s ease;
+}
+
+/* Credits Progress Bar */
+.credits-progress-bar {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.credits-progress-fill {
+  height: 100%;
+  background: #FFFFFF;
+  border-radius: 9999px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 15px 3px rgba(255, 255, 255, 0.4);
+  transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Credits Tooltip */
+.credit-tooltip {
+  opacity: 0;
+  transform: translateY(5px) scale(0.98);
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: bottom right;
+}
+
+.credit-tooltip.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Header Animation */
+.header-fade {
+  animation: slideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Notification Dot Animation */
+.notification-dot {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
