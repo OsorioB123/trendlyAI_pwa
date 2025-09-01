@@ -142,12 +142,9 @@ const ToolModal = ({ tool, isOpen, onClose }) => {
       <div 
         className={`fixed z-[101] transition-all duration-400 ${
           isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-        } 
-        ${window.innerWidth <= 768 
-          ? 'bottom-0 left-0 right-0 h-[90vh] rounded-t-[20px] border-b-0' 
-          : 'top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[min(90vw,800px)] h-[min(85vh,750px)] rounded-3xl'
-        }
-        bg-[rgba(20,20,22,0.9)] backdrop-blur-[24px] border border-white/10 overflow-hidden`}
+        } top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[min(90vw,800px)] h-[min(85vh,750px)] rounded-3xl
+        bg-[rgba(20,20,22,0.9)] backdrop-blur-[24px] border border-white/10 overflow-hidden md:block
+        mobile:fixed mobile:bottom-0 mobile:left-0 mobile:right-0 mobile:h-[90vh] mobile:rounded-t-[20px] mobile:border-b-0 mobile:transform-none mobile:w-full mobile:translate-x-0 mobile:translate-y-0`}
       >
         {/* Inner Content */}
         <div className={`h-full w-full transition-all duration-300 ${
