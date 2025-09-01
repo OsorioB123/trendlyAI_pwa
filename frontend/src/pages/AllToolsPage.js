@@ -611,6 +611,11 @@ const AllToolsPage = () => {
       </div>
 
       <style jsx>{`
+        .control-panel-dropdown {
+          z-index: 9999 !important;
+          position: absolute;
+        }
+
         .liquid-glass-enhanced {
           backdrop-filter: blur(20px);
           background-color: rgba(255, 255, 255, 0.12);
