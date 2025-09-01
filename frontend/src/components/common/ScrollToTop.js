@@ -5,24 +5,14 @@ const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    // Multiple approaches to ensure scroll to top works
     const scrollToTop = () => {
-      // Method 1: window.scrollTo with instant behavior
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'instant'
-      });
-
-      // Method 2: Direct property assignment as fallback
+      // Force scroll to top using multiple methods
       window.scrollTo(0, 0);
       
-      // Method 3: Document element scroll as fallback
       if (document.documentElement) {
         document.documentElement.scrollTop = 0;
       }
       
-      // Method 4: Body scroll as fallback
       if (document.body) {
         document.body.scrollTop = 0;
       }
@@ -31,11 +21,34 @@ const ScrollToTop = () => {
     // Immediate scroll
     scrollToTop();
 
-    // Also scroll after a small delay to handle async loading
-    const timer = setTimeout(scrollToTop, 100);
+    // Use requestAnimationFrame to ensure it happens after render
+    requestAnimationFrame(() => {
+      scrollToTop();
+    });
+
+    // Additional timeout as fallback
+    const timer = setTimeout(() => {
+      scrollToTop();
+    }, 0);
 
     return () => clearTimeout(timer);
   }, [pathname]);
+
+  // Additional effect to handle route changes more aggressively
+  useEffect(() => {
+    const handleRouteChange = () => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+
+    // Listen for popstate events (browser back/forward)
+    window.addEventListener('popstate', handleRouteChange);
+    
+    return () => {
+      window.removeEventListener('popstate', handleRouteChange);
+    };
+  }, []);
 
   return null;
 };
