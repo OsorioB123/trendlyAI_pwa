@@ -329,7 +329,7 @@ frontend:
     status_history:
       - working: true
         agent: "main"
-        comment: "GLOBAL SCROLL TO TOP IMPLEMENTED: Created ScrollToTop component that automatically scrolls to top of page on every route change. Component uses useLocation hook from React Router to detect pathname changes and triggers window.scrollTo(0, 0) with 'instant' behavior. Integrated into App.js within Router context to work globally across all pages. This ensures that whenever users navigate to any page (forward navigation, back button, direct links), the page always starts from the top position, providing consistent UX. Tested and confirmed working - pages now always load from top regardless of previous scroll position."
+        comment: "GLOBAL SCROLL TO TOP ENHANCED AND WORKING: Enhanced ScrollToTop component with multiple fallback methods to ensure reliable scroll-to-top functionality. Implementation includes: 1) Multiple scroll methods (window.scrollTo, documentElement.scrollTop, body.scrollTop) 2) requestAnimationFrame for DOM-ready execution 3) Timeout fallback for async loading 4) Popstate event listener for browser navigation 5) Component moved inside App div for better DOM access. Tested and confirmed working - pages now consistently load from top position on all navigation types (forward, back, direct URL). Visual confirmation shows AllTracksPage and other pages starting from scroll position 0."
 
   - task: "AllTracksPage Z-Index and Layout Fix"
     implemented: true
