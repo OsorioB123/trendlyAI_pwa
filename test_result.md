@@ -307,6 +307,18 @@ frontend:
         agent: "testing"
         comment: "✅ ENHANCED HELP CENTER PAGE FULLY FUNCTIONAL: All requirements verified - Page loads with 'A Salina é sua primeira guia' header section. 'Falar com a Salina' button found and ready for /chat navigation. FAQ tabs working perfectly (4 tabs found) with switching between categories (Primeiros Passos, Assinatura, Ferramentas, Questões Técnicas). FAQ accordion expand/collapse functionality working (3 items found and tested). Chat widget 'Iniciar Conversa com um Especialista' button opens widget successfully with close button and backdrop dismissal working. All animations and visual effects working perfectly."
 
+  - task: "AllTracksPage Z-Index and Layout Fix"
+    implemented: true
+    working: false  
+    file: "/app/frontend/src/pages/AllTracksPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "ALLTRACKSPAGE LAYOUT FIX COMPLETED: Completely rewritten AllTracksPage to match exact HTML structure and design. Key fixes: 1) Fixed z-index hierarchy - filters drawer now uses z-[60] while header stays above with higher z-index 2) Implemented exact liquid-glass styling and animations from HTML 3) Proper responsive filters drawer (desktop: top-right positioning, mobile: bottom sheet) 4) Exact filter chip styling with white border glow effects 5) Progress bars with proper white fill and animations 6) Hover effects and card animations matching HTML exactly 7) Custom select dropdown with proper styling 8) All category filter chips with active states. Component now follows HTML structure perfectly with all animations, transitions, and responsive behavior preserved."
+
   - task: "Tool Modal Implementation"
     implemented: true
     working: "NA"  
