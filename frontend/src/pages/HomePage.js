@@ -65,21 +65,27 @@ const MOCK_TOOLS = [
     title: 'Crie um Roteiro Viral em 30 Segundos',
     description: 'Transforme qualquer ideia em uma estrutura de roteiro de 3 atos para engajamento máximo.',
     tags: ['roteiro', 'storytelling'],
-    content: 'Você é um especialista em storytelling viral para redes sociais...'
+    compatibility: ['ChatGPT', 'Claude', 'Gemini'],
+    content: 'Você é um especialista em storytelling viral para redes sociais.\n\nCONTEXTO:\n- Tema: [TEMA]\n- Público-alvo: [PÚBLICO-ALVO]\n- Tom de voz: [TOM DE VOZ]\n- Duração: 30-60 segundos\n\nESTRUTURA OBRIGATÓRIA:\n1. GANCHO (0-3s): Uma frase impactante que pare o scroll\n2. DESENVOLVIMENTO (3-45s): Apresente o problema/solução/história\n3. CALL TO ACTION (45-60s): Convide para ação específica\n\nCRITÉRIOS DE SUCESSO:\n- Use linguagem simples e direta\n- Inclua elementos de curiosidade ou surpresa\n- Termine com uma pergunta ou convite à interação\n- Mantenha o ritmo acelerado\n\nCrie o roteiro seguindo exatamente esta estrutura.',
+    how_to_use: 'Substitua [TEMA], [PÚBLICO-ALVO] e [TOM DE VOZ] pelos seus dados específicos antes de usar o prompt.'
   },
   {
     id: 2,
     title: 'Crie Títulos Otimizados para SEO',
     description: 'Use este prompt para gerar títulos magnéticos e otimizados para mecanismos de busca.',
     tags: ['seo', 'títulos'],
-    content: 'Você é um especialista em SEO e copywriting...'
+    compatibility: ['ChatGPT', 'Claude'],
+    content: 'Você é um especialista em SEO e copywriting.\n\nCrie 5 títulos SEO-otimizados para o seguinte conteúdo:\n\n[CONTEÚDO]: {seu_conteudo_aqui}\n[PALAVRA-CHAVE]: {palavra_chave_principal}\n\nDIRETRIZES:\n- Máximo 60 caracteres\n- Inclua a palavra-chave principal no início\n- Use power words (como \'definitivo\', \'completo\', \'secreto\')\n- Crie urgência ou curiosidade\n- Seja específico com números quando possível\n\nRetorne 5 opções numeradas com explicação do por que cada uma funciona.',
+    how_to_use: 'Substitua {seu_conteudo_aqui} e {palavra_chave_principal} pelas suas informações específicas.'
   },
   {
     id: 3,
     title: 'Copy de Vendas Irresistível',
     description: 'Crie textos persuasivos que convertem usando gatilhos mentais comprovados.',
     tags: ['copywriting', 'vendas'],
-    content: 'Você é um copywriter experiente especializado em vendas...'
+    compatibility: ['ChatGPT', 'Claude'],
+    content: 'Você é um copywriter experiente especializado em vendas.\n\nEscreva uma copy de vendas persuasiva usando o framework AIDA:\n\n[PRODUTO/SERVIÇO]: {seu_produto_aqui}\n[PÚBLICO-ALVO]: {sua_persona_aqui}\n\nESTRUTURA AIDA:\n🎯 ATENÇÃO\n- Headline impactante\n- Estatística ou pergunta provocativa\n- Promessa específica\n\n🔥 INTERESSE\n- Desenvolva o problema\n- Conte uma história relacionável\n- Apresente credibilidade\n\n💎 DESEJO\n- Benefícios transformadores\n- Prova social (depoimentos)\n- Urgência/escassez\n\n⚡ AÇÃO\n- Call-to-action claro\n- Garantia/redução de risco\n- Instruções específicas\n\nCopy completa otimizada para conversão.',
+    how_to_use: 'Substitua {seu_produto_aqui} e {sua_persona_aqui} pelas informações do seu negócio.'
   }
 ];
 
