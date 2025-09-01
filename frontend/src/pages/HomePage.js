@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Send, ArrowRight } from 'lucide-react';
 import { useBackground } from '../contexts/BackgroundContext';
 import Header from '../components/layout/Header';
