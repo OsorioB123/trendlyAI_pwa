@@ -378,9 +378,8 @@ const AllToolsPage = () => {
       {/* Header spacer */}
       <div style={{ height: '80px' }}></div>
 
-      <main className="w-full mx-auto max-w-7xl px-4 pb-12">
-        {/* Título */}
-        <h1 className="text-3xl md:text-4xl font-semibold text-white tracking-tight mb-8 text-center md:text-left animate-entry font-['Geist']">
+      <main className="mx-auto max-w-7xl px-4 pt-8 pb-12">
+        <h1 className="text-3xl text-center md:text-left md:text-4xl font-semibold text-white tracking-tight mb-6 animate-entry font-['Geist']">
           Explore todas as Ferramentas
         </h1>
 
