@@ -383,8 +383,8 @@ const AllToolsPage = () => {
           Explore todas as Ferramentas
         </h1>
 
-        {/* Painel de Controle */}
-        <section className="mb-10 animate-entry" style={{ animationDelay: '150ms' }}>
+        {/* Seção de Controles e Filtros */}
+        <section className="relative z-40 liquid-glass-enhanced rounded-2xl mb-8 p-4 animate-entry" style={{ animationDelay: '150ms' }}>
           <div className="grid grid-cols-1 md:grid-cols-10 gap-3 liquid-glass p-3">
             {/* Barra de Busca */}
             <div className="md:col-span-5 relative">
