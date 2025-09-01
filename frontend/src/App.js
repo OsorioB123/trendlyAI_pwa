@@ -35,6 +35,8 @@ function App() {
             <Route path="/chat" element={<ChatPage />} />
             {/* All Tracks Page */}
             <Route path="/tracks" element={<AllTracksPage />} />
+            {/* Track Detail Page */}
+            <Route path="/track/:id" element={<TrackDetailPage />} />
             {/* All Tools Page */}
             <Route path="/tools" element={<AllToolsPage />} />
             {/* Profile Page */}
