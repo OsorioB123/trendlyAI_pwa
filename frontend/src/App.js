@@ -30,6 +30,12 @@ function App() {
             <Route path="/home" element={<HomePage />} />
             {/* Chat Page */}
             <Route path="/chat" element={<ChatPage />} />
+            {/* All Tracks Page */}
+            <Route path="/tracks" element={<AllTracksPage />} />
+            {/* All Tools Page */}
+            <Route path="/tools" element={<AllToolsPage />} />
+            {/* Profile Page */}
+            <Route path="/profile" element={<ProfilePage />} />
           </Routes>
         </div>
       </Router>
