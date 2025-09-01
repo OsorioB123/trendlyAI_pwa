@@ -9,6 +9,7 @@ import OnboardingPage from './pages/OnboardingPage';
 import HomePage from './pages/HomePage';
 import ChatPage from './pages/ChatPage';
 import AllTracksPage from './pages/AllTracksPage';
+import TrackDetailPage from './pages/TrackDetailPage';
 import AllToolsPage from './pages/AllToolsPage';
 import ProfilePage from './pages/ProfilePage';
 import SubscriptionPage from './pages/SubscriptionPage';
