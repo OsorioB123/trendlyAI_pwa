@@ -11,6 +11,9 @@ import ChatPage from './pages/ChatPage';
 import AllTracksPage from './pages/AllTracksPage';
 import AllToolsPage from './pages/AllToolsPage';
 import ProfilePage from './pages/ProfilePage';
+import SubscriptionPage from './pages/SubscriptionPage';
+import SettingsPage from './pages/SettingsPage';
+import HelpPage from './pages/HelpPage';
 import './App.css';
 
 function App() {
