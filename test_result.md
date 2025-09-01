@@ -307,6 +307,18 @@ frontend:
         agent: "testing"
         comment: "✅ ENHANCED HELP CENTER PAGE FULLY FUNCTIONAL: All requirements verified - Page loads with 'A Salina é sua primeira guia' header section. 'Falar com a Salina' button found and ready for /chat navigation. FAQ tabs working perfectly (4 tabs found) with switching between categories (Primeiros Passos, Assinatura, Ferramentas, Questões Técnicas). FAQ accordion expand/collapse functionality working (3 items found and tested). Chat widget 'Iniciar Conversa com um Especialista' button opens widget successfully with close button and backdrop dismissal working. All animations and visual effects working perfectly."
 
+  - task: "Global Scroll To Top Implementation"
+    implemented: true
+    working: true  
+    file: "/app/frontend/src/components/common/ScrollToTop.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "GLOBAL SCROLL TO TOP IMPLEMENTED: Created ScrollToTop component that automatically scrolls to top of page on every route change. Component uses useLocation hook from React Router to detect pathname changes and triggers window.scrollTo(0, 0) with 'instant' behavior. Integrated into App.js within Router context to work globally across all pages. This ensures that whenever users navigate to any page (forward navigation, back button, direct links), the page always starts from the top position, providing consistent UX. Tested and confirmed working - pages now always load from top regardless of previous scroll position."
+
   - task: "AllTracksPage Z-Index and Layout Fix"
     implemented: true
     working: false  
