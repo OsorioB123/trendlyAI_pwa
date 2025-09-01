@@ -96,6 +96,8 @@ const HomePage = () => {
   const [commandInput, setCommandInput] = useState('');
   const [showIcebreakers, setShowIcebreakers] = useState(false);
   const [isCommandFocused, setIsCommandFocused] = useState(false);
+  const [showToolModal, setShowToolModal] = useState(false);
+  const [selectedTool, setSelectedTool] = useState(null);
 
   const icebreakers = [
     'Me dê ideias para um vídeo',
