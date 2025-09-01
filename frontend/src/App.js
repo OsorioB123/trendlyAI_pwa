@@ -7,6 +7,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import LinkSentPage from './pages/LinkSentPage';
 import OnboardingPage from './pages/OnboardingPage';
 import HomePage from './pages/HomePage';
+import ChatPage from './pages/ChatPage';
 import './App.css';
 
 function App() {
