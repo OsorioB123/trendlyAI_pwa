@@ -161,6 +161,9 @@ const HomePage = () => {
       {/* Background overlay */}
       <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
       
+      {/* Header */}
+      <Header variant={HeaderVariant.PRIMARY} />
+      
       {/* Header spacer */}
       <div style={{ height: '80px' }}></div>
 
