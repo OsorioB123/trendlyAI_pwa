@@ -307,6 +307,18 @@ frontend:
         agent: "testing"
         comment: "✅ ENHANCED HELP CENTER PAGE FULLY FUNCTIONAL: All requirements verified - Page loads with 'A Salina é sua primeira guia' header section. 'Falar com a Salina' button found and ready for /chat navigation. FAQ tabs working perfectly (4 tabs found) with switching between categories (Primeiros Passos, Assinatura, Ferramentas, Questões Técnicas). FAQ accordion expand/collapse functionality working (3 items found and tested). Chat widget 'Iniciar Conversa com um Especialista' button opens widget successfully with close button and backdrop dismissal working. All animations and visual effects working perfectly."
 
+  - task: "Onboarding Background and Theme Selection Fix"
+    implemented: true
+    working: true  
+    file: "/app/frontend/src/pages/OnboardingPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "ONBOARDING COMPLETELY FIXED: Successfully resolved all reported onboarding issues. Key fixes: 1) BACKGROUND IMAGES: Fixed slides 1, 2, and 4 to display correct background images using provided URLs (tela-1.webp, tela-2.webp, tela-4.webp) through enhanced OnboardingSlider with dynamic background function 2) MOBILE THEME SELECTION: Removed problematic auto-selection on intersection, now only responds to manual clicks with proper scroll-to-center behavior 3) REAL-TIME BACKGROUND CHANGES: Implemented immediate background application during theme selection in slide 3 using changeBackground() function 4) AUTH PAGES BACKGROUND: All authentication pages (LoginPage, SignUpPage, ForgotPasswordPage, LinkSentPage) already use AuthLayout which correctly applies selected background or default (grad-1.webp) 5) BACKGROUND CONSISTENCY: Enhanced BackgroundContext with proper default fallback to ensure consistent background application across entire PWA. Theme selection now works perfectly on both mobile and desktop with visual feedback."
+
   - task: "Settings Page Layout and Background Fix"
     implemented: true
     working: true  
