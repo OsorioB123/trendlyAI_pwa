@@ -59,7 +59,7 @@ const ThemeSelector = ({
   return (
     <div className="slide-content-theme">
       <section className="text-center pt-8 pb-4 flex-shrink-0">
-        <h2 className="text-3xl font-semibold tracking-tight animate-entry font-geist">
+        <h2 className="text-3xl font-semibold tracking-tight animate-entry font-geist text-white">
           Defina a energia do seu estúdio.
         </h2>
         <p className="mt-2 text-white/80 animate-entry delay-1">
