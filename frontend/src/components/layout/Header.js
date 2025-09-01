@@ -154,7 +154,7 @@ const Header = ({ variant = HeaderVariant.PRIMARY, onMenuToggle, showMobileSideb
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-30 pt-3 pr-4 pb-3 pl-4 header-fade">
-        <div className="max-w-7xl flex sticky top-0 z-40 mr-auto ml-auto items-center justify-between liquid-glass rounded-full px-5 py-3">
+        <div className="max-w-7xl flex sticky top-0 z-40 mr-auto ml-auto items-center justify-between liquid-glass-header rounded-full px-5 py-3">
           
           {/* Left Section */}
           {renderLeftSection()}
