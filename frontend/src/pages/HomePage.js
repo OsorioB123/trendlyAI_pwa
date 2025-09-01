@@ -132,7 +132,8 @@ const HomePage = () => {
 
   const handleTrackClick = (track) => {
     console.log('Track clicked:', track);
-    // TODO: Navegar para página da trilha
+    // Navegar para página da trilha específica
+    navigate(`/track/${track.id}`);
   };
 
   const handleToolClick = (tool) => {
