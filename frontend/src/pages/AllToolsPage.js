@@ -453,7 +453,7 @@ const AllToolsPage = () => {
                 <ArrowUpDown className="w-4 h-4 text-white/60 transition-transform" />
               </button>
               {showSortDropdown && (
-                <div className="control-panel-dropdown absolute top-full right-0 mt-2 w-max min-w-[200px] z-50 bg-[rgba(30,31,35,0.97)] backdrop-blur-3xl border border-white/18 shadow-[0_16px_48px_rgba(0,0,0,0.5)] rounded-xl p-2">
+                <div className="control-panel-dropdown absolute top-full right-0 mt-2 w-max min-w-[200px] z-50 bg-[rgba(30,31,35,0.98)] backdrop-blur-3xl border border-white/20 shadow-[0_16px_48px_rgba(0,0,0,0.6)] rounded-xl p-2">
                   <button 
                     onClick={() => handleSortChange('relevance')}
                     className={`menu-item w-full text-left p-2.5 flex items-center justify-between text-sm transition-colors rounded-lg hover:bg-white/10 ${
