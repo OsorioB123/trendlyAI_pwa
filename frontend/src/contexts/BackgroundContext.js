@@ -41,10 +41,17 @@ export const BackgroundProvider = ({ children }) => {
     }
   };
 
+  // Função adicional para mudanças diretas (compatibilidade)
+  const setCurrentBackgroundDirect = (backgroundObject) => {
+    setCurrentBackground(backgroundObject);
+    localStorage.setItem('trendlyai-background', backgroundObject.id);
+  };
+
   return (
     <BackgroundContext.Provider value={{
       currentBackground,
       changeBackground,
+      setCurrentBackground: setCurrentBackgroundDirect,
       availableBackgrounds: BACKGROUNDS
     }}>
       {children}
