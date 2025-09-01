@@ -50,10 +50,13 @@ const ProfilePage = () => {
     navigate(`/track/${track.id}`);
   };
 
-  const handleThemeChange = (theme) => {
-    setCurrentBackground(theme);
-    setShowThemeSelector(false);
-    console.log('Theme changed to:', theme.name);
+  const handleThemeChange = (themeId) => {
+    const theme = availableBackgrounds.find(bg => bg.id === themeId);
+    if (theme) {
+      setCurrentBackground(theme);
+      setShowThemeSelector(false);
+      console.log('Theme changed to:', theme.name);
+    }
   };
 
   const stats = {
