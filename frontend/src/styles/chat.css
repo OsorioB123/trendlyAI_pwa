@@ -1,0 +1,248 @@
+/* TrendlyAI Chat Page Styles */
+
+:root {
+  --brand-blue: #0091FF;
+  --brand-blue-rgb: 0, 145, 255;
+}
+
+.chat-page-container {
+  min-height: 100vh;
+  background-color: #121217;
+  font-family: 'Inter', sans-serif;
+  color: white;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+}
+
+/* Layout */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+}
+
+.chat-area {
+  flex-grow: 1;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding-top: 100px;
+  padding-bottom: 160px;
+}
+
+.chat-area-content {
+  /* Content handled by component */
+}
+
+.composer-container {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 20;
+}
+
+/* Hide scrollbars */
+.hide-scrollbar::-webkit-scrollbar { 
+  display: none; 
+}
+.hide-scrollbar { 
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
+}
+
+/* Message Bubbles */
+.user-bubble { 
+  backdrop-filter: blur(12px); 
+  background-color: rgba(255, 255, 255, 0.15); 
+  border: 1px solid rgba(255, 255, 255, 0.25); 
+  color: white; 
+}
+
+.assistant-bubble { 
+  backdrop-filter: blur(12px); 
+  background-color: rgba(255, 255, 255, 0.05); 
+  border: 1px solid rgba(255, 255, 255, 0.15); 
+  color: #fff; 
+}
+
+.message-bubble { 
+  max-width: 85%; 
+  border-radius: 18px; 
+  padding: 12px 16px; 
+  animation: fadeInUpBubble 0.4s ease-out; 
+}
+
+.markdown-content { 
+  color: rgba(255, 255, 255, 0.95); 
+  line-height: 1.6; 
+}
+
+@keyframes fadeInUpBubble { 
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  } 
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  } 
+}
+
+/* Chat Composer */
+.chat-composer-container {
+  background-color: #1E1F22;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.25rem;
+  transition: border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-composer-container.focused { 
+  border-color: rgba(255, 255, 255, 0.3); 
+}
+
+.chat-composer-textarea {
+  background: transparent;
+  border: none;
+  color: white;
+  resize: none;
+  outline: none;
+  min-height: 52px;
+  max-height: 200px;
+  line-height: 1.5;
+  font-size: 1rem;
+}
+
+.chat-composer-textarea::placeholder { 
+  color: rgba(255, 255, 255, 0.5); 
+}
+
+.chat-composer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+}
+
+.composer-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.composer-btn:hover { 
+  background-color: rgba(255, 255, 255, 0.12); 
+  color: white; 
+}
+
+.composer-btn.active {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.search-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 36px;
+  padding: 0 0.5rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid transparent;
+}
+
+.search-toggle-btn.active {
+  background-color: rgba(var(--brand-blue-rgb), 0.15);
+  border-color: var(--brand-blue);
+  color: var(--brand-blue);
+}
+
+.search-toggle-btn:not(.active) {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.search-toggle-btn:not(.active):hover {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.search-text { 
+  transition: all 0.3s ease; 
+  white-space: nowrap; 
+  overflow: hidden; 
+}
+
+/* AI Thinking Animation */
+.ai-thinking-container {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUpBubble 0.4s ease-out forwards;
+}
+
+.ai-thinking-text {
+  font-size: 1.125rem;
+  font-weight: 600;
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0.9) 25%,
+    rgba(255, 255, 255, 0.9) 75%,
+    rgba(255, 255, 255, 0.4) 100%);
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shimmer 2.5s linear infinite;
+  white-space: nowrap;
+  min-width: max-content;
+  display: flex;
+  justify-content: center;
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease-out;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+.ai-thinking-text.fade-out {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+/* Sidebar Styles */
+.conversation-item { 
+  transition: all 0.3s ease; 
+  border-radius: 12px; 
+}
+
+.conversation-item.active { 
+  background-color: rgba(255, 255, 255, 0.15); 
+}
+
+.conversation-item:hover { 
+  background-color: rgba(255, 255, 255, 0.1); 
+}
+
+/* Mobile adjustments */
+@media (max-width: 767px) { 
+  .message-bubble { 
+    max-width: 95%; 
+  } 
+}
