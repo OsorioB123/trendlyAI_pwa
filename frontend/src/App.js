@@ -39,6 +39,12 @@ function App() {
             <Route path="/tools" element={<AllToolsPage />} />
             {/* Profile Page */}
             <Route path="/profile" element={<ProfilePage />} />
+            {/* Subscription Management */}
+            <Route path="/subscription" element={<SubscriptionPage />} />
+            {/* Account Settings */}
+            <Route path="/settings" element={<SettingsPage />} />
+            {/* Help Center */}
+            <Route path="/help" element={<HelpPage />} />
           </Routes>
         </div>
       </Router>
