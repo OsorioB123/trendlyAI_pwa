@@ -611,6 +611,14 @@ const AllToolsPage = () => {
       </div>
 
       <style jsx>{`
+        .liquid-glass-enhanced {
+          backdrop-filter: blur(20px);
+          background-color: rgba(255, 255, 255, 0.12);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+          border-radius: 16px;
+        }
+
         .liquid-glass {
           backdrop-filter: blur(20px);
           background-color: rgba(255, 255, 255, 0.08);
