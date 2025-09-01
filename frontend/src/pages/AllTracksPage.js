@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, SlidersHorizontal, ChevronDown, X } from 'lucide-react';
+import { Search, ChevronDown, SlidersHorizontal, X, Check } from 'lucide-react';
 import { useBackground } from '../contexts/BackgroundContext';
 import Header from '../components/layout/Header';
 import { HeaderVariant } from '../types/header';
@@ -21,6 +21,7 @@ const ALL_TRACKS = [
 const AllTracksPage = () => {
   const navigate = useNavigate();
   const { currentBackground } = useBackground();
+  
   const [state, setState] = useState({
     page: 1,
     loading: false,
@@ -33,8 +34,11 @@ const AllTracksPage = () => {
       sort: 'top'
     }
   });
+  
+  const [showSelectDropdown, setShowSelectDropdown] = useState(false);
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
-  const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [displayedTracks, setDisplayedTracks] = useState([]);
+  const [isLoadMoreVisible, setIsLoadMoreVisible] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState(null);
 
   const unsplashUrl = (id, w = 800, q = 80) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=${q}`;
@@ -64,18 +68,17 @@ const AllTracksPage = () => {
     return filtered;
   };
 
-  const [displayedTracks, setDisplayedTracks] = useState([]);
-  const [isLoadMoreVisible, setIsLoadMoreVisible] = useState(false);
+  const fetchAndRender = async (isLoadMore = false) => {
+    if (state.loading) return;
+    setState(prev => ({ ...prev, loading: true }));
 
-  useEffect(() => {
-    renderTracks();
-  }, [state.filters]);
-
-  const renderTracks = async (isLoadMore = false) => {
     if (!isLoadMore) {
       setState(prev => ({ ...prev, page: 1 }));
       setDisplayedTracks([]);
     }
+
+    // Simulate API delay
+    await new Promise(res => setTimeout(res, 300));
 
     const filtered = filterAndSortTracks();
     setState(prev => ({ ...prev, total: filtered.length }));
@@ -94,7 +97,13 @@ const AllTracksPage = () => {
 
     const displayedCount = Math.min(currentPage * PAGE_SIZE, filtered.length);
     setIsLoadMoreVisible(displayedCount < filtered.length);
+    
+    setState(prev => ({ ...prev, loading: false }));
   };
+
+  useEffect(() => {
+    fetchAndRender();
+  }, [state.filters]);
 
   const handleSearchChange = (value) => {
     if (searchTimeout) clearTimeout(searchTimeout);
@@ -114,12 +123,12 @@ const AllTracksPage = () => {
       ...prev,
       filters: { ...prev.filters, sort: sortValue }
     }));
-    setShowSortDropdown(false);
+    setShowSelectDropdown(false);
   };
 
-  const handleCategoryFilter = (category) => {
+  const handleCategoryFilter = (category, isActive) => {
     setState(prev => {
-      const categories = prev.filters.categories.includes(category)
+      const categories = isActive
         ? prev.filters.categories.filter(c => c !== category)
         : [...prev.filters.categories, category];
       
@@ -155,12 +164,11 @@ const AllTracksPage = () => {
     document.querySelectorAll('#filters-drawer input[type="checkbox"]').forEach(cb => {
       cb.checked = false;
     });
-    setShowFiltersDrawer(false);
   };
 
   const loadMore = () => {
     setState(prev => ({ ...prev, page: prev.page + 1 }));
-    renderTracks(true);
+    fetchAndRender(true);
   };
 
   const TrackCard = ({ track }) => {
@@ -171,9 +179,19 @@ const AllTracksPage = () => {
 
     return (
       <div className="animate-entry">
-        <a href="#" onClick={(e) => { e.preventDefault(); navigate(`/track/${track.id}`); }} 
-           className="interactive-card rounded-2xl overflow-hidden shadow-[0px_8px_24px_rgba(0,0,0,0.28)] relative h-64 card-glow block">
-          <img src={unsplashUrl(track.image)} alt={track.title} className="absolute w-full h-full object-cover" />
+        <a 
+          href="#" 
+          onClick={(e) => { 
+            e.preventDefault(); 
+            navigate(`/track/${track.id}`); 
+          }} 
+          className="interactive-card rounded-2xl overflow-hidden shadow-[0px_8px_24px_rgba(0,0,0,0.28)] relative h-64 card-glow block"
+        >
+          <img 
+            src={unsplashUrl(track.image)} 
+            alt={track.title} 
+            className="absolute w-full h-full object-cover" 
+          />
           <div className="absolute top-0 left-0 p-5 flex items-start gap-2 flex-wrap">
             {categoryTags}
             {levelTag}
@@ -220,6 +238,7 @@ const AllTracksPage = () => {
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50 pointer-events-none z-10" />
               <input 
+                id="search-input" 
                 type="text" 
                 placeholder="Busque por trilhas, tópicos..." 
                 className="w-full bg-white/5 border border-white/10 rounded-lg py-2.5 pl-12 pr-4 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
@@ -229,29 +248,33 @@ const AllTracksPage = () => {
             <div className="relative md:w-52">
               <button 
                 type="button" 
-                onClick={() => setShowSortDropdown(!showSortDropdown)}
+                onClick={() => setShowSelectDropdown(!showSelectDropdown)}
                 className="w-full flex items-center justify-between bg-white/5 border border-white/10 rounded-lg py-2.5 pl-4 pr-3 text-white focus:outline-none focus:ring-2 focus:ring-white/50"
               >
                 <span className="truncate">
                   {state.filters.sort === 'recent' ? 'Mais recentes' : 'Mais relevantes'}
                 </span>
-                <ChevronDown className={`w-5 h-5 text-white/50 transition-transform ${showSortDropdown ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-5 h-5 text-white/50 transition-transform ${showSelectDropdown ? 'rotate-180' : ''}`} />
               </button>
-              {showSortDropdown && (
-                <div className="absolute top-full right-0 mt-2 w-full rounded-lg z-20 p-1 custom-select-panel bg-[rgba(30,30,35,0.9)] backdrop-blur-lg border border-white/16 shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
+              {showSelectDropdown && (
+                <div className="absolute top-full right-0 mt-2 w-full rounded-lg z-20 p-1 custom-select-panel">
                   <button 
                     onClick={() => handleSortChange('top')}
-                    className={`w-full text-left p-2 rounded-md flex items-center justify-between text-sm custom-select-option ${state.filters.sort === 'top' ? 'selected text-white' : 'text-white/80 hover:text-white'}`}
+                    className={`w-full text-left p-2 rounded-md flex items-center justify-between text-sm custom-select-option ${
+                      state.filters.sort === 'top' ? 'selected' : ''
+                    }`}
                   >
                     <span>Mais relevantes</span>
-                    {state.filters.sort === 'top' && <span>✓</span>}
+                    {state.filters.sort === 'top' && <Check className="w-4 h-4" />}
                   </button>
                   <button 
                     onClick={() => handleSortChange('recent')}
-                    className={`w-full text-left p-2 rounded-md flex items-center justify-between text-sm custom-select-option ${state.filters.sort === 'recent' ? 'selected text-white' : 'text-white/80 hover:text-white'}`}
+                    className={`w-full text-left p-2 rounded-md flex items-center justify-between text-sm custom-select-option ${
+                      state.filters.sort === 'recent' ? 'selected' : ''
+                    }`}
                   >
                     <span>Mais recentes</span>
-                    {state.filters.sort === 'recent' && <span>✓</span>}
+                    {state.filters.sort === 'recent' && <Check className="w-4 h-4" />}
                   </button>
                 </div>
               )}
@@ -259,21 +282,24 @@ const AllTracksPage = () => {
           </div>
           <div className="flex items-center gap-2">
             <div className="flex-1 overflow-x-auto hide-scrollbar whitespace-nowrap pb-2 -mb-2">
-              {['Marketing', 'Copywriting', 'Vídeo', 'Social Media'].map(category => (
-                <button 
-                  key={category}
-                  onClick={() => handleCategoryFilter(category)}
-                  className={`filter-chip inline-block px-4 py-1.5 rounded-full bg-white/5 text-sm text-white/80 hover:text-white mr-2 transition-all hover:scale-105 ${
-                    state.filters.categories.includes(category) ? 'active bg-white/15' : ''
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
+              {['Marketing', 'Copywriting', 'Vídeo', 'Social Media'].map(category => {
+                const isActive = state.filters.categories.includes(category);
+                return (
+                  <button 
+                    key={category}
+                    onClick={() => handleCategoryFilter(category, isActive)}
+                    className={`filter-chip inline-block px-4 py-1.5 rounded-full bg-white/5 text-sm text-white/80 hover:text-white mr-2 transition-all hover:scale-105 ${
+                      isActive ? 'active' : ''
+                    }`}
+                  >
+                    {category}
+                  </button>
+                );
+              })}
             </div>
             <button 
               onClick={() => setShowFiltersDrawer(true)}
-              className="flex-shrink-0 px-4 py-1.5 rounded-full liquid-glass-pill text-sm flex items-center gap-2 hover:bg-white/15 hover:scale-105 transition-all"
+              className="flex-shrink-0 px-4 py-1.5 rounded-full liquid-glass-pill text-sm flex items-center gap-2"
             >
               <SlidersHorizontal className="w-4 h-4" />
               <span>Filtros</span>
@@ -281,7 +307,8 @@ const AllTracksPage = () => {
           </div>
         </section>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10 animate-entry delay-2">
+        {/* Tracks Grid */}
+        <div id="tracks-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10 animate-entry delay-2">
           {displayedTracks.length === 0 ? (
             <div className="col-span-full text-center py-12">
               <div className="liquid-glass rounded-xl p-8 max-w-md mx-auto">
@@ -295,12 +322,14 @@ const AllTracksPage = () => {
           )}
         </div>
 
+        {/* Load More */}
         <div className="mt-10 flex flex-col items-center">
-          <p className="text-sm text-white/70 mb-4">
+          <p id="display-counter" className="text-sm text-white/70 mb-4">
             Exibindo {Math.min(state.page * 9, state.total)} de {state.total} trilhas
           </p>
           {isLoadMoreVisible && (
             <button 
+              id="load-more"
               onClick={loadMore}
               className="liquid-glass-pill px-6 py-3 text-sm font-medium hover:bg-white/15 hover:scale-105 transition-all"
             >
@@ -315,73 +344,91 @@ const AllTracksPage = () => {
       </footer>
 
       {/* Filters Drawer */}
-      {showFiltersDrawer && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-white/8 backdrop-blur-lg border border-white/12 rounded-2xl w-full max-w-md mx-4 max-h-[85vh] flex flex-col">
-            <div className="p-4 border-b border-white/10 flex items-center justify-between flex-shrink-0">
-              <h2 className="text-lg font-semibold tracking-tight text-white font-['Geist']">Filtros Avançados</h2>
-              <button 
-                onClick={() => setShowFiltersDrawer(false)}
-                className="w-9 h-9 rounded-full hover:bg-white/10 flex items-center justify-center liquid-glass-pill active:scale-95"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-5 space-y-6">
-              <div>
-                <h3 className="text-sm font-medium uppercase tracking-wider text-white/60 mb-3">NÍVEL</h3>
-                <div className="flex flex-col space-y-2">
-                  {['Iniciante', 'Intermediário', 'Avançado'].map(level => (
-                    <label key={level} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        data-filter-group="levels" 
-                        value={level} 
-                        className="h-4 w-4 rounded bg-white/10 border-white/20 text-white focus:ring-white focus:ring-offset-0" 
-                      />
-                      <span>{level}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium uppercase tracking-wider text-white/60 mb-3">STATUS</h3>
-                <div className="flex flex-col space-y-2">
-                  {[
-                    { value: 'nao_iniciado', label: 'Não iniciado' },
-                    { value: 'em_andamento', label: 'Em andamento' },
-                    { value: 'concluido', label: 'Concluído' }
-                  ].map(status => (
-                    <label key={status.value} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        data-filter-group="status" 
-                        value={status.value} 
-                        className="h-4 w-4 rounded bg-white/10 border-white/20 text-white focus:ring-white focus:ring-offset-0" 
-                      />
-                      <span>{status.label}</span>
-                    </label>
-                  ))}
-                </div>
+      <div 
+        id="filters-drawer-container"
+        className={`fixed inset-0 z-[60] transition-opacity duration-300 ${
+          showFiltersDrawer ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        <div 
+          id="drawer-backdrop"
+          className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
+            showFiltersDrawer ? 'opacity-100' : 'opacity-0'
+          }`}
+          onClick={() => setShowFiltersDrawer(false)}
+        />
+        <div 
+          id="filters-drawer"
+          className={`absolute bottom-0 left-0 right-0 md:left-auto md:right-4 md:top-24 md:w-[380px] md:h-auto liquid-glass flex flex-col max-h-[85vh] rounded-t-2xl md:rounded-2xl transition-transform duration-400 ${
+            showFiltersDrawer ? 'translate-y-0 scale-100 md:opacity-100' : 'translate-y-full md:translate-y-0 md:scale-95 md:opacity-0'
+          }`}
+        >
+          <div className="p-4 border-b border-white/10 flex items-center justify-between flex-shrink-0">
+            <h2 className="text-lg font-semibold tracking-tight text-white font-['Geist']">
+              Filtros Avançados
+            </h2>
+            <button 
+              onClick={() => setShowFiltersDrawer(false)}
+              className="w-9 h-9 rounded-full hover:bg-white/10 flex items-center justify-center liquid-glass-pill active:scale-95"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-5 space-y-6">
+            <div>
+              <h3 className="text-sm font-medium uppercase tracking-wider text-white/60 mb-3">NÍVEL</h3>
+              <div className="flex flex-col space-y-2">
+                {['Iniciante', 'Intermediário', 'Avançado'].map(level => (
+                  <label key={level} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      data-filter-group="levels" 
+                      value={level} 
+                      className="h-4 w-4 rounded bg-white/10 border-white/20 text-white focus:ring-white focus:ring-offset-0" 
+                    />
+                    <span>{level}</span>
+                  </label>
+                ))}
               </div>
             </div>
-            <div className="p-4 border-t border-white/10 flex items-center gap-3 justify-end flex-shrink-0">
-              <button 
-                onClick={clearFilters}
-                className="liquid-glass-pill px-5 py-2.5 text-sm font-medium hover:bg-white/15 transition-all"
-              >
-                Limpar
-              </button>
-              <button 
-                onClick={applyAdvancedFilters}
-                className="liquid-glass-pill px-5 py-2.5 text-sm font-medium text-black bg-white hover:bg-gray-100 transition-all"
-              >
-                Aplicar
-              </button>
+            <div>
+              <h3 className="text-sm font-medium uppercase tracking-wider text-white/60 mb-3">STATUS</h3>
+              <div className="flex flex-col space-y-2">
+                {[
+                  { value: 'nao_iniciado', label: 'Não iniciado' },
+                  { value: 'em_andamento', label: 'Em andamento' },
+                  { value: 'concluido', label: 'Concluído' }
+                ].map(status => (
+                  <label key={status.value} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      data-filter-group="status" 
+                      value={status.value} 
+                      className="h-4 w-4 rounded bg-white/10 border-white/20 text-white focus:ring-white focus:ring-offset-0" 
+                    />
+                    <span>{status.label}</span>
+                  </label>
+                ))}
+              </div>
             </div>
           </div>
+          <div className="p-4 border-t border-white/10 flex items-center gap-3 justify-end flex-shrink-0">
+            <button 
+              onClick={clearFilters}
+              className="liquid-glass-pill px-5 py-2.5 text-sm font-medium"
+            >
+              Limpar
+            </button>
+            <button 
+              onClick={applyAdvancedFilters}
+              className="liquid-glass-pill px-5 py-2.5 text-sm font-medium text-black"
+              style={{ background: 'white' }}
+            >
+              Aplicar
+            </button>
+          </div>
         </div>
-      )}
+      </div>
 
       <style jsx>{`
         .liquid-glass {
@@ -399,6 +446,15 @@ const AllTracksPage = () => {
           border-radius: 9999px;
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
           cursor: pointer;
+        }
+
+        .liquid-glass-pill:hover {
+          background-color: rgba(255, 255, 255, 0.15);
+          transform: scale(1.05);
+        }
+
+        .liquid-glass-pill:active {
+          transform: scale(0.97);
         }
 
         .liquid-glass-tag {
@@ -516,6 +572,10 @@ const AllTracksPage = () => {
           pointer-events: none;
         }
 
+        .filter-chip:hover {
+          transform: scale(1.05);
+        }
+
         .filter-chip:hover::before {
           opacity: 0.7;
         }
@@ -533,6 +593,21 @@ const AllTracksPage = () => {
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
+        }
+
+        .custom-select-panel {
+          backdrop-filter: blur(20px);
+          background-color: rgba(30, 30, 35, 0.9);
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        .custom-select-option:hover {
+          background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .custom-select-option.selected {
+          color: white;
         }
       `}</style>
     </div>
