@@ -41,7 +41,7 @@ const ACHIEVEMENTS = [
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const { currentBackground, setCurrentBackground } = useBackground();
+  const { currentBackground, setCurrentBackground, availableBackgrounds } = useBackground();
   const [activeTab, setActiveTab] = useState('overview');
   const [showThemeSelector, setShowThemeSelector] = useState(false);
 
