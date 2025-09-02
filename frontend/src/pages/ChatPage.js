@@ -597,49 +597,53 @@ const ChatPage = () => {
           </div>
         </header>
 
-        {/* Messages Area */}
+        {/* Chat Area */}
         <main 
-          ref={messagesRef}
-          className={`flex-1 overflow-y-auto pt-24 pb-32 transition-all duration-300 ${
-            !isSidebarOpen ? '' : 'md:ml-80'
-          }`}
+          ref={chatAreaRef}
+          className="flex-grow overflow-y-auto hide-scrollbar scroll-smooth"
+          style={{ paddingTop: '100px', paddingBottom: '160px' }}
         >
-          <div className="w-full max-w-4xl mx-auto p-4 flex flex-col gap-6">
-            {messages.map((message) => (
+          <div 
+            ref={chatContentRef}
+            className="w-full max-w-4xl mx-auto p-4 flex flex-col gap-6"
+          >
+            {activeConversation?.messages.map((message, index) => (
               <div
-                key={message.id}
-                className={`flex items-start gap-4 animate-fade-in ${
-                  message.type === 'user' ? 'justify-end' : ''
+                key={index}
+                className={`flex items-start gap-4 w-full ${
+                  message.role === 'user' ? 'justify-end' : ''
                 }`}
+                style={{ animation: 'fadeInUpBubble 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}
               >
-                {message.type === 'assistant' && (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-emerald-400 flex items-center justify-center font-semibold text-sm shrink-0" />
-                )}
-                
-                <div className={`message-bubble max-w-[85%] rounded-2xl p-4 ${
-                  message.type === 'user' 
-                    ? 'user-bubble bg-white/15 border border-white/25' 
-                    : 'assistant-bubble bg-white/5 border border-white/15'
-                }`}>
-                  <p className="text-white/95 leading-relaxed">{message.content}</p>
-                </div>
-                
-                {message.type === 'user' && (
-                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-black font-semibold text-sm shrink-0">
-                    U
+                {message.role === 'assistant' && (
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-emerald-400 flex items-center justify-center font-semibold text-sm shrink-0">
+                    AI
                   </div>
                 )}
+                <div 
+                  className={`message-bubble max-w-[85%] border-radius-18 p-3 ${
+                    message.role === 'user' 
+                      ? 'user-bubble bg-white/12 border border-white/20' 
+                      : 'assistant-bubble bg-white/5 border border-white/15'
+                  }`}
+                  style={{ borderRadius: '18px', padding: '12px 16px' }}
+                >
+                  <div className="markdown-content text-white/95 leading-relaxed">
+                    <p>{message.content}</p>
+                  </div>
+                </div>
               </div>
             ))}
             
+            {/* AI Thinking Indicator */}
             {isLoading && (
-              <div className="flex items-start gap-4 animate-fade-in">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-emerald-400 flex items-center justify-center font-semibold text-sm shrink-0" />
-                <div className="assistant-bubble bg-white/5 border border-white/15 rounded-2xl p-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse" />
-                    <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse delay-100" />
-                    <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse delay-200" />
+              <div className="flex items-start gap-4 ai-thinking-container">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-emerald-400 flex items-center justify-center font-semibold text-sm shrink-0">
+                  AI
+                </div>
+                <div className="assistant-bubble message-bubble bg-white/5 border border-white/15" style={{ borderRadius: '18px', padding: '12px 16px' }}>
+                  <div className="ai-thinking-text text-lg font-semibold bg-gradient-to-r from-white/40 via-white/90 to-white/40 bg-clip-text text-transparent animate-pulse">
+                    Pensando...
                   </div>
                 </div>
               </div>
