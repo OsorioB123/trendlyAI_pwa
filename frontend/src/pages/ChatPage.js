@@ -296,9 +296,9 @@ const ChatPage = () => {
         onClick={() => setIsMobileSidebarOpen(false)}
       />
 
-      {/* Conversations Sidebar - Always visible on desktop */}
+      {/* Conversations Sidebar - Always visible on desktop, fixed position */}
       <aside 
-        className={`fixed top-0 left-0 w-[85%] sm:w-80 h-full z-50 transform transition-transform duration-300 md:relative md:transform-none ${
+        className={`fixed top-0 left-0 w-[85%] sm:w-80 h-full z-50 transform transition-transform duration-300 ${
           isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } md:translate-x-0`}
       >
