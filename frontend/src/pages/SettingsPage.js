@@ -294,10 +294,7 @@ const SettingsPage = () => {
     setDeleteForm({ confirmation: '' });
   };
 
-  const handleNotificationToggle = (type) => {
-    setNotifications(prev => ({ ...prev, [type]: !prev[type] }));
-    showToastMessage('Configuração atualizada.');
-  };
+
 
   const isEmailFormValid = () => {
     return emailForm.currentPassword.length > 0 && 
