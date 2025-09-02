@@ -61,6 +61,53 @@ const SettingsPage = () => {
   });
   
   const fileInputRef = useRef(null);
+
+  // Load profile data when component mounts or profile changes
+  useEffect(() => {
+    if (profile) {
+      const profileFormData = {
+        display_name: profile.display_name || '',
+        bio: profile.bio || '',
+        email: profile.email || user?.email || ''
+      };
+      setFormData(profileFormData);
+      setOriginalData(profileFormData);
+      
+      // Load notification preferences from profile
+      if (profile.preferences?.notifications) {
+        setNotifications(prev => ({ ...prev, ...profile.preferences.notifications }));
+      }
+    }
+  }, [profile, user]);
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/login');
+    }
+  }, [user, authLoading, navigate]);
+
+  // Show loading state
+  if (authLoading || !user || !profile) {
+    return (
+      <div 
+        className="min-h-screen flex items-center justify-center"
+        style={{
+          backgroundImage: `url("${currentBackground.value}?w=800&q=80")`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
+        <div className="text-white text-center">
+          <Loader className="w-8 h-8 animate-spin mx-auto mb-4" />
+          <p>Carregando configurações...</p>
+        </div>
+      </div>
+    );
+  }
   const indicatorRef = useRef(null);
 
   const themes = [
