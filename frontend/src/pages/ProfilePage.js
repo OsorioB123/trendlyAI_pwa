@@ -344,6 +344,65 @@ const ProfilePage = () => {
                   Streak: 5 Dias
                 </div>
               </div>
+              
+              {/* Editable Bio */}
+              <div className="mt-6">
+                {editingField === 'bio' ? (
+                  <div className="flex flex-col gap-2">
+                    <textarea
+                      value={formData.bio}
+                      onChange={(e) => handleInputChange('bio', e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && e.ctrlKey) {
+                          handleSaveField('bio');
+                        } else if (e.key === 'Escape') {
+                          handleCancelEdit('bio');
+                        }
+                      }}
+                      placeholder="Conte um pouco sobre você..."
+                      className="w-full p-3 text-white/80 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-white/40 resize-none"
+                      rows="3"
+                      disabled={saving}
+                      autoFocus
+                    />
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleSaveField('bio')}
+                        disabled={saving}
+                        className="px-3 py-1 text-green-400 hover:text-green-300 disabled:opacity-50 text-sm flex items-center gap-1"
+                      >
+                        {saving ? <Loader className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+                        Salvar
+                      </button>
+                      <button
+                        onClick={() => handleCancelEdit('bio')}
+                        disabled={saving}
+                        className="px-3 py-1 text-red-400 hover:text-red-300 disabled:opacity-50 text-sm flex items-center gap-1"
+                      >
+                        <X className="w-3 h-3" />
+                        Cancelar  
+                      </button>
+                      <span className="text-xs text-white/40 ml-auto">
+                        Ctrl + Enter para salvar
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="group">
+                    <div className="flex items-start gap-2">
+                      <p className="text-white/70 leading-relaxed flex-1">
+                        {formData.bio || 'Adicione uma biografia para contar mais sobre você...'}
+                      </p>
+                      <button
+                        onClick={() => handleFieldEdit('bio')}
+                        className="p-1 text-white/40 hover:text-white/80 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </section>
 
