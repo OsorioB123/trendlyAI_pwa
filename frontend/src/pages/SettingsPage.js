@@ -374,7 +374,7 @@ const SettingsPage = () => {
                     <ProfileField
                       key={field}
                       field={field}
-                      value={profileData[field]}
+                      value={formData[field]}
                       isEditing={currentEditingField === field}
                       onStartEdit={() => startEditing(field)}
                       onSave={(value) => saveField(field, value)}
