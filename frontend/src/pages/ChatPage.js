@@ -80,33 +80,102 @@ const ChatPage = () => {
     }
   }, [inputValue]);
 
-  const createThinkingMessage = () => {
-    return {
+  const startNewConversationWithMessage = (message) => {
+    const newConversation = {
       id: Date.now(),
-      type: 'thinking',
-      content: thinkingTexts[0],
-      timestamp: new Date()
+      title: message.substring(0, 30) + (message.length > 30 ? '...' : ''),
+      timestamp: 'Agora',
+      isActive: true
     };
+    
+    // Update conversations
+    setConversations(prev => [
+      newConversation,
+      ...prev.map(conv => ({ ...conv, isActive: false }))
+    ]);
+    
+    setActiveConversationId(newConversation.id);
+    
+    // Set initial messages
+    setMessages([
+      {
+        id: 1,
+        type: 'assistant',
+        content: 'Olá! 👋 Sou seu assistente TrendlyAI. Como posso impulsionar suas ideias hoje?',
+        timestamp: new Date()
+      },
+      {
+        id: 2,
+        type: 'user',
+        content: message,
+        timestamp: new Date()
+      }
+    ]);
+    
+    // Simulate AI response
+    setTimeout(() => {
+      setMessages(prev => [...prev, {
+        id: 3,
+        type: 'assistant',
+        content: 'Ótima pergunta! Vou te ajudar com isso. Deixe-me pensar nas melhores estratégias para o seu caso...',
+        timestamp: new Date()
+      }]);
+    }, 1000);
   };
 
-  const simulateAIResponse = (userMessage) => {
-    // Simulated AI response based on user input
-    let aiResponse = "Entendi sua mensagem! Como posso ajudar você com isso? Posso fornecer ideias criativas, sugestões de conteúdo ou qualquer outra coisa que precise.";
-
-    if (userMessage.toLowerCase().includes('café') || userMessage.toLowerCase().includes('reels')) {
-      aiResponse = "Ótima ideia para Reels de café! ☕ Aqui estão algumas sugestões criativas: 1) Processo de preparo em time-lapse, 2) Comparação de métodos de preparo, 3) Dicas de latte art para iniciantes, 4) Curiosidades sobre grãos de café. Qual dessas direções te interessa mais?";
-    } else if (userMessage.toLowerCase().includes('marketing') || userMessage.toLowerCase().includes('estratégia')) {
-      aiResponse = "Perfeito! Vamos criar uma estratégia de marketing sólida. Primeiro, preciso entender melhor seu público-alvo e objetivos. Você está focando em que nicho específico? Isso me ajudará a sugerir as melhores táticas.";
-    } else if (userMessage.toLowerCase().includes('roteiro') || userMessage.toLowerCase().includes('vídeo')) {
-      aiResponse = "Excelente! Vamos criar um roteiro envolvente. Para começar, qual é o tema do seu vídeo e qual a duração desejada? Com essas informações, posso estruturar um roteiro com gancho, desenvolvimento e call-to-action otimizados.";
-    }
-
-    return {
-      id: Date.now() + 1,
-      type: 'assistant',
-      content: aiResponse,
-      timestamp: new Date()
+  const startNewConversation = () => {
+    const newConversation = {
+      id: Date.now(),
+      title: 'Nova Conversa',
+      timestamp: 'Agora',
+      isActive: true
     };
+    
+    setConversations(prev => [
+      newConversation,
+      ...prev.map(conv => ({ ...conv, isActive: false }))
+    ]);
+    
+    setActiveConversationId(newConversation.id);
+    setMessages([
+      {
+        id: 1,
+        type: 'assistant',
+        content: 'Olá! 👋 Sou seu assistente TrendlyAI. Como posso impulsionar suas ideias hoje?',
+        timestamp: new Date()
+      }
+    ]);
+    
+    // Close mobile sidebar
+    setIsMobileSidebarOpen(false);
+  };
+
+  const selectConversation = (conversationId) => {
+    setConversations(prev => prev.map(conv => ({
+      ...conv,
+      isActive: conv.id === conversationId
+    })));
+    setActiveConversationId(conversationId);
+    setIsMobileSidebarOpen(false);
+  };
+
+  const editConversationTitle = (conversationId, newTitle) => {
+    setConversations(prev => prev.map(conv => 
+      conv.id === conversationId ? { ...conv, title: newTitle } : conv
+    ));
+    setEditingConversationId(null);
+  };
+
+  const deleteConversation = (conversationId) => {
+    setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+    if (activeConversationId === conversationId && conversations.length > 1) {
+      // Switch to first remaining conversation
+      const remaining = conversations.filter(conv => conv.id !== conversationId);
+      if (remaining.length > 0) {
+        selectConversation(remaining[0].id);
+      }
+    }
+    setConversationMenuId(null);
   };
 
   const sendMessage = async () => {
