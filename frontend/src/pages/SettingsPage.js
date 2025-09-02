@@ -77,10 +77,36 @@ const SettingsPage = () => {
     { id: 'notifications', label: 'Notificações', icon: Bell }
   ];
 
-  const showToastMessage = (message) => {
+  // Initialize tab indicator position
+  useEffect(() => {
+    updateTabIndicator(activeTab);
+  }, [activeTab]);
+
+  const showToastMessage = (message, type = 'success') => {
     setToastMessage(message);
+    setToastType(type);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 2000);
+  };
+
+  const updateTabIndicator = (tabId) => {
+    const activeTabElement = document.querySelector(`[data-tab="${tabId}"]`);
+    const indicator = indicatorRef.current;
+    
+    if (activeTabElement && indicator) {
+      const tabRect = activeTabElement.getBoundingClientRect();
+      const containerRect = activeTabElement.parentElement.getBoundingClientRect();
+      const position = tabRect.left - containerRect.left;
+      const width = tabRect.width;
+      
+      indicator.style.transform = `translateX(${position}px)`;
+      indicator.style.width = `${width}px`;
+    }
+  };
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    updateTabIndicator(tabId);
   };
 
   const handleThemeChange = (themeId) => {
