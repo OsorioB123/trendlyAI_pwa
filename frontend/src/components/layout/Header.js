@@ -12,6 +12,7 @@ import {
   X
 } from 'lucide-react';
 import { HeaderVariant, User } from '../../types/header';
+import { useAuth } from '../../contexts/AuthContext';
 import PaywallModal from '../modals/PaywallModal';
 import '../styles/header.css';
 
