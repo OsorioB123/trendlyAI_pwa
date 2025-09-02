@@ -345,7 +345,7 @@ const SettingsPage = () => {
               <div className="grid grid-cols-1 gap-y-10">
                 {/* Avatar Section */}
                 <div className="flex items-center gap-6">
-                  <label className="group relative flex-shrink-0 cursor-pointer">
+                  <label className="group relative flex-shrink-0 cursor-pointer" onClick={handleAvatarClick}>
                     <input 
                       ref={fileInputRef}
                       type="file" 
