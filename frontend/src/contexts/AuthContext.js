@@ -85,6 +85,7 @@ export const AuthProvider = ({ children }) => {
 
   const loadUserProfile = async (userId) => {
     try {
+      console.log('Loading user profile for:', userId)
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -95,15 +96,28 @@ export const AuthProvider = ({ children }) => {
         if (error.code === 'PGRST116') {
           // Profile doesn't exist, this is handled by the trigger
           console.log('Profile not found, will be created by trigger')
+          // Set a default profile while waiting for trigger to create it
+          setProfile({
+            id: userId,
+            display_name: 'Usuário',
+            level: 'Iniciante',
+            credits: 0,
+            streak_days: 0,
+            total_tracks: 0,
+            completed_modules: 0
+          })
         } else {
           console.error('Error loading profile:', error)
+          throw error // Re-throw to be caught by timeout mechanism
         }
         return
       }
 
+      console.log('Profile loaded successfully:', data)
       setProfile(data)
     } catch (error) {
       console.error('Error in loadUserProfile:', error)
+      throw error // Re-throw to be caught by timeout mechanism
     }
   }
 
