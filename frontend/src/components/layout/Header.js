@@ -19,10 +19,12 @@ import '../styles/header.css';
 const Header = ({ variant = HeaderVariant.PRIMARY, onMenuToggle, showMobileSidebar = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { signOut, user, profile } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showCreditsTooltip, setShowCreditsTooltip] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   
   const notificationsRef = useRef(null);
   const profileRef = useRef(null);
