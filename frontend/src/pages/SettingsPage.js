@@ -352,26 +352,21 @@ const SettingsPage = () => {
 
           {/* Tabs */}
           <div className="w-full overflow-x-auto mb-10 opacity-0 animate-fade-in" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
-            <div className="relative inline-flex p-1 bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-              <div 
-                className="absolute top-1 h-10 bg-white/10 border border-white/10 rounded-lg transition-all duration-300 z-0"
-                style={{
-                  width: `${100/tabs.length}%`,
-                  transform: `translateX(${tabs.findIndex(tab => tab.id === activeTab) * 100}%)`
-                }}
-              />
+            <div className="settings-tabs-list">
+              <div id="active-tab-indicator" />
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`relative z-10 flex items-center gap-2 px-6 py-3 font-medium transition-colors text-sm rounded-lg ${
-                      activeTab === tab.id ? 'text-white' : 'text-white/60 hover:text-white'
-                    }`}
+                    className={`settings-tab-trigger ${
+                      activeTab === tab.id ? 'is-active' : ''
+                    } hover:text-white`}
+                    data-tab={tab.id}
                   >
-                    <Icon className="w-4 h-4" />
-                    <span className="hidden sm:inline">{tab.label}</span>
+                    <Icon className="w-4 h-4" style={{ strokeWidth: 1.5 }} />
+                    <span className="tab-label">{tab.label}</span>
                   </button>
                 );
               })}
