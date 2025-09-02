@@ -429,9 +429,7 @@ const ChatPage = () => {
         {/* Chat Header */}
         <header className="fixed top-0 left-0 right-0 z-30 pt-3 pr-4 pb-3 pl-4">
           <div 
-            className={`max-w-7xl flex sticky top-0 z-40 mr-auto ml-auto items-center justify-between liquid-glass-header rounded-full px-5 py-3 transition-all duration-300 ${
-              isSidebarOpen ? 'md:ml-80' : 'md:ml-0'
-            }`}
+            className="max-w-7xl flex sticky top-0 z-40 mr-auto ml-auto items-center justify-between liquid-glass-header rounded-full px-5 py-3 md:ml-80"
           >
             {/* Left Section */}
             <div className="flex items-center gap-4">
