@@ -138,34 +138,63 @@ const ChatPage = () => {
     setConversationMenuId(null);
   };
 
-  const renameConversation = (conversationId) => {
-    const conversation = conversations.find(c => c.id === conversationId);
-    if (!conversation) return;
-    
-    const newTitle = prompt('Digite o novo nome para a conversa:', conversation.title);
-    if (newTitle && newTitle.trim()) {
-      setConversations(prev => 
-        prev.map(c => c.id === conversationId ? { ...c, title: newTitle.trim() } : c)
-      );
-    }
+  const startRenaming = (conversationId, currentTitle) => {
+    setEditingConversationId(conversationId);
+    setEditingTitle(currentTitle);
     setConversationMenuId(null);
   };
 
-  const deleteConversation = (conversationId) => {
-    if (!confirm('Tem certeza que deseja excluir esta conversa?')) return;
+  const saveRename = () => {
+    if (editingTitle.trim() && editingConversationId) {
+      setConversations(prev => 
+        prev.map(c => c.id === editingConversationId ? { ...c, title: editingTitle.trim() } : c)
+      );
+    }
+    setEditingConversationId(null);
+    setEditingTitle('');
+  };
+
+  const cancelRename = () => {
+    setEditingConversationId(null);
+    setEditingTitle('');
+  };
+
+  const handleRenameKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveRename();
+    } else if (e.key === 'Escape') {
+      cancelRename();
+    }
+  };
+
+  const confirmDeleteConversation = (conversationId) => {
+    setConversationToDelete(conversationId);
+    setShowDeleteModal(true);
+    setConversationMenuId(null);
+  };
+
+  const executeDelete = () => {
+    if (!conversationToDelete) return;
     
-    setConversations(prev => prev.filter(c => c.id !== conversationId));
+    setConversations(prev => prev.filter(c => c.id !== conversationToDelete));
     
-    if (activeConversationId === conversationId) {
-      const remaining = conversations.filter(c => c.id !== conversationId);
+    if (activeConversationId === conversationToDelete) {
+      const remaining = conversations.filter(c => c.id !== conversationToDelete);
       if (remaining.length > 0) {
         setActiveConversationId(remaining[0].id);
       } else {
         handleNewConversation();
-        return;
       }
     }
-    setConversationMenuId(null);
+    
+    setShowDeleteModal(false);
+    setConversationToDelete(null);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setConversationToDelete(null);
   };
 
   const sendMessage = () => {
