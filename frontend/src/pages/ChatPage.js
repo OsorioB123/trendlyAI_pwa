@@ -18,7 +18,8 @@ import {
   HelpCircle,
   Gem,
   LogOut,
-  Info
+  Info,
+  CheckCircle
 } from 'lucide-react';
 import { useBackground } from '../contexts/BackgroundContext';
 import '../components/styles/header.css';
