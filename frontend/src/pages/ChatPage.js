@@ -24,25 +24,34 @@ import { useBackground } from '../contexts/BackgroundContext';
 
 const ChatPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentBackground } = useBackground();
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      type: 'assistant',
-      content: 'Olá! 👋 Sou seu assistente TrendlyAI. Como posso impulsionar suas ideias hoje?',
-      timestamp: new Date()
-    }
-  ]);
-  const [isTyping, setIsTyping] = useState(false);
-  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
-  const [showDesktopSidebar, setShowDesktopSidebar] = useState(true);
-  const [isSearchEnabled, setIsSearchEnabled] = useState(true);
-  const [isFocused, setIsFocused] = useState(false);
   
+  // Chat state
+  const [messages, setMessages] = useState([]);
+  const [inputValue, setInputValue] = useState('');
+  const [isSearchEnabled, setIsSearchEnabled] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Sidebar state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  
+  // Conversations state
+  const [conversations, setConversations] = useState([
+    { id: 1, title: 'Ideias para Reels de Café', timestamp: 'Agora', isActive: true }
+  ]);
+  const [activeConversationId, setActiveConversationId] = useState(1);
+  const [editingConversationId, setEditingConversationId] = useState(null);
+  const [conversationMenuId, setConversationMenuId] = useState(null);
+  
+  // Dropdowns state
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  
+  // Refs
+  const messagesRef = useRef(null);
   const textareaRef = useRef(null);
-  const chatAreaRef = useRef(null);
-  const messagesEndRef = useRef(null);
 
   // Mock conversations data
   const conversations = [
