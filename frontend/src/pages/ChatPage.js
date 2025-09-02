@@ -63,22 +63,11 @@ const ChatPage = () => {
   const chatAreaRef = useRef(null);
   const chatContentRef = useRef(null);
 
-  // Initialize messages on component mount or when conversation changes
+  // Handle message from HomePage
   useEffect(() => {
-    // Check if coming from home page with a message
     const homeMessage = location.state?.message;
     if (homeMessage) {
-      startNewConversationWithMessage(homeMessage);
-    } else {
-      // Default welcome message
-      setMessages([
-        {
-          id: 1,
-          type: 'assistant',
-          content: 'Olá! 👋 Sou seu assistente TrendlyAI. Como posso impulsionar suas ideias hoje?',
-          timestamp: new Date()
-        }
-      ]);
+      handleNewConversationWithMessage(homeMessage);
     }
   }, [location.state]);
 
@@ -86,9 +75,17 @@ const ChatPage = () => {
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 200) + 'px';
+      const newHeight = Math.min(Math.max(textareaRef.current.scrollHeight, 52), 200);
+      textareaRef.current.style.height = `${newHeight}px`;
     }
-  }, [inputValue]);
+  }, [messageInput]);
+
+  // Auto scroll to bottom
+  useEffect(() => {
+    if (chatAreaRef.current) {
+      chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight;
+    }
+  }, [conversations, activeConversationId]);
 
   const startNewConversationWithMessage = (message) => {
     const newConversation = {
