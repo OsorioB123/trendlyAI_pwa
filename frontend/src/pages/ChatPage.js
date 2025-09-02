@@ -680,11 +680,7 @@ const ChatPage = () => {
         </main>
 
         {/* Chat Composer */}
-        <div 
-          className={`fixed bottom-0 left-0 right-0 z-20 p-4 transition-all duration-300 ${
-            isSidebarOpen ? 'md:ml-80' : 'md:ml-0'
-          }`}
-        >
+        <div className="fixed bottom-0 left-0 right-0 z-20 p-4 md:ml-80">
           <div className="w-full max-w-4xl mx-auto">
             <div 
               className={`chat-composer-container bg-[#1E1F22] border border-white/10 rounded-2xl flex flex-col transition-all duration-200 ${
