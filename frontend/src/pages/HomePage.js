@@ -134,8 +134,8 @@ const HomePage = () => {
   const handleCommandSubmit = (e) => {
     e.preventDefault();
     if (commandInput.trim()) {
-      console.log('Command submitted:', commandInput);
-      // TODO: Implementar lógica de comando
+      // Navigate to chat with the message
+      navigate('/chat', { state: { message: commandInput.trim() } });
     }
   };
 
