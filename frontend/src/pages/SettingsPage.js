@@ -453,6 +453,62 @@ const SettingsPage = () => {
       )}
 
       <style jsx>{`
+        .settings-tabs-list {
+          display: flex;
+          position: relative;
+          padding: 4px;
+          background-color: rgba(255, 255, 255, 0.12);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          border-radius: 12px;
+          backdrop-filter: blur(20px);
+          width: fit-content;
+          margin: 0 auto;
+        }
+
+        #active-tab-indicator {
+          position: absolute;
+          top: 4px;
+          left: 4px;
+          height: calc(100% - 8px);
+          background-color: rgba(255, 255, 255, 0.15);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 8px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          width: calc(${100/tabs.length}% - 4px);
+          transform: translateX(${tabs.findIndex(tab => tab.id === activeTab) * 100}%);
+        }
+
+        .settings-tab-trigger {
+          position: relative;
+          z-index: 10;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 12px 24px;
+          font-weight: 500;
+          transition: color 0.2s ease;
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.6);
+          border-radius: 8px;
+          border: none;
+          background: transparent;
+          cursor: pointer;
+        }
+
+        .settings-tab-trigger.is-active {
+          color: white;
+        }
+
+        .tab-label {
+          display: none;
+        }
+
+        @media (min-width: 640px) {
+          .tab-label {
+            display: inline;
+          }
+        }
+
         @keyframes fade-in {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
