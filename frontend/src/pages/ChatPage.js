@@ -391,14 +391,14 @@ const ChatPage = () => {
                   {conversationMenuId === conversation.id && (
                     <div className="conversation-dropdown-menu liquid-glass absolute top-full right-2 mt-1 p-2 w-40 z-10 rounded-lg opacity-100 transform scale-100 pointer-events-auto">
                       <button
-                        onClick={() => renameConversation(conversation.id)}
+                        onClick={() => startRenaming(conversation.id, conversation.title)}
                         className="dropdown-item w-full text-left flex items-center gap-2 p-2 text-sm rounded-md hover:bg-white/10 transition-colors"
                       >
                         <Pencil className="w-4 h-4" />
                         Renomear
                       </button>
                       <button
-                        onClick={() => deleteConversation(conversation.id)}
+                        onClick={() => confirmDeleteConversation(conversation.id)}
                         className="dropdown-item w-full text-left flex items-center gap-2 p-2 text-sm rounded-md text-red-400 hover:text-red-300 hover:bg-white/10 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
