@@ -562,75 +562,46 @@ const SettingsPage = () => {
 
       {/* Toast Notification */}
       {showToast && (
-        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-white/8 backdrop-blur-lg border border-white/15 rounded-xl p-3 flex items-center gap-3">
-          <CheckCircle className="w-5 h-5 text-green-400" />
-          <span className="text-white">{toastMessage}</span>
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-200 transition-all duration-500 backdrop-blur-16 bg-gray-800/85 border border-white/15 shadow-lg rounded-xl p-3 text-white flex items-center gap-4">
+          <CheckCircle className={`w-5 h-5 ${toastType === 'success' ? 'text-green-400' : 'text-blue-400'}`} strokeWidth={1.5} />
+          <span>{toastMessage}</span>
         </div>
       )}
 
       <style jsx>{`
-        .settings-tabs-list {
-          display: flex;
-          position: relative;
-          padding: 4px;
-          background-color: rgba(255, 255, 255, 0.12);
-          border: 1px solid rgba(255, 255, 255, 0.18);
-          border-radius: 12px;
-          backdrop-filter: blur(20px);
-          width: fit-content;
-          margin: 0 auto;
-        }
-
-        #active-tab-indicator {
-          position: absolute;
-          top: 4px;
-          left: 4px;
-          height: calc(100% - 8px);
-          background-color: rgba(255, 255, 255, 0.15);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 8px;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          width: calc(${100/tabs.length}% - 4px);
-          transform: translateX(${tabs.findIndex(tab => tab.id === activeTab) * 100}%);
-        }
-
-        .settings-tab-trigger {
-          position: relative;
-          z-index: 10;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          padding: 12px 24px;
-          font-weight: 500;
-          transition: color 0.2s ease;
-          font-size: 14px;
-          color: rgba(255, 255, 255, 0.6);
-          border-radius: 8px;
-          border: none;
-          background: transparent;
-          cursor: pointer;
-        }
-
-        .settings-tab-trigger.is-active {
-          color: white;
-        }
-
-        .tab-label {
-          display: none;
-        }
-
-        @media (min-width: 640px) {
-          .tab-label {
-            display: inline;
-          }
-        }
-
         @keyframes fade-in {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        
         .animate-fade-in {
           animation: fade-in 0.6s ease-out;
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar { 
+          display: none; 
+        }
+        
+        .hide-scrollbar { 
+          -ms-overflow-style: none; 
+          scrollbar-width: none; 
+        }
+        
+        .liquid-glass { 
+          backdrop-filter: blur(20px); 
+          background-color: rgba(255, 255, 255, 0.08); 
+          border: 1px solid rgba(255, 255, 255, 0.14); 
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28); 
+          border-radius: 20px; 
+        }
+        
+        .settings-tabs-list { 
+          position: relative; 
+          display: inline-flex; 
+          padding: 4px; 
+          border-radius: 12px; 
+          background-color: rgba(255, 255, 255, 0.05); 
+          border: 1px solid rgba(255, 255, 255, 0.1); 
         }
       `}</style>
     </div>
