@@ -343,9 +343,30 @@ const ChatPage = () => {
                     }`}
                   >
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-sm text-white truncate">
-                        {conversation.title}
-                      </h4>
+                      {editingConversationId === conversation.id ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={editingTitle}
+                            onChange={(e) => setEditingTitle(e.target.value)}
+                            onKeyDown={handleRenameKeyPress}
+                            onBlur={saveRename}
+                            className="flex-1 bg-white/20 border border-white/30 rounded-lg px-2 py-1 text-sm text-white placeholder-white/50 focus:outline-none focus:border-white/50"
+                            autoFocus
+                          />
+                          <button
+                            onClick={saveRename}
+                            className="p-1 rounded-md hover:bg-white/10 transition-colors"
+                            aria-label="Salvar nome"
+                          >
+                            <CheckCircle className="w-4 h-4 text-green-400" />
+                          </button>
+                        </div>
+                      ) : (
+                        <h4 className="font-medium text-sm text-white truncate">
+                          {conversation.title}
+                        </h4>
+                      )}
                     </div>
                   </button>
                   
