@@ -286,6 +286,8 @@ export const AuthProvider = ({ children }) => {
     signOut,
     resetPassword,
     updateProfile,
+    updateAvatar,
+    refreshProfile,
     signInWithGoogle,
     // Helper methods
     isAuthenticated: !!user,
