@@ -784,21 +784,59 @@ const ProfileField = ({ field, value, isEditing, onStartEdit, onSave, onCancel, 
       <div className="profile-text relative flex justify-between items-center w-full">
         <div className="profile-field-content relative flex-1 cursor-pointer p-1">
           {isEditing ? (
-            <input
-              ref={fieldRef}
-              type="text"
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onBlur={handleSave}
-              onKeyDown={handleKeyDown}
-              className="profile-field-text w-full bg-transparent text-white text-base leading-6 outline-none border-b-2 border-white pb-1"
-            />
+            <div className="space-y-2">
+              {field === 'bio' ? (
+                <textarea
+                  ref={fieldRef}
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="profile-field-text w-full bg-transparent text-white text-base leading-6 outline-none border-b-2 border-white pb-1 resize-none"
+                  rows="3"
+                  disabled={saving}
+                />
+              ) : (
+                <input
+                  ref={fieldRef}
+                  type="text"
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="profile-field-text w-full bg-transparent text-white text-base leading-6 outline-none border-b-2 border-white pb-1"
+                  disabled={saving}
+                />
+              )}
+              <div className="flex items-center gap-2 mt-2">
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="px-3 py-1 text-green-400 hover:text-green-300 disabled:opacity-50 text-sm flex items-center gap-1"
+                >
+                  {saving ? <Loader className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+                  Salvar
+                </button>
+                <button
+                  onClick={() => {
+                    setEditValue(value);
+                    onCancel();
+                  }}
+                  disabled={saving}
+                  className="px-3 py-1 text-red-400 hover:text-red-300 disabled:opacity-50 text-sm flex items-center gap-1"
+                >
+                  <X className="w-3 h-3" />
+                  Cancelar
+                </button>
+                <span className="text-xs text-white/40 ml-auto">
+                  Enter para salvar, Esc para cancelar
+                </span>
+              </div>
+            </div>
           ) : (
             <div 
               onClick={onStartEdit}
               className="profile-field-text text-white text-base leading-6 transition-all cursor-pointer"
             >
-              {value}
+              {value || `Clique para adicionar ${fieldLabels[field].toLowerCase()}`}
             </div>
           )}
         </div>
