@@ -50,19 +50,31 @@ export const AuthProvider = ({ children }) => {
         
         setSession(session)
         setUser(session?.user ?? null)
-        setLoading(false)
 
         if (session?.user) {
-          // Load or create user profile
-          await loadUserProfile(session.user.id)
-          
-          // Handle profile creation on signup
-          if (event === 'SIGNED_UP') {
-            await createUserProfile(session.user)
+          try {
+            // Load or create user profile with timeout
+            const profilePromise = loadUserProfile(session.user.id)
+            const timeoutPromise = new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Profile loading timeout')), 5000)
+            )
+            
+            await Promise.race([profilePromise, timeoutPromise])
+            
+            // Handle profile creation on signup
+            if (event === 'SIGNED_UP') {
+              await createUserProfile(session.user)
+            }
+          } catch (error) {
+            console.error('Profile loading failed or timed out:', error)
+            // Continue with auth flow even if profile loading fails
           }
         } else {
           setProfile(null)
         }
+        
+        // Always ensure loading is set to false after auth state change
+        setLoading(false)
       }
     )
 
