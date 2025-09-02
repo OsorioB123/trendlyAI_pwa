@@ -94,14 +94,18 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center font-['Inter'] text-white p-4 bg-black">
-      {/* Background Image */}
-      <div 
-        className="fixed top-0 w-full h-screen bg-cover bg-center -z-10" 
-        style={{
-          backgroundImage: `url("${currentBackground.value}")`
-        }}
-      />
+    <div 
+      className="min-h-screen flex flex-col items-center justify-center font-['Inter'] text-white p-4 bg-black"
+      style={{
+        backgroundImage: `url("${currentBackground.value}?w=800&q=80")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Background overlay */}
+      <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
 
       <main className="w-full max-w-md flex flex-col items-center">
         {/* Logo */}
