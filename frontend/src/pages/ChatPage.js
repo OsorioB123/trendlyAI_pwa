@@ -722,38 +722,16 @@ const ChatPage = () => {
         </div>
       </div>
 
-      <style jsx>{`
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        
-        .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        
-        .liquid-glass {
-          backdrop-filter: blur(20px);
-          background-color: rgba(255, 255, 255, 0.08);
-          border: 1px solid rgba(255, 255, 255, 0.14);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
-        }
-        
-        .animate-fade-in {
-          animation: fadeIn 0.4s ease-out;
-        }
-        
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
+      {/* Click outside to close menus */}
+      {(showNotifications || showProfileDropdown || conversationMenuId) && (
+        <div 
+          className="fixed inset-0 z-10" 
+          onClick={() => {
+            closeAllMenus();
+            setConversationMenuId(null);
+          }}
+        />
+      )}
     </div>
   );
 };
