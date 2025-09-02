@@ -110,7 +110,7 @@ const SettingsPage = () => {
   };
 
   const handleThemeChange = (themeId) => {
-    const theme = availableBackgrounds.find(bg => bg.id === themeId);
+    const theme = themes.find(t => t.id === themeId);
     if (theme) {
       changeBackground(themeId);
       showToastMessage('Ambiente atualizado.');
@@ -129,27 +129,24 @@ const SettingsPage = () => {
     }
   };
 
-  const handleFieldEdit = (field, value) => {
+  const startEditing = (field) => {
+    setCurrentEditingField(field);
+  };
+
+  const saveField = (field, value) => {
     if (field === 'username' && !value.startsWith('@')) {
       value = '@' + value.replace(/@/g, '');
     }
+    
     setProfileData(prev => ({ ...prev, [field]: value }));
-    setEditingField(null);
+    setCurrentEditingField(null);
+    
     const fieldNames = {
       name: 'Nome',
       username: 'Nome de usuário',
       bio: 'Bio'
     };
     showToastMessage(`${fieldNames[field]} atualizado.`);
-  };
-
-  const handleKeyDown = (e, field) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleFieldEdit(field, e.target.textContent);
-    } else if (e.key === 'Escape') {
-      setEditingField(null);
-    }
   };
 
   const openModal = (modalName) => {
