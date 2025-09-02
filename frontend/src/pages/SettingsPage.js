@@ -374,7 +374,7 @@ const SettingsPage = () => {
 
                 {/* Profile Fields */}
                 <div className="space-y-6">
-                  {['name', 'username', 'bio'].map((field) => (
+                  {['display_name', 'bio'].map((field) => (
                     <ProfileField
                       key={field}
                       field={field}
@@ -383,6 +383,7 @@ const SettingsPage = () => {
                       onStartEdit={() => startEditing(field)}
                       onSave={(value) => saveField(field, value)}
                       onCancel={() => setCurrentEditingField(null)}
+                      saving={saving}
                     />
                   ))}
                 </div>
