@@ -151,17 +151,26 @@ export const AuthProvider = ({ children }) => {
 
   const signIn = async (email, password) => {
     try {
+      console.log('🔄 Starting signIn process for:', email)
       setLoading(true)
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
       
+      console.log('🔍 SignIn response:', { 
+        hasUser: !!data?.user, 
+        userEmail: data?.user?.email,
+        hasSession: !!data?.session,
+        error: error?.message 
+      })
+      
       return { data, error }
     } catch (error) {
-      console.error('Sign in error:', error)
+      console.error('❌ Sign in error:', error)
       return { data: null, error }
     } finally {
+      console.log('✅ SignIn finally block - setting loading to false')
       setLoading(false)
     }
   }
