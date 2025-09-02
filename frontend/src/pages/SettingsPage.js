@@ -171,15 +171,47 @@ const SettingsPage = () => {
     }
   };
 
-  const handleAvatarChange = (event) => {
+  const handleAvatarClick = () => {
+    if (!uploading) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleAvatarChange = async (event) => {
     const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setProfileData(prev => ({ ...prev, avatar: e.target.result }));
-        showToastMessage('Foto de perfil atualizada.');
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    setUploading(true);
+
+    try {
+      // Compress image before upload
+      const compressedFile = await compressImage(file, 400, 0.8);
+      
+      // Upload to Supabase Storage
+      const { data: avatarUrl, error: uploadError } = await uploadImage(
+        compressedFile, 
+        'avatars', 
+        user.id
+      );
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // Update profile with new avatar URL
+      const { error: updateError } = await updateAvatar(avatarUrl);
+      
+      if (updateError) {
+        throw updateError;
+      }
+
+      showToastMessage('Foto de perfil atualizada com sucesso!', 'success');
+
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      showToastMessage('Erro ao atualizar avatar. Tente novamente.', 'error');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -187,20 +219,66 @@ const SettingsPage = () => {
     setCurrentEditingField(field);
   };
 
-  const saveField = (field, value) => {
-    if (field === 'username' && !value.startsWith('@')) {
-      value = '@' + value.replace(/@/g, '');
+  const saveField = async (field, value) => {
+    if (!value || value === originalData[field]) {
+      setCurrentEditingField(null);
+      return;
     }
+
+    setSaving(true);
     
-    setProfileData(prev => ({ ...prev, [field]: value }));
-    setCurrentEditingField(null);
+    try {
+      const updates = { [field]: value };
+      const { error } = await updateProfile(updates);
+      
+      if (error) {
+        throw error;
+      }
+
+      // Update form data
+      setFormData(prev => ({ ...prev, [field]: value }));
+      setOriginalData(prev => ({ ...prev, [field]: value }));
+      
+      const fieldNames = {
+        display_name: 'Nome',
+        bio: 'Biografia'
+      };
+      showToastMessage(`${fieldNames[field]} atualizado com sucesso!`, 'success');
+      
+    } catch (error) {
+      console.error('Profile update error:', error);
+      showToastMessage('Erro ao atualizar perfil. Tente novamente.', 'error');
+    } finally {
+      setSaving(false);
+      setCurrentEditingField(null);
+    }
+  };
+
+  const handleNotificationToggle = async (type) => {
+    const newNotifications = { ...notifications, [type]: !notifications[type] };
+    setNotifications(newNotifications);
     
-    const fieldNames = {
-      name: 'Nome',
-      username: 'Nome de usuário',
-      bio: 'Bio'
-    };
-    showToastMessage(`${fieldNames[field]} atualizado.`);
+    try {
+      // Save notification preferences to profile
+      const preferences = {
+        ...profile.preferences,
+        notifications: newNotifications
+      };
+      
+      const { error } = await updateProfile({ preferences });
+      
+      if (error) {
+        throw error;
+      }
+      
+      showToastMessage('Preferência de notificação atualizada!', 'success');
+      
+    } catch (error) {
+      console.error('Notification update error:', error);
+      showToastMessage('Erro ao atualizar preferências.', 'error');
+      // Revert change
+      setNotifications(prev => ({ ...prev, [type]: !prev[type] }));
+    }
   };
 
   const openModal = (modalName) => {
