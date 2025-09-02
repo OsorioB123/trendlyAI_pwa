@@ -643,7 +643,7 @@ const ChatPage = () => {
         >
           <div 
             ref={chatContentRef}
-            className="w-full max-w-4xl mx-auto p-4 flex flex-col gap-6"
+            className="w-full max-w-3xl mx-auto p-4 flex flex-col gap-6"
           >
             {activeConversation?.messages.map((message, index) => (
               <div
