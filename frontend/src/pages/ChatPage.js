@@ -654,10 +654,10 @@ const ChatPage = () => {
                 style={{ animation: 'fadeInUpBubble 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}
               >
                 <div 
-                  className={`message-bubble max-w-[85%] border-radius-18 p-3 ${
+                  className={`message-bubble border-radius-18 p-3 ${
                     message.role === 'user' 
-                      ? 'user-bubble bg-white/12 border border-white/20' 
-                      : 'assistant-bubble bg-white/5 border border-white/15'
+                      ? 'user-bubble bg-white/12 border border-white/20 max-w-[70%] md:max-w-[60%]' 
+                      : 'assistant-bubble bg-white/5 border border-white/15 max-w-[90%] md:max-w-[75%]'
                   }`}
                   style={{ borderRadius: '18px', padding: '12px 16px' }}
                 >
