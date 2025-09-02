@@ -1,6 +1,25 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Send, Paperclip, Globe, Plus, ChevronLeft, X, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { 
+  Send, 
+  Paperclip, 
+  Globe, 
+  Menu, 
+  X, 
+  Plus, 
+  ChevronLeft,
+  PanelLeftClose,
+  PanelLeftOpen,
+  MoreHorizontal,
+  Edit,
+  Trash2,
+  Bell,
+  Settings,
+  HelpCircle,
+  Gem,
+  LogOut,
+  Info
+} from 'lucide-react';
 import { useBackground } from '../contexts/BackgroundContext';
 import Header from '../components/layout/Header';
 import { HeaderVariant } from '../types/header';
