@@ -239,41 +239,105 @@ const ProfilePage = () => {
       <main className="w-full mx-auto">
         <div className="max-w-6xl relative mx-auto px-6 py-10">
 
+          {/* Success/Error Messages */}
+          {success && (
+            <div className="mb-6 p-4 rounded-lg bg-green-500/20 border border-green-500/30 text-green-200 text-sm flex items-center gap-2">
+              <Check className="w-4 h-4" />
+              {success}
+            </div>
+          )}
+          
+          {error && (
+            <div className="mb-6 p-4 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 text-sm flex items-center gap-2">
+              <X className="w-4 h-4" />
+              {error}
+            </div>
+          )}
+
           {/* Header Unificado */}
           <section className="flex flex-col md:flex-row gap-8 items-center text-center md:text-left mb-16 animate-entry">
             <button 
               className="relative flex-shrink-0 group avatar-interactive-wrapper"
               onClick={handleAvatarClick}
+              disabled={uploading}
             >
               <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-white/10">
                 <img 
-                  src={profileData.avatar} 
+                  src={profile.avatar_url || 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=300&q=80'} 
                   alt="Avatar do usuário" 
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="absolute inset-0 rounded-full flex items-center justify-center avatar-overlay bg-black/0 hover:bg-black/60 transition-all duration-300">
-                <Camera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                {uploading ? (
+                  <Loader className="w-6 h-6 text-white animate-spin" />
+                ) : (
+                  <Camera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                )}
               </div>
               <input
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 onChange={handleAvatarChange}
+                disabled={uploading}
                 className="hidden"
               />
             </button>
             <div className="flex-grow">
-              <h1 className="text-5xl font-medium text-white tracking-tight mb-2">João da Silva</h1>
-              <p className="text-white/60 text-lg mb-6">Nível Criativo: Estrategista</p>
+              {/* Editable Display Name */}
+              <div className="mb-2">
+                {editingField === 'display_name' ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={formData.display_name}
+                      onChange={(e) => handleInputChange('display_name', e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(e, 'display_name')}
+                      className="text-5xl font-medium text-white tracking-tight bg-transparent border-b-2 border-white/50 focus:outline-none focus:border-white"
+                      autoFocus
+                      disabled={saving}
+                    />
+                    <button
+                      onClick={() => handleSaveField('display_name')}
+                      disabled={saving}
+                      className="p-1 text-green-400 hover:text-green-300 disabled:opacity-50"
+                    >
+                      {saving ? <Loader className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                    </button>
+                    <button
+                      onClick={() => handleCancelEdit('display_name')}
+                      disabled={saving}
+                      className="p-1 text-red-400 hover:text-red-300 disabled:opacity-50"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 group">
+                    <h1 className="text-5xl font-medium text-white tracking-tight">
+                      {formData.display_name || 'Usuário'}
+                    </h1>
+                    <button
+                      onClick={() => handleFieldEdit('display_name')}
+                      className="p-1 text-white/40 hover:text-white/80 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+              
+              <p className="text-white/60 text-lg mb-6">Nível Criativo: {formData.level}</p>
+              
               <div className="flex flex-wrap justify-center md:justify-start items-center gap-3">
                 <div className="metric-pill bg-white/8 border border-white/12 rounded-full px-4 py-2 text-sm font-medium text-white flex items-center gap-2 hover:bg-white/15 hover:-translate-y-0.5 transition-all duration-300">
                   <Navigation className="w-4 h-4" />
-                  4 Trilhas Ativas
+                  {profile.total_tracks || 0} Trilhas Ativas
                 </div>
                 <div className="metric-pill bg-white/8 border border-white/12 rounded-full px-4 py-2 text-sm font-medium text-white flex items-center gap-2 hover:bg-white/15 hover:-translate-y-0.5 transition-all duration-300">
                   <Award className="w-4 h-4" />
-                  12 Módulos Concluídos
+                  {profile.completed_modules || 0} Módulos Concluídos
                 </div>
                 <div className="metric-pill bg-white/8 border border-white/12 rounded-full px-4 py-2 text-sm font-medium text-white flex items-center gap-2 hover:bg-white/15 hover:-translate-y-0.5 transition-all duration-300">
                   <Flame className="w-4 h-4" />
