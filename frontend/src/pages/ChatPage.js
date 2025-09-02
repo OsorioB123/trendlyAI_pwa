@@ -21,6 +21,7 @@ import {
   Info
 } from 'lucide-react';
 import { useBackground } from '../contexts/BackgroundContext';
+import '../components/styles/header.css';
 
 const ChatPage = () => {
   const navigate = useNavigate();
