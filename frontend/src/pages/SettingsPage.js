@@ -427,68 +427,138 @@ const SettingsPage = () => {
       </main>
 
       {/* Modals */}
-      {Object.entries(modals).map(([key, isOpen]) => {
-        if (!isOpen) return null;
-        
-        const modalContent = {
-          changeEmail: {
-            title: 'Alterar seu Email',
-            description: 'Digite sua senha atual e o novo email para confirmar a alteração.',
-            action: () => { closeModal('changeEmail'); showToastMessage('Email alterado com sucesso.'); }
-          },
-          changePassword: {
-            title: 'Alterar sua Senha',
-            description: 'Digite sua senha atual e escolha uma nova senha segura.',
-            action: () => { closeModal('changePassword'); showToastMessage('Sua senha foi alterada com sucesso.'); }
-          },
-          setup2FA: {
-            title: 'Configurar Autenticação de Dois Fatores',
-            description: 'Configure 2FA para adicionar uma camada extra de segurança à sua conta.',
-            action: () => { closeModal('setup2FA'); showToastMessage('Autenticação de dois fatores configurada.'); }
-          },
-          deleteAccount: {
-            title: 'Você tem certeza absoluta?',
-            description: 'Esta ação é irreversível. Todos os seus dados, projetos e trilhas serão permanentemente apagados. Não há como voltar atrás.',
-            action: () => { closeModal('deleteAccount'); showToastMessage('Conta excluída permanentemente.'); }
-          }
-        };
+      <Modal
+        isOpen={modals.changeEmail}
+        onClose={() => closeModal('changeEmail')}
+        title="Alterar seu Email"
+        description="Digite sua senha atual e o novo email para confirmar a alteração."
+      >
+        <input
+          type="password"
+          placeholder="Senha atual"
+          value={emailForm.currentPassword}
+          onChange={(e) => setEmailForm(prev => ({ ...prev, currentPassword: e.target.value }))}
+          className="modal-input w-full bg-white/8 border border-white/14 rounded-lg p-3 text-white text-sm mb-4 placeholder-white/50 focus:outline-none focus:border-white/30"
+        />
+        <input
+          type="email"
+          placeholder="Novo email"
+          value={emailForm.newEmail}
+          onChange={(e) => setEmailForm(prev => ({ ...prev, newEmail: e.target.value }))}
+          className="modal-input w-full bg-white/8 border border-white/14 rounded-lg p-3 text-white text-sm mb-4 placeholder-white/50 focus:outline-none focus:border-white/30"
+        />
+        <button
+          onClick={handleSaveEmail}
+          disabled={!isEmailFormValid()}
+          className="btn-primary w-full bg-white text-black border-none rounded-lg p-3 font-semibold cursor-pointer transition-all mb-3 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/90"
+        >
+          Salvar Novo Email
+        </button>
+        <button
+          onClick={() => closeModal('changeEmail')}
+          className="btn-secondary w-full bg-none border-none text-white/70 p-2 cursor-pointer underline text-sm transition-all hover:text-white"
+        >
+          Cancelar
+        </button>
+      </Modal>
 
-        const content = modalContent[key];
-        
-        return (
-          <div key={key} className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white/8 backdrop-blur-lg border border-white/14 rounded-2xl p-8 max-w-md w-full">
-              <h3 className="text-xl font-semibold text-white mb-2">{content.title}</h3>
-              <p className="text-white/70 text-sm mb-6">{content.description}</p>
-              
-              <div className="space-y-4 mb-6">
-                <input 
-                  type={key === 'changeEmail' ? 'email' : 'password'} 
-                  className="w-full bg-white/8 border border-white/14 rounded-lg p-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30" 
-                  placeholder={key === 'deleteAccount' ? "Digite 'EXCLUIR' para confirmar" : "Digite aqui..."}
-                />
-              </div>
+      <Modal
+        isOpen={modals.changePassword}
+        onClose={() => closeModal('changePassword')}
+        title="Alterar sua Senha"
+        description="Digite sua senha atual e escolha uma nova senha segura."
+      >
+        <input
+          type="password"
+          placeholder="Senha atual"
+          value={passwordForm.current}
+          onChange={(e) => setPasswordForm(prev => ({ ...prev, current: e.target.value }))}
+          className="modal-input w-full bg-white/8 border border-white/14 rounded-lg p-3 text-white text-sm mb-4 placeholder-white/50 focus:outline-none focus:border-white/30"
+        />
+        <input
+          type="password"
+          placeholder="Nova senha"
+          value={passwordForm.new}
+          onChange={(e) => setPasswordForm(prev => ({ ...prev, new: e.target.value }))}
+          className="modal-input w-full bg-white/8 border border-white/14 rounded-lg p-3 text-white text-sm mb-4 placeholder-white/50 focus:outline-none focus:border-white/30"
+        />
+        <input
+          type="password"
+          placeholder="Confirme a nova senha"
+          value={passwordForm.confirm}
+          onChange={(e) => setPasswordForm(prev => ({ ...prev, confirm: e.target.value }))}
+          className="modal-input w-full bg-white/8 border border-white/14 rounded-lg p-3 text-white text-sm mb-4 placeholder-white/50 focus:outline-none focus:border-white/30"
+        />
+        <button
+          onClick={handleSavePassword}
+          disabled={!isPasswordFormValid()}
+          className="btn-primary w-full bg-white text-black border-none rounded-lg p-3 font-semibold cursor-pointer transition-all mb-3 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/90"
+        >
+          Salvar Nova Senha
+        </button>
+        <button
+          onClick={() => closeModal('changePassword')}
+          className="btn-secondary w-full bg-none border-none text-white/70 p-2 cursor-pointer underline text-sm transition-all hover:text-white"
+        >
+          Cancelar
+        </button>
+      </Modal>
 
-              <button 
-                onClick={content.action}
-                className={`w-full py-3 px-6 rounded-lg font-semibold mb-3 transition-all ${
-                  key === 'deleteAccount' 
-                    ? 'bg-red-600 hover:bg-red-700 text-white' 
-                    : 'bg-white text-black hover:bg-gray-100'
-                }`}
-              >
-                {key === 'deleteAccount' ? 'Sim, excluir minha conta permanentemente' : 'Confirmar'}
-              </button>
-              <button 
-                onClick={() => closeModal(key)}
-                className="w-full text-white/70 hover:text-white text-sm underline"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        );
-      })}
+      <Modal
+        isOpen={modals.setup2FA}
+        onClose={() => closeModal('setup2FA')}
+        title="Configurar Autenticação de Dois Fatores"
+        description="Configure 2FA para adicionar uma camada extra de segurança à sua conta."
+      >
+        <input
+          type="password"
+          placeholder="Digite sua senha atual"
+          value={twoFAForm.password}
+          onChange={(e) => setTwoFAForm(prev => ({ ...prev, password: e.target.value }))}
+          className="modal-input w-full bg-white/8 border border-white/14 rounded-lg p-3 text-white text-sm mb-4 placeholder-white/50 focus:outline-none focus:border-white/30"
+        />
+        <button
+          onClick={handleSetup2FA}
+          disabled={!is2FAFormValid()}
+          className="btn-primary w-full bg-white text-black border-none rounded-lg p-3 font-semibold cursor-pointer transition-all mb-3 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/90"
+        >
+          Configurar 2FA
+        </button>
+        <button
+          onClick={() => closeModal('setup2FA')}
+          className="btn-secondary w-full bg-none border-none text-white/70 p-2 cursor-pointer underline text-sm transition-all hover:text-white"
+        >
+          Cancelar
+        </button>
+      </Modal>
+
+      <Modal
+        isOpen={modals.deleteAccount}
+        onClose={() => closeModal('deleteAccount')}
+        title="Você tem certeza absoluta?"
+        description="Esta ação é irreversível. Todos os seus dados, projetos e trilhas serão permanentemente apagados. Não há como voltar atrás."
+      >
+        <input
+          type="text"
+          placeholder="Digite 'EXCLUIR' para confirmar"
+          value={deleteForm.confirmation}
+          onChange={(e) => setDeleteForm(prev => ({ ...prev, confirmation: e.target.value }))}
+          className="modal-input w-full bg-white/8 border border-white/14 rounded-lg p-3 text-white text-sm mb-4 placeholder-white/50 focus:outline-none focus:border-white/30"
+        />
+        <button
+          onClick={handleDeleteAccount}
+          disabled={!isDeleteFormValid()}
+          className="btn-danger w-full bg-red-600 text-white border-none rounded-lg p-3 font-semibold cursor-pointer transition-all mb-3 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-700"
+        >
+          Sim, excluir minha conta permanentemente
+        </button>
+        <button
+          onClick={() => closeModal('deleteAccount')}
+          className="btn-secondary w-full bg-none border-none text-white/70 p-2 cursor-pointer underline text-sm transition-all hover:text-white"
+        >
+          Cancelar
+        </button>
+      </Modal>
 
       {/* Toast Notification */}
       {showToast && (
