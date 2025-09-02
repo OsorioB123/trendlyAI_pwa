@@ -51,17 +51,64 @@ const USER_TRACKS = [
 const ProfilePage = () => {
   const navigate = useNavigate();
   const { currentBackground } = useBackground();
+  const { user, profile, updateProfile, updateAvatar, refreshProfile, loading: authLoading } = useAuth();
   const [activeArsenalTab, setActiveArsenalTab] = useState('trails');
   const [activeReferralTab, setActiveReferralTab] = useState('credits');
   const [editingField, setEditingField] = useState(null);
-  const [profileData, setProfileData] = useState({
-    name: 'Sofia',
-    username: '@sofia',
-    bio: 'Explorando o futuro da criação de conteúdo com IA.',
-    avatar: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=300&q=80'
+  const [formData, setFormData] = useState({
+    display_name: '',
+    bio: '',
+    level: 'Explorador'
   });
-  
+  const [originalData, setOriginalData] = useState({});
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
   const fileInputRef = useRef(null);
+
+  // Load profile data when component mounts or profile changes
+  useEffect(() => {
+    if (profile) {
+      const profileData = {
+        display_name: profile.display_name || '',
+        bio: profile.bio || '',
+        level: profile.level || 'Explorador'
+      };
+      setFormData(profileData);
+      setOriginalData(profileData);
+    }
+  }, [profile]);
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/login');
+    }
+  }, [user, authLoading, navigate]);
+
+  // Show loading state
+  if (authLoading || !user || !profile) {
+    return (
+      <div 
+        className="min-h-screen flex items-center justify-center"
+        style={{
+          backgroundImage: `url("${currentBackground.value}?w=800&q=80")`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
+        <div className="text-white text-center">
+          <Loader className="w-8 h-8 animate-spin mx-auto mb-4" />
+          <p>Carregando perfil...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleTrackClick = (track) => {
     console.log('Track clicked:', track);
