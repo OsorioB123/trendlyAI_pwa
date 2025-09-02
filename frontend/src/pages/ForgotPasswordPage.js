@@ -254,7 +254,7 @@ const ForgotPasswordPage = () => {
       </main>
 
       <style jsx>{`
-        /* Efeito Liquid Glass para o card (Consistente) */
+        /* Efeito Liquid Glass */
         .liquid-glass {
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
@@ -263,75 +263,19 @@ const ForgotPasswordPage = () => {
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
-        /* Estilo customizado para os inputs (Consistente) */
-        .form-input {
-          background-color: rgba(0, 0, 0, 0.2);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .form-input:focus {
-          outline: none;
-          background-color: rgba(0, 0, 0, 0.25);
-          border-color: rgba(255, 255, 255, 0.4);
-          box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
-        }
-
-        /* Estilo para input com erro */
-        .input-error {
-          border-color: #fb7185; /* Tailwind rose-400 */
-        }
-
-        /* Botão de Ação Principal (Consistente) */
-        .primary-action-btn {
-          background-color: rgba(255, 255, 255, 0.1);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .primary-action-btn:hover {
-          background-color: rgba(255, 255, 255, 0.15);
-          transform: translateY(-4px);
-          box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-        }
-
-        .primary-action-btn:active {
-          transform: translateY(-1px) scale(0.98);
-        }
-
-        /* Estilo para mensagens de erro com animação */
-        .error-message {
-          max-height: 0;
-          overflow: hidden;
-          transition: max-height 0.3s ease-out, margin-top 0.3s ease-out;
-        }
-
-        .error-message.show {
-          max-height: 2.5rem;
-          margin-top: 0.25rem;
-        }
-
-        /* Estilo para mensagem de sucesso */
-        .success-message {
-          background-color: rgba(34, 197, 94, 0.1);
-          border: 1px solid rgba(34, 197, 94, 0.2);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-        }
-
-        /* Animação de entrada (Consistente) */
+        /* Animação de entrada */
         .animate-fade-in-up {
           animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
         @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(25px);
+          from { 
+            opacity: 0; 
+            transform: translateY(25px); 
           }
-          to {
-            opacity: 1;
-            transform: translateY(0);
+          to { 
+            opacity: 1; 
+            transform: translateY(0); 
           }
         }
       `}</style>
