@@ -20,19 +20,23 @@ import { uploadImage, compressImage } from '../utils/supabaseStorage';
 const SettingsPage = () => {
   const navigate = useNavigate();
   const { currentBackground, changeBackground, availableBackgrounds } = useBackground();
+  const { user, profile, updateProfile, updateAvatar, refreshProfile, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
-  const [profileData, setProfileData] = useState({
-    name: 'Sofia',
-    username: '@sofia',
-    bio: 'Explorando o futuro da criação de conteúdo com IA.',
-    avatar: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=200&q=80',
-    email: 'sofia@example.com'
+  
+  // Form data using real profile data
+  const [formData, setFormData] = useState({
+    display_name: '',
+    bio: '',
+    email: ''
   });
+  const [originalData, setOriginalData] = useState({});
   
   const [currentEditingField, setCurrentEditingField] = useState(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
   
   // Modal states
   const [modals, setModals] = useState({
