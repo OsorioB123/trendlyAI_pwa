@@ -200,7 +200,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .update(updates)
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', user.id)
         .select()
         .single()
@@ -215,6 +218,45 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Error in updateProfile:', error)
       return { data: null, error }
+    }
+  }
+
+  const updateAvatar = async (avatarUrl) => {
+    if (!user) return { error: new Error('No user logged in') }
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ 
+          avatar_url: avatarUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id)
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Error updating avatar:', error)
+        return { data: null, error }
+      }
+
+      setProfile(data)
+      return { data, error: null }
+    } catch (error) {
+      console.error('Error in updateAvatar:', error)
+      return { data: null, error }
+    }
+  }
+
+  const refreshProfile = async () => {
+    if (!user) return { error: new Error('No user logged in') }
+
+    try {
+      await loadUserProfile(user.id)
+      return { error: null }
+    } catch (error) {
+      console.error('Error refreshing profile:', error)
+      return { error }
     }
   }
 
