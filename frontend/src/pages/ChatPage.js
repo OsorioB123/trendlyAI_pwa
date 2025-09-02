@@ -256,9 +256,6 @@ const ChatPage = () => {
     >
       {/* Background overlay */}
       <div className="fixed inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-      
-      {/* Header spacer */}
-      <div style={{ height: '80px' }} className="fixed top-0 left-0 right-0 z-40" />
 
       {/* Mobile sidebar backdrop */}
       <div 
@@ -278,27 +275,23 @@ const ChatPage = () => {
           {/* Sidebar Header */}
           <div className="p-4 flex flex-col flex-shrink-0">
             <div className="flex justify-between items-center h-11">
-              <button
-                onClick={() => navigate(-1)}
-                className="w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95 md:hidden"
-              >
-                <ChevronLeft className="w-6 h-6" />
-              </button>
-              <h3 className="text-white font-semibold tracking-tight hidden md:block">Conversas</h3>
-              <button
-                onClick={() => setIsMobileSidebarOpen(false)}
-                className="w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95 md:hidden"
-              >
-                <X className="w-6 h-6" />
-              </button>
+              <h3 class="text-white font-semibold tracking-tight hidden md:block">Conversas</h3>
               <button
                 onClick={toggleDesktopSidebar}
                 className="text-white/60 hover:text-white hidden md:flex w-9 h-9 items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+                aria-label="Minimizar sidebar"
               >
                 <PanelLeftClose className="w-5 h-5" />
               </button>
+              <h3 className="text-white font-semibold tracking-tight mt-2 md:hidden">Conversas</h3>
+              <button
+                onClick={() => setIsMobileSidebarOpen(false)}
+                className="w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95 md:hidden"
+                aria-label="Fechar Menu"
+              >
+                <X className="w-6 h-6" />
+              </button>
             </div>
-            <h3 className="text-white font-semibold tracking-tight mt-2 md:hidden">Conversas</h3>
           </div>
 
           {/* Divider */}
@@ -308,48 +301,58 @@ const ChatPage = () => {
 
           {/* Conversations List */}
           <div className="flex-grow overflow-y-auto hide-scrollbar px-2 space-y-1">
-            {conversations.map((conversation) => (
-              <div key={conversation.id} className="relative group">
-                <button
-                  onClick={() => selectConversation(conversation.id)}
-                  className={`conversation-item w-full text-left p-3 rounded-xl transition-all ${
-                    conversation.isActive ? 'bg-white/15' : 'hover:bg-white/10'
-                  }`}
-                >
-                  <h4 className="font-medium text-sm text-white truncate pr-8">
-                    {conversation.title}
-                  </h4>
-                  <p className="text-xs text-white/60 mt-1">{conversation.timestamp}</p>
-                </button>
-                
-                {/* 3-dots menu */}
-                <div className="absolute top-3 right-3">
+            {conversations.length === 0 ? (
+              <p className="text-center text-sm text-white/50 px-4 py-2">
+                Inicie uma nova conversa para começar.
+              </p>
+            ) : (
+              conversations.map((conversation) => (
+                <div key={conversation.id} className="relative group">
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setConversationMenuId(conversationMenuId === conversation.id ? null : conversation.id);
-                    }}
-                    className="opacity-0 group-hover:opacity-100 w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 transition-all"
+                    onClick={() => selectConversation(conversation.id)}
+                    className={`conversation-item w-full text-left p-3 flex justify-between items-center transition-all duration-200 rounded-xl ${
+                      conversation.id === activeConversationId 
+                        ? 'active bg-white/15' 
+                        : 'hover:bg-white/8 hover:translate-x-1'
+                    }`}
                   >
-                    <MoreHorizontal className="w-4 h-4" />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-sm text-white truncate">
+                        {conversation.title}
+                      </h4>
+                    </div>
                   </button>
+                  
+                  {/* 3-dots menu */}
+                  <div className="absolute top-1/2 right-3 -translate-y-1/2 flex items-center">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setConversationMenuId(
+                          conversationMenuId === conversation.id ? null : conversation.id
+                        );
+                      }}
+                      className={`conversation-options-btn p-1 rounded-md hover:bg-white/10 transition-opacity ${
+                        conversationMenuId === conversation.id ? 'opacity-100' : 'opacity-60 group-hover:opacity-100'
+                      }`}
+                    >
+                      <MoreHorizontal className="w-5 h-5" />
+                    </button>
+                  </div>
                   
                   {/* Dropdown menu */}
                   {conversationMenuId === conversation.id && (
-                    <div className="absolute top-full right-0 mt-1 liquid-glass rounded-lg p-2 w-40 z-10">
+                    <div className="conversation-dropdown-menu liquid-glass absolute top-full right-2 mt-1 p-2 w-40 z-10 rounded-lg opacity-100 transform scale-100 pointer-events-auto">
                       <button
-                        onClick={() => {
-                          setEditingConversationId(conversation.id);
-                          setConversationMenuId(null);
-                        }}
-                        className="flex items-center gap-2 w-full p-2 text-sm rounded-lg hover:bg-white/10 transition-colors"
+                        onClick={() => renameConversation(conversation.id)}
+                        className="dropdown-item w-full text-left flex items-center gap-2 p-2 text-sm rounded-md hover:bg-white/10 transition-colors"
                       >
-                        <Edit className="w-4 h-4" />
-                        Editar
+                        <Pencil className="w-4 h-4" />
+                        Renomear
                       </button>
                       <button
                         onClick={() => deleteConversation(conversation.id)}
-                        className="flex items-center gap-2 w-full p-2 text-sm rounded-lg hover:bg-white/10 transition-colors text-red-400"
+                        className="dropdown-item w-full text-left flex items-center gap-2 p-2 text-sm rounded-md text-red-400 hover:text-red-300 hover:bg-white/10 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                         Excluir
@@ -357,14 +360,14 @@ const ChatPage = () => {
                     </div>
                   )}
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           {/* New Conversation Button */}
           <div className="p-2 flex-shrink-0">
             <button
-              onClick={startNewConversation}
+              onClick={handleNewConversation}
               className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 active:scale-[0.98]"
             >
               <Plus className="w-5 h-5" />
