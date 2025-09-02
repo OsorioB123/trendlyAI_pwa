@@ -17,7 +17,6 @@ import {
   Gem,
   LogOut,
   Info,
-  CheckCircle,
   Sparkles,
   Pencil
 } from 'lucide-react';
