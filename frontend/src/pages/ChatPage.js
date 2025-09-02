@@ -179,36 +179,38 @@ const ChatPage = () => {
   };
 
   const sendMessage = async () => {
-    if (!message.trim()) return;
-
+    if (!inputValue.trim() || isLoading) return;
+    
     const userMessage = {
       id: Date.now(),
       type: 'user',
-      content: message,
+      content: inputValue.trim(),
       timestamp: new Date()
     };
-
-    // Add user message
-    setMessages(prev => [...prev, userMessage]);
     
-    // Clear input
-    setMessage('');
-    adjustTextareaHeight();
-
-    // Add thinking animation
-    const thinkingMessage = createThinkingMessage();
-    setMessages(prev => [...prev, thinkingMessage]);
-    setIsTyping(true);
-
-    // Simulate AI processing delay
+    setMessages(prev => [...prev, userMessage]);
+    setInputValue('');
+    setIsLoading(true);
+    
+    // Update conversation title if it's still "Nova Conversa"
+    const activeConv = conversations.find(conv => conv.id === activeConversationId);
+    if (activeConv && activeConv.title === 'Nova Conversa') {
+      const newTitle = userMessage.content.substring(0, 30) + (userMessage.content.length > 30 ? '...' : '');
+      editConversationTitle(activeConversationId, newTitle);
+    }
+    
+    // Simulate AI response
     setTimeout(() => {
-      setMessages(prev => {
-        const newMessages = prev.filter(msg => msg.type !== 'thinking');
-        const aiResponse = simulateAIResponse(userMessage.content);
-        return [...newMessages, aiResponse];
-      });
-      setIsTyping(false);
-    }, 3000);
+      const aiMessage = {
+        id: Date.now() + 1,
+        type: 'assistant',
+        content: 'Essa é uma excelente pergunta! Vou te ajudar a explorar essa ideia. Baseado no que você mencionou, posso sugerir algumas abordagens interessantes...',
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, aiMessage]);
+      setIsLoading(false);
+    }, 1500);
   };
 
   const handleKeyPress = (e) => {
@@ -219,110 +221,69 @@ const ChatPage = () => {
   };
 
   const toggleMobileSidebar = () => {
-    setShowMobileSidebar(!showMobileSidebar);
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
   };
 
   const toggleDesktopSidebar = () => {
-    setShowDesktopSidebar(!showDesktopSidebar);
-  };
-
-  const startNewConversation = () => {
-    setMessages([{
-      id: 1,
-      type: 'assistant',
-      content: 'Olá! 👋 Sou seu assistente TrendlyAI. Como posso impulsionar suas ideias hoje?',
-      timestamp: new Date()
-    }]);
-    setShowMobileSidebar(false);
-  };
-
-  const ThinkingAnimation = ({ text }) => {
-    const [currentTextIndex, setCurrentTextIndex] = useState(0);
-    const [fadeClass, setFadeClass] = useState('');
-
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setFadeClass('fade-out');
-        
-        setTimeout(() => {
-          setCurrentTextIndex(prev => (prev + 1) % thinkingTexts.length);
-          setFadeClass('');
-        }, 150);
-      }, 1500);
-
-      return () => clearInterval(interval);
-    }, []);
-
-    return (
-      <div className="flex items-center justify-center p-4">
-        <div className="relative px-4 py-2 w-full">
-          <div className={`ai-thinking-text ${fadeClass}`}>
-            {thinkingTexts[currentTextIndex]}
-          </div>
-        </div>
-      </div>
-    );
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
   return (
     <div 
-      className="chat-page-container"
+      className="min-h-screen flex text-white font-['Inter'] antialiased"
       style={{
-        backgroundImage: `url("${currentBackground.value}?w=800&q=80")`
+        backgroundImage: `url("${currentBackground.value}")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
       }}
     >
       {/* Background overlay */}
-      <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
+      <div className="fixed inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+      
+      {/* Header spacer */}
+      <div style={{ height: '80px' }} className="fixed top-0 left-0 right-0 z-40" />
 
-      {/* Mobile Sidebar Backdrop */}
+      {/* Mobile sidebar backdrop */}
       <div 
         className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${
-          showMobileSidebar ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          isMobileSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
-        onClick={() => setShowMobileSidebar(false)}
+        onClick={() => setIsMobileSidebarOpen(false)}
       />
 
-      {/* Sidebar */}
+      {/* Conversations Sidebar */}
       <aside 
-        className={`fixed top-0 left-0 w-[85%] sm:w-80 h-full z-50 transform transition-transform duration-300 ${
-          showMobileSidebar ? 'translate-x-0' : '-translate-x-full'
-        } md:translate-x-0 ${
-          showDesktopSidebar ? 'md:translate-x-0' : 'md:-translate-x-full'
-        }`}
+        className={`fixed top-0 left-0 w-[85%] sm:w-80 h-full z-50 transform transition-transform duration-300 md:relative md:transform-none ${
+          isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } ${!isSidebarOpen ? 'md:-translate-x-full' : 'md:translate-x-0'}`}
       >
-        <div className="liquid-glass w-full h-full flex flex-col rounded-none md:rounded-3xl md:m-4">
+        <div className="liquid-glass w-full h-full flex flex-col rounded-none md:rounded-3xl md:m-4 md:h-[calc(100vh-2rem)]">
           {/* Sidebar Header */}
           <div className="p-4 flex flex-col flex-shrink-0">
             <div className="flex justify-between items-center h-11">
-              <button 
+              <button
                 onClick={() => navigate(-1)}
                 className="w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95 md:hidden"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
-              
-              <h3 className="text-white font-semibold tracking-tight hidden md:block">
-                Conversas
-              </h3>
-              
-              <button 
-                onClick={() => setShowMobileSidebar(false)}
+              <h3 className="text-white font-semibold tracking-tight hidden md:block">Conversas</h3>
+              <button
+                onClick={() => setIsMobileSidebarOpen(false)}
                 className="w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95 md:hidden"
               >
                 <X className="w-6 h-6" />
               </button>
-              
-              <button 
+              <button
                 onClick={toggleDesktopSidebar}
                 className="text-white/60 hover:text-white hidden md:flex w-9 h-9 items-center justify-center rounded-full hover:bg-white/10 transition-colors"
               >
                 <PanelLeftClose className="w-5 h-5" />
               </button>
             </div>
-            
-            <h3 className="text-white font-semibold tracking-tight mt-2 md:hidden">
-              Conversas
-            </h3>
+            <h3 className="text-white font-semibold tracking-tight mt-2 md:hidden">Conversas</h3>
           </div>
 
           {/* Divider */}
@@ -333,26 +294,61 @@ const ChatPage = () => {
           {/* Conversations List */}
           <div className="flex-grow overflow-y-auto hide-scrollbar px-2 space-y-1">
             {conversations.map((conversation) => (
-              <button
-                key={conversation.id}
-                className={`conversation-item w-full text-left p-3 rounded-lg transition-all ${
-                  conversation.active ? 'active' : ''
-                }`}
-                onClick={() => setShowMobileSidebar(false)}
-              >
-                <h4 className="font-medium text-sm text-white truncate">
-                  {conversation.title}
-                </h4>
-                <p className="text-xs text-white/60 mt-1">
-                  {conversation.time}
-                </p>
-              </button>
+              <div key={conversation.id} className="relative group">
+                <button
+                  onClick={() => selectConversation(conversation.id)}
+                  className={`conversation-item w-full text-left p-3 rounded-xl transition-all ${
+                    conversation.isActive ? 'bg-white/15' : 'hover:bg-white/10'
+                  }`}
+                >
+                  <h4 className="font-medium text-sm text-white truncate pr-8">
+                    {conversation.title}
+                  </h4>
+                  <p className="text-xs text-white/60 mt-1">{conversation.timestamp}</p>
+                </button>
+                
+                {/* 3-dots menu */}
+                <div className="absolute top-3 right-3">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setConversationMenuId(conversationMenuId === conversation.id ? null : conversation.id);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 transition-all"
+                  >
+                    <MoreHorizontal className="w-4 h-4" />
+                  </button>
+                  
+                  {/* Dropdown menu */}
+                  {conversationMenuId === conversation.id && (
+                    <div className="absolute top-full right-0 mt-1 liquid-glass rounded-lg p-2 w-40 z-10">
+                      <button
+                        onClick={() => {
+                          setEditingConversationId(conversation.id);
+                          setConversationMenuId(null);
+                        }}
+                        className="flex items-center gap-2 w-full p-2 text-sm rounded-lg hover:bg-white/10 transition-colors"
+                      >
+                        <Edit className="w-4 h-4" />
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => deleteConversation(conversation.id)}
+                        className="flex items-center gap-2 w-full p-2 text-sm rounded-lg hover:bg-white/10 transition-colors text-red-400"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Excluir
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
 
           {/* New Conversation Button */}
           <div className="p-2 flex-shrink-0">
-            <button 
+            <button
               onClick={startNewConversation}
               className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 active:scale-[0.98]"
             >
@@ -363,133 +359,291 @@ const ChatPage = () => {
         </div>
       </aside>
 
-      {/* Desktop Sidebar Toggle Button */}
-      <button 
+      {/* Open sidebar button (desktop) */}
+      <button
         onClick={toggleDesktopSidebar}
-        className={`fixed left-4 top-24 w-12 h-12 rounded-full liquid-glass-pill hidden md:flex items-center justify-center shadow-lg z-20 transition-all duration-300 ${
-          showDesktopSidebar ? 'opacity-0 pointer-events-none transform -translate-x-4 scale-95' : 'opacity-100 pointer-events-auto transform translate-x-0 scale-100'
-        }`}
+        className={`fixed left-4 top-24 w-12 h-12 rounded-full liquid-glass flex items-center justify-center shadow-lg z-20 transition-all duration-300 ${
+          isSidebarOpen ? 'opacity-0 pointer-events-none -translate-x-4 scale-95' : 'opacity-100 pointer-events-auto translate-x-0 scale-100'
+        } hidden md:block`}
       >
         <PanelLeftOpen className="w-5 h-5 text-white" />
       </button>
 
-      {/* Main Chat Container */}
-      <div 
-        className={`chat-container transition-all duration-300 ${
-          showDesktopSidebar ? 'md:ml-[21rem]' : 'md:ml-0'
-        }`}
-      >
-        {/* Header */}
-        <Header 
-          variant={HeaderVariant.CHAT} 
-          onMenuToggle={toggleMobileSidebar}
-          showMobileSidebar={showMobileSidebar}
-        />
-
-        {/* Chat Area */}
-        <main 
-          ref={chatAreaRef}
-          className="chat-area hide-scrollbar"
-        >
-          <div className="chat-area-content w-full max-w-4xl mx-auto p-4 flex flex-col gap-6">
-            {messages.map((msg) => (
-              <div 
-                key={msg.id}
-                className={`flex items-start gap-4 ${
-                  msg.type === 'user' ? 'justify-end' : ''
-                }`}
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col relative z-10">
+        {/* Chat Header */}
+        <header className="fixed top-0 left-0 right-0 z-30 pt-3 pr-4 pb-3 pl-4">
+          <div 
+            className={`max-w-7xl flex sticky top-0 z-40 mr-auto ml-auto items-center justify-between liquid-glass-header rounded-full px-5 py-3 transition-all duration-300 ${
+              !isSidebarOpen ? '' : 'md:ml-80'
+            }`}
+          >
+            {/* Left Section */}
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate(-1)}
+                className="w-11 h-11 hidden md:flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95"
               >
-                {msg.type === 'assistant' && (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-emerald-400 flex items-center justify-center font-semibold text-sm shrink-0">
-                    AI
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                onClick={toggleMobileSidebar}
+                className="w-11 h-11 flex md:hidden items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => navigate('/home')}
+                className="flex items-center hover:opacity-80 transition-opacity"
+              >
+                <img 
+                  src="https://i.ibb.co/S4B3GHJN/Sem-nome-Apresenta-o-43-64-x-40-px-180-x-96-px.png" 
+                  alt="TrendlyAI Logo" 
+                  className="h-8 w-auto object-cover"
+                />
+              </button>
+            </div>
+
+            {/* Right Section */}
+            <div className="flex items-center gap-2">
+              {/* Notifications */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="relative w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95"
+                >
+                  <Bell className="w-5 h-5" />
+                  <span className="absolute top-2 right-2 flex h-2 w-2">
+                    <span className="notification-dot absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-pulse" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
+                  </span>
+                </button>
+                
+                {showNotifications && (
+                  <div className="absolute top-full right-0 mt-2 liquid-glass rounded-2xl p-4 w-80 z-50">
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="text-white font-semibold text-sm">Notificações</h4>
+                      <button className="text-xs text-white/60 hover:text-white transition-colors">
+                        Marcar como lidas
+                      </button>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="p-3 rounded-lg hover:bg-white/5 transition-colors">
+                        <p className="text-sm text-white">Nova trilha de Storytelling disponível!</p>
+                        <span className="text-xs text-white/60">há 5 min</span>
+                      </div>
+                    </div>
                   </div>
                 )}
+              </div>
+
+              {/* Profile */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                  className="w-11 h-11 rounded-full flex items-center justify-center transition-all ring-2 ring-transparent hover:ring-white/30 liquid-glass"
+                >
+                  <div className="w-9 h-9 rounded-full overflow-hidden">
+                    <img 
+                      src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=200&q=80" 
+                      alt="Avatar" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </button>
                 
-                <div className={`message-bubble ${
-                  msg.type === 'user' ? 'user-bubble' : 'assistant-bubble'
-                }`}>
-                  {msg.type === 'thinking' ? (
-                    <ThinkingAnimation text={msg.content} />
-                  ) : (
-                    <div className="markdown-content">
-                      <p>{msg.content}</p>
+                {showProfileDropdown && (
+                  <div className="absolute top-full right-0 mt-2 liquid-glass rounded-2xl p-4 w-72 z-50">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                        <img 
+                          src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=200&q=80" 
+                          alt="Avatar" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div>
+                        <h5 className="font-semibold text-white">João da Silva</h5>
+                        <p className="text-sm text-white/70">✨ Explorador</p>
+                      </div>
                     </div>
-                  )}
+                    
+                    <button
+                      onClick={() => navigate('/profile')}
+                      className="block text-center w-full px-4 py-2.5 mb-5 text-sm font-semibold text-white bg-white/10 hover:bg-white/20 rounded-full transition-all duration-300"
+                    >
+                      Meu Perfil
+                    </button>
+                    
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => navigate('/subscription')}
+                        className="flex items-center gap-3 p-2.5 text-white text-sm rounded-lg w-full hover:bg-white/10 transition-colors"
+                      >
+                        <Gem className="w-4 h-4 text-white/70" />
+                        <span>Gerenciar Assinatura</span>
+                      </button>
+                      <button
+                        onClick={() => navigate('/settings')}
+                        className="flex items-center gap-3 p-2.5 text-white text-sm rounded-lg w-full hover:bg-white/10 transition-colors"
+                      >
+                        <Settings className="w-4 h-4 text-white/70" />
+                        <span>Configurações da Conta</span>
+                      </button>
+                      <button
+                        onClick={() => navigate('/help')}
+                        className="flex items-center gap-3 p-2.5 text-white text-sm rounded-lg w-full hover:bg-white/10 transition-colors"
+                      >
+                        <HelpCircle className="w-4 h-4 text-white/70" />
+                        <span>Central de Ajuda</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Messages Area */}
+        <main 
+          ref={messagesRef}
+          className={`flex-1 overflow-y-auto pt-24 pb-32 transition-all duration-300 ${
+            !isSidebarOpen ? '' : 'md:ml-80'
+          }`}
+        >
+          <div className="w-full max-w-4xl mx-auto p-4 flex flex-col gap-6">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex items-start gap-4 animate-fade-in ${
+                  message.type === 'user' ? 'justify-end' : ''
+                }`}
+              >
+                {message.type === 'assistant' && (
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-emerald-400 flex items-center justify-center font-semibold text-sm shrink-0" />
+                )}
+                
+                <div className={`message-bubble max-w-[85%] rounded-2xl p-4 ${
+                  message.type === 'user' 
+                    ? 'user-bubble bg-white/15 border border-white/25' 
+                    : 'assistant-bubble bg-white/5 border border-white/15'
+                }`}>
+                  <p className="text-white/95 leading-relaxed">{message.content}</p>
                 </div>
                 
-                {msg.type === 'user' && (
+                {message.type === 'user' && (
                   <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-black font-semibold text-sm shrink-0">
-                    S
+                    U
                   </div>
                 )}
               </div>
             ))}
-            <div ref={messagesEndRef} />
+            
+            {isLoading && (
+              <div className="flex items-start gap-4 animate-fade-in">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-emerald-400 flex items-center justify-center font-semibold text-sm shrink-0" />
+                <div className="assistant-bubble bg-white/5 border border-white/15 rounded-2xl p-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse" />
+                    <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse delay-100" />
+                    <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse delay-200" />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </main>
 
-        {/* Chat Composer */}
+        {/* Message Input */}
         <div 
-          className={`composer-container transition-all duration-300 ${
-            showDesktopSidebar ? '' : ''
+          className={`fixed bottom-0 right-0 p-4 transition-all duration-300 ${
+            !isSidebarOpen ? 'left-0' : 'left-0 md:ml-80'
           }`}
         >
-          <div className="w-full max-w-4xl mx-auto p-4">
-            <div className={`chat-composer-container ${isFocused ? 'focused' : ''}`}>
-              <div className="overflow-y-auto max-h-[200px] hide-scrollbar p-1">
+          <div className="w-full max-w-4xl mx-auto">
+            <div className="liquid-glass rounded-2xl overflow-hidden">
+              <div className="overflow-y-auto max-h-[200px]">
                 <textarea
                   ref={textareaRef}
-                  value={message}
-                  onChange={(e) => {
-                    setMessage(e.target.value);
-                    adjustTextareaHeight();
-                  }}
-                  onFocus={() => setIsFocused(true)}
-                  onBlur={() => setIsFocused(false)}
-                  onKeyDown={handleKeyPress}
-                  placeholder={isSearchEnabled ? "Search the web..." : "Digite sua mensagem..."}
-                  className="chat-composer-textarea w-full hide-scrollbar p-3"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Converse com a IA..."
+                  className="w-full bg-white/5 border-none rounded-t-2xl text-white placeholder-white/60 resize-none outline-none min-h-[52px] leading-tight p-4 hide-scrollbar"
                   rows={1}
                 />
               </div>
               
-              <div className="chat-composer-actions">
+              <div className="bg-white/5 h-12 flex items-center justify-between px-4">
                 <div className="flex items-center gap-2">
-                  <label className="composer-btn cursor-pointer">
+                  <label className="cursor-pointer rounded-lg p-2 hover:bg-white/10 transition-colors">
                     <input type="file" className="hidden" />
-                    <Paperclip className="w-5 h-5" />
+                    <Paperclip className="w-4 h-4 text-white/60" />
                   </label>
                   
-                  <button 
+                  <button
                     onClick={() => setIsSearchEnabled(!isSearchEnabled)}
-                    className={`search-toggle-btn ${isSearchEnabled ? 'active' : ''}`}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border ${
+                      isSearchEnabled 
+                        ? 'bg-emerald-400/15 border-emerald-400 text-emerald-400' 
+                        : 'bg-white/5 border-transparent text-white/40 hover:text-white/80'
+                    }`}
                   >
                     <Globe className="w-4 h-4" />
-                    <span 
-                      className="search-text"
-                      style={{
-                        width: isSearchEnabled ? 'auto' : '0px',
-                        opacity: isSearchEnabled ? '1' : '0',
-                        overflow: 'hidden',
-                        transition: 'all 0.3s ease'
-                      }}
-                    >
-                      Search
-                    </span>
+                    <span className="text-sm">Search</span>
                   </button>
                 </div>
                 
-                <button 
+                <button
                   onClick={sendMessage}
-                  className={`composer-btn ${message.trim() ? 'active' : ''}`}
+                  disabled={!inputValue.trim() || isLoading}
+                  className={`rounded-lg p-2 transition-colors ${
+                    inputValue.trim() && !isLoading
+                      ? 'bg-emerald-400/15 text-emerald-400 hover:bg-emerald-400/25'
+                      : 'bg-white/5 text-white/40'
+                  }`}
                 >
-                  <Send className="w-5 h-5" />
+                  <Send className="w-4 h-4" />
                 </button>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        
+        .liquid-glass {
+          backdrop-filter: blur(20px);
+          background-color: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+        }
+        
+        .animate-fade-in {
+          animation: fadeIn 0.4s ease-out;
+        }
+        
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 };
