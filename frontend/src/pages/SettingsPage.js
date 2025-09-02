@@ -167,7 +167,7 @@ const SettingsPage = () => {
     const theme = themes.find(t => t.id === themeId);
     if (theme) {
       changeBackground(themeId);
-      showToastMessage('Ambiente atualizado.');
+      showToastMessage('Ambiente atualizado.', 'success');
     }
   };
 
