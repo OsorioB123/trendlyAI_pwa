@@ -134,6 +134,10 @@ const ChatPage = () => {
     setActiveConversationId(conversationId);
     setIsMobileSidebarOpen(false);
     setConversationMenuId(null);
+    // Close editing if active
+    if (editingConversationId) {
+      cancelRename();
+    }
   };
 
   const startRenaming = (conversationId, currentTitle) => {
