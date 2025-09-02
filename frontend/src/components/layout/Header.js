@@ -308,11 +308,11 @@ const Header = ({ variant = HeaderVariant.PRIMARY, onMenuToggle, showMobileSideb
                       <div className="credits-progress-bar w-full h-3">
                         <div 
                           className="credits-progress-fill" 
-                          style={{ width: `${User.credits.percentage}%` }}
+                          style={{ width: `${profile?.credits && profile?.max_credits ? (profile.credits / profile.max_credits * 100) : 0}%` }}
                         />
                       </div>
                       <p className="text-xs text-right text-white/60 mt-1">
-                        {User.credits.used}/{User.credits.total}
+                        {profile?.credits || 0}/{profile?.max_credits || 50}
                       </p>
                     </div>
                   </div>
