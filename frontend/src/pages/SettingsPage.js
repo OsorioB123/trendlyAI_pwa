@@ -329,13 +329,18 @@ const SettingsPage = () => {
 
   return (
     <div 
-      className="min-h-screen"
+      id="settings-container"
+      className="min-h-screen text-white font-['Inter'] antialiased selection:bg-white/20 relative"
       style={{
-        backgroundImage: `url("${currentBackground.value}?w=800&q=80")`
+        backgroundImage: `url("${currentBackground.value}")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
       }}
     >
-      {/* Background overlay */}
-      <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
+      {/* Background overlay with higher opacity */}
+      <div className="fixed inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
       
       {/* Header */}
       <Header variant={HeaderVariant.SECONDARY} />
