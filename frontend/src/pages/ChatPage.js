@@ -308,14 +308,7 @@ const ChatPage = () => {
           {/* Sidebar Header */}
           <div className="p-4 flex flex-col flex-shrink-0">
             <div className="flex justify-between items-center h-11">
-              <h3 class="text-white font-semibold tracking-tight hidden md:block">Conversas</h3>
-              <button
-                onClick={toggleDesktopSidebar}
-                className="text-white/60 hover:text-white hidden md:flex w-9 h-9 items-center justify-center rounded-full hover:bg-white/10 transition-colors"
-                aria-label="Minimizar sidebar"
-              >
-                <PanelLeftClose className="w-5 h-5" />
-              </button>
+              <h3 className="text-white font-semibold tracking-tight hidden md:block">Conversas</h3>
               <h3 className="text-white font-semibold tracking-tight mt-2 md:hidden">Conversas</h3>
               <button
                 onClick={() => setIsMobileSidebarOpen(false)}
