@@ -424,25 +424,8 @@ const ChatPage = () => {
         </div>
       </aside>
 
-      {/* Open sidebar button (desktop) */}
-      <button
-        onClick={toggleDesktopSidebar}
-        className={`fixed left-4 top-24 w-12 h-12 rounded-full liquid-glass-pill hidden md:flex items-center justify-center shadow-lg z-20 transition-all duration-300 ${
-          isSidebarOpen 
-            ? 'opacity-0 pointer-events-none -translate-x-4 scale-95' 
-            : 'opacity-100 pointer-events-auto translate-x-0 scale-100'
-        }`}
-        aria-label="Abrir sidebar"
-      >
-        <PanelLeftOpen className="w-5 h-5 text-white" />
-      </button>
-
-      {/* Main Chat Container */}
-      <div 
-        className={`flex-1 flex flex-col transition-all duration-300 ${
-          isSidebarOpen ? 'md:ml-80' : 'md:ml-0'
-        }`}
-      >
+      {/* Main Chat Container - Always with sidebar space on desktop */}
+      <div className="flex-1 flex flex-col md:ml-80">
         {/* Chat Header */}
         <header className="fixed top-0 left-0 right-0 z-30 pt-3 pr-4 pb-3 pl-4">
           <div 
