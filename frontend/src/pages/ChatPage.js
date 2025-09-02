@@ -671,9 +671,6 @@ const ChatPage = () => {
             {/* AI Thinking Indicator */}
             {isLoading && (
               <div className="flex items-start gap-4 ai-thinking-container">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-emerald-400 flex items-center justify-center font-semibold text-sm shrink-0">
-                  AI
-                </div>
                 <div className="assistant-bubble message-bubble bg-white/5 border border-white/15" style={{ borderRadius: '18px', padding: '12px 16px' }}>
                   <div className="ai-thinking-text text-lg font-semibold bg-gradient-to-r from-white/40 via-white/90 to-white/40 bg-clip-text text-transparent animate-pulse">
                     Pensando...
