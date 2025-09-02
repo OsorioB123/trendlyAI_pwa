@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   UserCircle2, 
@@ -7,12 +7,12 @@ import {
   Camera, 
   Edit2, 
   CheckCircle,
-  X
+  X,
+  Check
 } from 'lucide-react';
 import { useBackground } from '../contexts/BackgroundContext';
 import Header from '../components/layout/Header';
 import { HeaderVariant } from '../types/header';
-import ThemeSelector from '../components/onboarding/ThemeSelector';
 
 const SettingsPage = () => {
   const navigate = useNavigate();
