@@ -155,11 +155,56 @@ const SettingsPage = () => {
 
   const closeModal = (modalName) => {
     setModals(prev => ({ ...prev, [modalName]: false }));
+    // Reset form data
+    setEmailForm({ currentPassword: '', newEmail: '' });
+    setPasswordForm({ current: '', new: '', confirm: '' });
+    setTwoFAForm({ password: '' });
+    setDeleteForm({ confirmation: '' });
   };
 
   const handleNotificationToggle = (type) => {
     setNotifications(prev => ({ ...prev, [type]: !prev[type] }));
     showToastMessage('Configuração atualizada.');
+  };
+
+  const isEmailFormValid = () => {
+    return emailForm.currentPassword.length > 0 && 
+           emailForm.newEmail.includes('@') && 
+           emailForm.newEmail.length > 5;
+  };
+
+  const isPasswordFormValid = () => {
+    return passwordForm.current.length > 0 && 
+           passwordForm.new.length >= 6 && 
+           passwordForm.new === passwordForm.confirm;
+  };
+
+  const is2FAFormValid = () => {
+    return twoFAForm.password.length > 0;
+  };
+
+  const isDeleteFormValid = () => {
+    return deleteForm.confirmation === 'EXCLUIR';
+  };
+
+  const handleSaveEmail = () => {
+    closeModal('changeEmail');
+    showToastMessage('Email alterado com sucesso.');
+  };
+
+  const handleSavePassword = () => {
+    closeModal('changePassword');
+    showToastMessage('Sua senha foi alterada com sucesso.');
+  };
+
+  const handleSetup2FA = () => {
+    closeModal('setup2FA');
+    showToastMessage('Autenticação de dois fatores configurada.');
+  };
+
+  const handleDeleteAccount = () => {
+    closeModal('deleteAccount');
+    showToastMessage('Conta excluída permanentemente.');
   };
 
   const renderTabContent = () => {
