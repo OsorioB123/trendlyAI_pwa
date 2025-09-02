@@ -373,56 +373,53 @@ const SettingsPage = () => {
 
   return (
     <div 
-      id="settings-container"
-      className="min-h-screen text-white font-['Inter'] antialiased selection:bg-white/20 relative"
+      className="min-h-screen bg-gray-950 text-white overflow-x-hidden antialiased selection:bg-white/10 selection:text-white"
       style={{
         backgroundImage: `url("${currentBackground.value}")`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed'
+        backgroundAttachment: 'fixed',
+        transition: 'background-image 0.5s ease-in-out'
       }}
     >
-      {/* Background overlay with higher opacity */}
+      {/* Background overlay */}
       <div className="fixed inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
       
       {/* Header */}
       <Header variant={HeaderVariant.SECONDARY} />
       
       {/* Header spacer */}
-      <div style={{ height: '80px' }}></div>
+      <div style={{ height: '80px' }} />
 
-      <main className="w-full mx-auto pb-32">
-        <div id="settings-container" className="max-w-4xl relative mr-auto ml-auto px-4">
+      <main className="w-full mx-auto pb-32 relative z-10">
+        <div className="max-w-4xl relative mr-auto ml-auto px-4">
           <header className="mb-10 mt-12 opacity-0 animate-fade-in" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
-            <h2 className="text-3xl font-semibold text-white tracking-tight">Configurações</h2>
+            <h2 className="text-3xl font-semibold text-white tracking-tight font-['Geist']">Configurações</h2>
             <p className="text-white/70 mt-2">Gerencie seu perfil, conta e preferências.</p>
           </header>
 
-          {/* Tabs */}
-          <div className="w-full overflow-x-auto mb-10 opacity-0 animate-fade-in" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
-            <div className="settings-tabs-list">
-              <div id="active-tab-indicator" />
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`settings-tab-trigger ${
-                      activeTab === tab.id ? 'is-active' : ''
-                    } hover:text-white`}
-                    data-tab={tab.id}
-                  >
-                    <Icon className="w-4 h-4" style={{ strokeWidth: 1.5 }} />
-                    <span className="tab-label">{tab.label}</span>
-                  </button>
-                );
-              })}
+          <div className="w-full overflow-x-auto hide-scrollbar mb-10 opacity-0 animate-fade-in" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
+            <div className="settings-tabs-list relative inline-flex p-1 rounded-xl bg-white/5 border border-white/10">
+              <div 
+                ref={indicatorRef}
+                className="absolute z-1 top-1 left-0 h-[calc(100%-8px)] rounded-lg bg-white/10 transition-all duration-300 ease-in-out"
+              />
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  data-tab={tab.id}
+                  onClick={() => handleTabChange(tab.id)}
+                  className={`settings-tab-trigger relative z-2 border-none bg-none px-5 py-2.5 text-sm font-medium rounded-lg cursor-pointer transition-all duration-300 whitespace-nowrap flex items-center gap-2 ${
+                    activeTab === tab.id ? 'is-active text-white' : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  <tab.icon className="w-4 h-4" strokeWidth={1.5} />
+                  <span className="tab-label">{tab.label}</span>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Tab Content */}
           <div className="relative space-y-6 opacity-0 animate-fade-in" style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}>
             {renderTabContent()}
           </div>
