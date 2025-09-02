@@ -743,7 +743,7 @@ const SettingsPage = () => {
 };
 
 // Profile Field Component
-const ProfileField = ({ field, value, isEditing, onStartEdit, onSave, onCancel }) => {
+const ProfileField = ({ field, value, isEditing, onStartEdit, onSave, onCancel, saving = false }) => {
   const [editValue, setEditValue] = useState(value);
   const fieldRef = useRef(null);
 
@@ -753,6 +753,10 @@ const ProfileField = ({ field, value, isEditing, onStartEdit, onSave, onCancel }
       fieldRef.current.select();
     }
   }, [isEditing]);
+
+  useEffect(() => {
+    setEditValue(value);
+  }, [value]);
 
   const handleSave = () => {
     onSave(editValue);
@@ -770,9 +774,8 @@ const ProfileField = ({ field, value, isEditing, onStartEdit, onSave, onCancel }
   };
 
   const fieldLabels = {
-    name: 'Nome',
-    username: 'Nome de Usuário',
-    bio: 'Bio'
+    display_name: 'Nome',
+    bio: 'Biografia'
   };
 
   return (
