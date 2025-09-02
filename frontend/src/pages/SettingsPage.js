@@ -25,15 +25,27 @@ const SettingsPage = () => {
     avatar: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=200&q=80',
     email: 'sofia@example.com'
   });
-  const [editingField, setEditingField] = useState(null);
+  
+  const [currentEditingField, setCurrentEditingField] = useState(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
+  
+  // Modal states
   const [modals, setModals] = useState({
     changeEmail: false,
     changePassword: false,
     setup2FA: false,
     deleteAccount: false
   });
+  
+  // Form states for modals
+  const [emailForm, setEmailForm] = useState({ currentPassword: '', newEmail: '' });
+  const [passwordForm, setPasswordForm] = useState({ current: '', new: '', confirm: '' });
+  const [twoFAForm, setTwoFAForm] = useState({ password: '' });
+  const [deleteForm, setDeleteForm] = useState({ confirmation: '' });
+  
+  // Notification settings
   const [notifications, setNotifications] = useState({
     email: false,
     push: true,
@@ -42,6 +54,7 @@ const SettingsPage = () => {
   });
   
   const fileInputRef = useRef(null);
+  const indicatorRef = useRef(null);
 
   const tabs = [
     { id: 'profile', label: 'Perfil', icon: UserCircle2 },
