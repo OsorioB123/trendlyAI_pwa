@@ -264,10 +264,6 @@ const ChatPage = () => {
     setIsMobileSidebarOpen(!isMobileSidebarOpen);
   };
 
-  const toggleDesktopSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
   const toggleSearch = () => {
     setIsSearchEnabled(!isSearchEnabled);
   };
