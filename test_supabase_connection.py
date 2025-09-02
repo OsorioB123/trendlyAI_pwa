@@ -7,9 +7,14 @@ import asyncio
 import sys
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables
+backend_path = Path(__file__).parent / 'backend'
+env_path = backend_path / '.env'
+load_dotenv(env_path)
 
 # Add backend to path
-backend_path = Path(__file__).parent / 'backend'
 sys.path.append(str(backend_path))
 
 from supabase_client import supabase_client
