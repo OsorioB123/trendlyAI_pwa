@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Camera, 
@@ -14,12 +14,17 @@ import {
   Copy, 
   ArrowRight,
   ChevronDown,
-  Edit2
+  Edit2,
+  Loader,
+  Check,
+  X
 } from 'lucide-react';
 import { useBackground } from '../contexts/BackgroundContext';
+import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/layout/Header'; 
 import { HeaderVariant, User } from '../types/header';
 import TrackCard from '../components/cards/TrackCard';
+import { uploadImage, compressImage } from '../utils/supabaseStorage';
 
 // Mock data for user tracks
 const USER_TRACKS = [
