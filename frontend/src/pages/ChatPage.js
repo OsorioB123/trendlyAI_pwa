@@ -93,6 +93,23 @@ const ChatPage = () => {
     }
   }, [conversations, activeConversationId]);
 
+  // Close conversation menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (conversationMenuId && !event.target.closest('.relative.group')) {
+        setConversationMenuId(null);
+      }
+      if (editingConversationId && !event.target.closest('input[type="text"]') && !event.target.closest('.conversation-item')) {
+        cancelRename();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [conversationMenuId, editingConversationId]);
+
   const handleNewConversationWithMessage = (message) => {
     const newConversation = {
       id: Date.now(),
