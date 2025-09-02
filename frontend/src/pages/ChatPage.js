@@ -400,7 +400,7 @@ const ChatPage = () => {
         <header className="fixed top-0 left-0 right-0 z-30 pt-3 pr-4 pb-3 pl-4">
           <div 
             className={`max-w-7xl flex sticky top-0 z-40 mr-auto ml-auto items-center justify-between liquid-glass-header rounded-full px-5 py-3 transition-all duration-300 ${
-              !isSidebarOpen ? '' : 'md:ml-80'
+              isSidebarOpen ? 'md:ml-80' : 'md:ml-0'
             }`}
           >
             {/* Left Section */}
@@ -408,21 +408,24 @@ const ChatPage = () => {
               <button
                 onClick={() => navigate(-1)}
                 className="w-11 h-11 hidden md:flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95"
+                aria-label="Voltar"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
               <button
                 onClick={toggleMobileSidebar}
                 className="w-11 h-11 flex md:hidden items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95"
+                aria-label="Abrir Menu"
               >
                 <Menu className="w-5 h-5" />
               </button>
               <button
                 onClick={() => navigate('/home')}
                 className="flex items-center hover:opacity-80 transition-opacity"
+                aria-label="Voltar para a Home"
               >
                 <img 
-                  src="https://i.ibb.co/S4B3GHJN/Sem-nome-Apresenta-o-43-64-x-40-px-180-x-96-px.png" 
+                  src="https://i.ibb.co/S4B3GHJN/Sem-nome-Apresenta-o-43-64-x-40-px-180-x-96-px.png?w=800&q=80" 
                   alt="TrendlyAI Logo" 
                   className="h-8 w-auto object-cover"
                 />
@@ -431,42 +434,61 @@ const ChatPage = () => {
 
             {/* Right Section */}
             <div className="flex items-center gap-2">
-              {/* Notifications */}
               <div className="relative">
                 <button
-                  onClick={() => setShowNotifications(!showNotifications)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const isOpen = showNotifications;
+                    closeAllMenus();
+                    if (!isOpen) setShowNotifications(true);
+                  }}
                   className="relative w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95"
+                  aria-label="Notificações"
                 >
                   <Bell className="w-5 h-5" />
                   <span className="absolute top-2 right-2 flex h-2 w-2">
-                    <span className="notification-dot absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-pulse" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
+                    <span className="notification-dot absolute inline-flex h-full w-full rounded-full bg-[#2fd159] opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#2fd159]" />
                   </span>
                 </button>
                 
                 {showNotifications && (
-                  <div className="absolute top-full right-0 mt-2 liquid-glass rounded-2xl p-4 w-80 z-50">
-                    <div className="flex justify-between items-center mb-3">
+                  <div className="dropdown-menu show liquid-glass-opaque absolute top-full right-0 mt-2 p-2 w-80 z-50 rounded-lg">
+                    <div className="p-2 flex justify-between items-center">
                       <h4 className="text-white font-semibold text-sm">Notificações</h4>
                       <button className="text-xs text-white/60 hover:text-white transition-colors">
                         Marcar como lidas
                       </button>
                     </div>
-                    <div className="space-y-2">
-                      <div className="p-3 rounded-lg hover:bg-white/5 transition-colors">
+                    <div className="space-y-1">
+                      <button className="notification-item block p-3 rounded-lg w-full text-left hover:bg-white/10">
                         <p className="text-sm text-white">Nova trilha de Storytelling disponível!</p>
                         <span className="text-xs text-white/60">há 5 min</span>
-                      </div>
+                      </button>
+                      <button className="notification-item block p-3 rounded-lg w-full text-left hover:bg-white/10">
+                        <p className="text-sm text-white">Seu projeto "Roteiro para Reels" foi salvo.</p>
+                        <span className="text-xs text-white/60">há 2 horas</span>
+                      </button>
+                    </div>
+                    <div className="border-t border-white/10 mt-2 pt-2">
+                      <button className="block text-center text-xs text-white/70 hover:text-white transition-colors p-2 w-full">
+                        Ver todas as notificações
+                      </button>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Profile */}
               <div className="relative">
                 <button
-                  onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-                  className="w-11 h-11 rounded-full flex items-center justify-center transition-all ring-2 ring-transparent hover:ring-white/30 liquid-glass"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const isOpen = showProfileDropdown;
+                    closeAllMenus();
+                    if (!isOpen) setShowProfileDropdown(true);
+                  }}
+                  className="w-11 h-11 rounded-full flex items-center justify-center transition-all ring-2 ring-transparent hover:ring-white/30 liquid-glass-pill"
+                  aria-label="Menu do Perfil"
                 >
                   <div className="w-9 h-9 rounded-full overflow-hidden">
                     <img 
@@ -478,7 +500,7 @@ const ChatPage = () => {
                 </button>
                 
                 {showProfileDropdown && (
-                  <div className="absolute top-full right-0 mt-2 liquid-glass rounded-2xl p-4 w-72 z-50">
+                  <div className="dropdown-menu show liquid-glass-opaque absolute top-full right-0 mt-2 p-4 w-72 z-50 rounded-lg">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                         <img 
@@ -489,38 +511,83 @@ const ChatPage = () => {
                       </div>
                       <div>
                         <h5 className="font-semibold text-white">João da Silva</h5>
-                        <p className="text-sm text-white/70">✨ Explorador</p>
+                        <p className="text-sm text-white/70 flex items-center gap-1.5">
+                          <Sparkles className="w-4 h-4 text-yellow-400" />
+                          <span>Explorador</span>
+                        </p>
                       </div>
                     </div>
-                    
+
                     <button
                       onClick={() => navigate('/profile')}
-                      className="block text-center w-full px-4 py-2.5 mb-5 text-sm font-semibold text-white bg-white/10 hover:bg-white/20 rounded-full transition-all duration-300"
+                      className="block text-center w-full px-4 py-2.5 mb-5 text-sm font-semibold text-white bg-white/10 hover:bg-white/20 rounded-full transition-all duration-300 liquid-glass-pill"
                     >
                       Meu Perfil
                     </button>
-                    
-                    <div className="space-y-1">
-                      <button
+
+                    <div className="mb-2">
+                      <div className="flex justify-between items-center mb-1.5">
+                        <h6 className="text-xs font-medium text-white/80">Créditos Mensais</h6>
+                        <div className="relative">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowCreditsTooltip(!showCreditsTooltip);
+                            }}
+                            className="text-white/60 hover:text-white transition-colors"
+                            aria-label="Informações sobre créditos"
+                          >
+                            <Info className="w-3.5 h-3.5" />
+                          </button>
+                          {showCreditsTooltip && (
+                            <div className="credit-tooltip show liquid-glass absolute bottom-full right-0 mb-2 p-3 w-64 rounded-lg">
+                              <p className="text-xs text-white/90">
+                                Seus créditos são usados para conversas e se renovam a cada 24h. Precisa de mais?{' '}
+                                <button className="font-semibold text-[#2fd159] hover:underline">
+                                  Torne-se um Maestro
+                                </button>{' '}
+                                para ter acesso ilimitado.
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="credits-progress-bar w-full h-3 bg-white/10 rounded-full">
+                          <div 
+                            className="credits-progress-fill h-full bg-white rounded-full shadow-[0_0_15px_3px_rgba(255,255,255,0.4)] transition-all duration-700" 
+                            style={{ width: '70%' }}
+                          />
+                        </div>
+                        <p className="text-xs text-right text-white/60 mt-1">35/50</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1 border-t border-white/10 pt-3 mt-4">
+                      <button 
                         onClick={() => navigate('/subscription')}
-                        className="flex items-center gap-3 p-2.5 text-white text-sm rounded-lg w-full hover:bg-white/10 transition-colors"
+                        className="menu-item flex items-center gap-3 p-2.5 text-white text-sm rounded-lg w-full text-left hover:bg-white/10"
                       >
                         <Gem className="w-4 h-4 text-white/70" />
                         <span>Gerenciar Assinatura</span>
                       </button>
-                      <button
+                      <button 
                         onClick={() => navigate('/settings')}
-                        className="flex items-center gap-3 p-2.5 text-white text-sm rounded-lg w-full hover:bg-white/10 transition-colors"
+                        className="menu-item flex items-center gap-3 p-2.5 text-white text-sm rounded-lg w-full text-left hover:bg-white/10"
                       >
                         <Settings className="w-4 h-4 text-white/70" />
-                        <span>Configurações da Conta</span>
+                        <span>Configurações</span>
                       </button>
-                      <button
-                        onClick={() => navigate('/help')}
-                        className="flex items-center gap-3 p-2.5 text-white text-sm rounded-lg w-full hover:bg-white/10 transition-colors"
+                      <div className="border-t border-white/10 my-2" />
+                      <button 
+                        onClick={() => {
+                          localStorage.removeItem('trendlyai-user-authenticated');
+                          navigate('/login');
+                        }}
+                        className="menu-item flex items-center gap-3 p-2.5 text-red-400 hover:text-red-300 text-sm rounded-lg w-full text-left hover:bg-white/10"
                       >
-                        <HelpCircle className="w-4 h-4 text-white/70" />
-                        <span>Central de Ajuda</span>
+                        <LogOut className="w-4 h-4" />
+                        <span>Sair da Conta</span>
                       </button>
                     </div>
                   </div>
