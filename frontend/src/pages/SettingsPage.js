@@ -354,7 +354,7 @@ const SettingsPage = () => {
                       onChange={handleAvatarChange}
                     />
                     <img 
-                      src={profileData.avatar} 
+                      src={profile?.avatar_url || '/default-avatar.png'} 
                       alt="Avatar" 
                       className="w-20 h-20 rounded-full object-cover transition-all duration-300 ring-1 ring-white/10 group-hover:ring-white/20"
                     />
