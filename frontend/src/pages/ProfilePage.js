@@ -116,31 +116,107 @@ const ProfilePage = () => {
   };
 
   const handleAvatarClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleAvatarChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setProfileData(prev => ({ ...prev, avatar: e.target.result }));
-      };
-      reader.readAsDataURL(file);
+    if (!uploading) {
+      fileInputRef.current?.click();
     }
   };
 
-  const handleFieldEdit = (field, value) => {
-    setProfileData(prev => ({ ...prev, [field]: value }));
+  const handleAvatarChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      // Compress image before upload
+      const compressedFile = await compressImage(file, 400, 0.8);
+      
+      // Upload to Supabase Storage
+      const { data: avatarUrl, error: uploadError } = await uploadImage(
+        compressedFile, 
+        'avatars', 
+        user.id
+      );
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // Update profile with new avatar URL
+      const { error: updateError } = await updateAvatar(avatarUrl);
+      
+      if (updateError) {
+        throw updateError;
+      }
+
+      setSuccess('Avatar atualizado com sucesso!');
+      setTimeout(() => setSuccess(''), 3000);
+
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      setError('Erro ao atualizar avatar. Tente novamente.');
+      setTimeout(() => setError(''), 5000);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleFieldEdit = (field) => {
+    setEditingField(field);
+    setOriginalData({ ...formData });
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveField = async (field) => {
+    if (formData[field] === originalData[field]) {
+      setEditingField(null);
+      return;
+    }
+
+    setSaving(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const updates = { [field]: formData[field] };
+      const { error } = await updateProfile(updates);
+      
+      if (error) {
+        throw error;
+      }
+
+      setSuccess('Perfil atualizado com sucesso!');
+      setTimeout(() => setSuccess(''), 3000);
+      setEditingField(null);
+
+    } catch (error) {
+      console.error('Profile update error:', error);
+      setError('Erro ao atualizar perfil. Tente novamente.');
+      setTimeout(() => setError(''), 5000);
+      
+      // Revert changes
+      setFormData(prev => ({ ...prev, [field]: originalData[field] }));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancelEdit = (field) => {
+    setFormData(prev => ({ ...prev, [field]: originalData[field] }));
     setEditingField(null);
   };
 
   const handleKeyDown = (e, field) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      handleFieldEdit(field, e.target.textContent);
+      handleSaveField(field);
     } else if (e.key === 'Escape') {
-      setEditingField(null);
+      handleCancelEdit(field);
     }
   };
 
