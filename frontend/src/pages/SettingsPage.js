@@ -281,124 +281,89 @@ const SettingsPage = () => {
 
       case 'security':
         return (
-          <div className="bg-white/8 backdrop-blur-lg border border-white/14 rounded-2xl p-8 md:p-10">
-            <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-white">Segurança da Conta</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 rounded-lg hover:bg-white/5 transition-colors">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-sm font-medium text-white/70 mb-1">Email</label>
-                    <span className="text-white break-all">{profileData.email}</span>
-                  </div>
-                  <button 
-                    onClick={() => openModal('changeEmail')}
-                    className="ml-4 px-4 py-2 border border-white/20 text-white/80 hover:text-white hover:bg-white/10 rounded-lg text-sm transition-all"
-                  >
-                    Alterar
-                  </button>
+          <section className="settings-panel is-active">
+            <div className="liquid-glass p-8 md:p-10">
+              <div className="space-y-6">
+                <h3 className="text-lg font-semibold text-white font-['Geist']">Segurança da Conta</h3>
+                <div className="space-y-4">
+                  <SecurityField
+                    label="Email"
+                    value={profileData.email}
+                    onAction={() => openModal('changeEmail')}
+                    actionLabel="Alterar"
+                  />
+                  
+                  <SecurityField
+                    label="Senha"
+                    value="••••••••"
+                    onAction={() => openModal('changePassword')}
+                    actionLabel="Alterar"
+                  />
+                  
+                  <SecurityField
+                    label="Autenticação de Dois Fatores"
+                    value="Adicione uma camada extra de segurança"
+                    onAction={() => openModal('setup2FA')}
+                    actionLabel="Configurar"
+                    isDescription
+                  />
                 </div>
 
-                <div className="flex items-center justify-between p-4 rounded-lg hover:bg-white/5 transition-colors">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-sm font-medium text-white/70 mb-1">Senha</label>
-                    <span className="text-white">••••••••</span>
+                <div className="border-t border-white/10 pt-6">
+                  <div className="danger-zone p-6 rounded-lg border border-red-500/40 bg-red-500/5">
+                    <h4 className="text-white font-semibold mb-2">Zona Perigosa</h4>
+                    <p className="text-white/70 text-sm mb-4">Essas ações são irreversíveis. Proceda com cuidado.</p>
+                    <button 
+                      onClick={() => openModal('deleteAccount')}
+                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors"
+                    >
+                      Excluir Conta
+                    </button>
                   </div>
-                  <button 
-                    onClick={() => openModal('changePassword')}
-                    className="ml-4 px-4 py-2 border border-white/20 text-white/80 hover:text-white hover:bg-white/10 rounded-lg text-sm transition-all"
-                  >
-                    Alterar
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between p-4 rounded-lg hover:bg-white/5 transition-colors">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-sm font-medium text-white/70 mb-1">
-                      Autenticação de Dois Fatores
-                    </label>
-                    <span className="text-white/80 text-sm">
-                      Adicione uma camada extra de segurança
-                    </span>
-                  </div>
-                  <button 
-                    onClick={() => openModal('setup2FA')}
-                    className="ml-4 px-4 py-2 border border-white/20 text-white/80 hover:text-white hover:bg-white/10 rounded-lg text-sm transition-all"
-                  >
-                    Configurar
-                  </button>
-                </div>
-              </div>
-
-              <div className="border-t border-white/10 pt-6">
-                <div className="border border-red-500/40 bg-red-500/5 p-6 rounded-lg">
-                  <h4 className="text-white font-semibold mb-2">Zona Perigosa</h4>
-                  <p className="text-white/70 text-sm mb-4">
-                    Essas ações são irreversíveis. Proceda com cuidado.
-                  </p>
-                  <button 
-                    onClick={() => openModal('deleteAccount')}
-                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors"
-                  >
-                    Excluir Conta
-                  </button>
                 </div>
               </div>
             </div>
-          </div>
+          </section>
         );
 
       case 'notifications':
         return (
-          <div className="bg-white/8 backdrop-blur-lg border border-white/14 rounded-2xl p-8 md:p-10">
-            <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-white">Preferências de Notificação</h3>
+          <section className="settings-panel is-active">
+            <div className="liquid-glass p-8 md:p-10">
               <div className="space-y-6">
-                {[
-                  { 
-                    key: 'email', 
-                    title: 'Notificações por email', 
-                    description: 'Receba atualizações importantes por email' 
-                  },
-                  { 
-                    key: 'push', 
-                    title: 'Notificações push', 
-                    description: 'Receba notificações no navegador' 
-                  },
-                  { 
-                    key: 'weekly', 
-                    title: 'Relatórios semanais', 
-                    description: 'Receba um resumo semanal da sua atividade' 
-                  },
-                  { 
-                    key: 'marketing', 
-                    title: 'Marketing', 
-                    description: 'Receba dicas e ofertas especiais' 
-                  }
-                ].map((item) => (
-                  <div key={item.key} className="flex items-center justify-between p-4 rounded-lg hover:bg-white/5 transition-colors">
-                    <div className="flex-1 mr-4">
-                      <p className="text-white font-medium">{item.title}</p>
-                      <p className="text-sm text-white/70">{item.description}</p>
-                    </div>
-                    <div 
-                      className={`w-11 h-6 rounded-full p-1 cursor-pointer transition-colors flex-shrink-0 ${
-                        notifications[item.key] ? 'bg-white' : 'bg-white/20 hover:bg-white/30'
-                      }`}
-                      onClick={() => handleNotificationToggle(item.key)}
-                    >
-                      <div 
-                        className={`w-4 h-4 rounded-full transition-all ${
-                          notifications[item.key] 
-                            ? 'bg-gray-900 transform translate-x-5' 
-                            : 'bg-white'
-                        }`}
-                      />
-                    </div>
-                  </div>
-                ))}
+                <h3 className="text-lg font-semibold text-white font-['Geist']">Preferências de Notificação</h3>
+                <div className="space-y-6">
+                  <NotificationToggle
+                    title="Notificações por email"
+                    description="Receba atualizações importantes por email"
+                    checked={notifications.email}
+                    onChange={() => handleNotificationToggle('email')}
+                  />
+                  
+                  <NotificationToggle
+                    title="Notificações push"
+                    description="Receba notificações no navegador"
+                    checked={notifications.push}
+                    onChange={() => handleNotificationToggle('push')}
+                  />
+                  
+                  <NotificationToggle
+                    title="Relatórios semanais"
+                    description="Receba um resumo semanal da sua atividade"
+                    checked={notifications.weekly}
+                    onChange={() => handleNotificationToggle('weekly')}
+                  />
+                  
+                  <NotificationToggle
+                    title="Marketing"
+                    description="Receba dicas e ofertas especiais"
+                    checked={notifications.marketing}
+                    onChange={() => handleNotificationToggle('marketing')}
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          </section>
         );
 
       default:
