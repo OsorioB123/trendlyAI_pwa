@@ -417,7 +417,7 @@ const SettingsPage = () => {
                 <div className="space-y-4">
                   <SecurityField
                     label="Email"
-                    value={profileData.email}
+                    value={formData.email}
                     onAction={() => openModal('changeEmail')}
                     actionLabel="Alterar"
                   />
