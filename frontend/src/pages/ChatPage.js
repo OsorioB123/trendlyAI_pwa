@@ -651,56 +651,70 @@ const ChatPage = () => {
           </div>
         </main>
 
-        {/* Message Input */}
+        {/* Chat Composer */}
         <div 
-          className={`fixed bottom-0 right-0 p-4 transition-all duration-300 ${
-            !isSidebarOpen ? 'left-0' : 'left-0 md:ml-80'
+          className={`fixed bottom-0 left-0 right-0 z-20 p-4 transition-all duration-300 ${
+            isSidebarOpen ? 'md:ml-80' : 'md:ml-0'
           }`}
         >
           <div className="w-full max-w-4xl mx-auto">
-            <div className="liquid-glass rounded-2xl overflow-hidden">
-              <div className="overflow-y-auto max-h-[200px]">
+            <div 
+              className={`chat-composer-container bg-[#1E1F22] border border-white/10 rounded-2xl flex flex-col transition-all duration-200 ${
+                isInputFocused ? 'border-white/30' : ''
+              }`}
+            >
+              <div className="overflow-y-auto max-h-[200px] hide-scrollbar p-1">
                 <textarea
                   ref={textareaRef}
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  value={messageInput}
+                  onChange={(e) => setMessageInput(e.target.value)}
+                  onFocus={() => setIsInputFocused(true)}
+                  onBlur={() => setIsInputFocused(false)}
+                  onKeyDown={handleKeyPress}
                   placeholder="Converse com a IA..."
-                  className="w-full bg-white/5 border-none rounded-t-2xl text-white placeholder-white/60 resize-none outline-none min-h-[52px] leading-tight p-4 hide-scrollbar"
+                  className="chat-composer-textarea w-full hide-scrollbar p-3 bg-transparent border-none text-white resize-none outline-none leading-6 text-base placeholder-white/50"
+                  style={{ minHeight: '52px', maxHeight: '200px' }}
                   rows={1}
                 />
               </div>
               
-              <div className="bg-white/5 h-12 flex items-center justify-between px-4">
+              <div className="chat-composer-actions flex items-center justify-between p-2 px-3">
                 <div className="flex items-center gap-2">
-                  <label className="cursor-pointer rounded-lg p-2 hover:bg-white/10 transition-colors">
+                  <label className="composer-btn flex items-center justify-center w-9 h-9 rounded-lg bg-white/8 text-white/60 hover:bg-white/12 hover:text-white transition-all cursor-pointer">
                     <input type="file" className="hidden" />
-                    <Paperclip className="w-4 h-4 text-white/60" />
+                    <Paperclip className="w-5 h-5" />
                   </label>
                   
                   <button
-                    onClick={() => setIsSearchEnabled(!isSearchEnabled)}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border ${
+                    onClick={toggleSearch}
+                    className={`search-toggle-btn flex items-center gap-2 h-9 px-2 rounded-full cursor-pointer transition-all border ${
                       isSearchEnabled 
-                        ? 'bg-emerald-400/15 border-emerald-400 text-emerald-400' 
-                        : 'bg-white/5 border-transparent text-white/40 hover:text-white/80'
+                        ? 'active bg-blue-500/15 border-blue-500 text-blue-500' 
+                        : 'bg-white/8 border-transparent text-white/60 hover:text-white hover:bg-white/12'
                     }`}
                   >
                     <Globe className="w-4 h-4" />
-                    <span className="text-sm">Search</span>
+                    <span 
+                      className="search-text transition-all duration-300 whitespace-nowrap overflow-hidden"
+                      style={{
+                        width: isSearchEnabled ? 'auto' : '0px',
+                        opacity: isSearchEnabled ? '1' : '0'
+                      }}
+                    >
+                      Search
+                    </span>
                   </button>
                 </div>
                 
                 <button
                   onClick={sendMessage}
-                  disabled={!inputValue.trim() || isLoading}
-                  className={`rounded-lg p-2 transition-colors ${
-                    inputValue.trim() && !isLoading
-                      ? 'bg-emerald-400/15 text-emerald-400 hover:bg-emerald-400/25'
-                      : 'bg-white/5 text-white/40'
+                  className={`composer-btn flex items-center justify-center w-9 h-9 rounded-lg transition-all ${
+                    messageInput.trim() 
+                      ? 'active bg-white/15 text-white' 
+                      : 'bg-white/8 text-white/60 hover:bg-white/12 hover:text-white'
                   }`}
                 >
-                  <Send className="w-4 h-4" />
+                  <Send className="w-5 h-5" />
                 </button>
               </div>
             </div>
