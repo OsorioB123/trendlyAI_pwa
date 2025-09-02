@@ -345,10 +345,15 @@ const Header = ({ variant = HeaderVariant.PRIMARY, onMenuToggle, showMobileSideb
                     
                     <button 
                       onClick={handleLogout}
-                      className="menu-item flex items-center gap-3 p-2.5 text-red-400 hover:text-red-300 text-sm rounded-lg w-full text-left"
+                      disabled={isLoggingOut}
+                      className="menu-item flex items-center gap-3 p-2.5 text-red-400 hover:text-red-300 text-sm rounded-lg w-full text-left disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <LogOut className="w-4 h-4" />
-                      <span>Sair da Conta</span>
+                      {isLoggingOut ? (
+                        <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <LogOut className="w-4 h-4" />
+                      )}
+                      <span>{isLoggingOut ? 'Saindo...' : 'Sair da Conta'}</span>
                     </button>
                   </div>
                 </div>
