@@ -24,6 +24,7 @@ import {
   Pencil
 } from 'lucide-react';
 import { useBackground } from '../contexts/BackgroundContext';
+import '../styles/chat.css';
 
 const ChatPage = () => {
   const navigate = useNavigate();
