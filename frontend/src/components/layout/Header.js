@@ -254,15 +254,15 @@ const Header = ({ variant = HeaderVariant.PRIMARY, onMenuToggle, showMobileSideb
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                       <img 
-                        src={User.avatar} 
+                        src={profile?.avatar_url || 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=200&q=80'} 
                         alt="Avatar" 
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div>
-                      <h5 className="font-semibold text-white">{User.name}</h5>
+                      <h5 className="font-semibold text-white">{profile?.display_name || 'Usuário'}</h5>
                       <p className="text-sm text-white/70 flex items-center gap-1.5">
-                        ✨ <span>{User.title}</span>
+                        ✨ <span>{profile?.level || 'Explorador'}</span>
                       </p>
                     </div>
                   </div>
