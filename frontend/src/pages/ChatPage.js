@@ -31,30 +31,37 @@ const ChatPage = () => {
   const { currentBackground } = useBackground();
   
   // Chat state
-  const [messages, setMessages] = useState([]);
-  const [inputValue, setInputValue] = useState('');
-  const [isSearchEnabled, setIsSearchEnabled] = useState(false);
+  const [conversations, setConversations] = useState([
+    { 
+      id: Date.now(), 
+      title: 'Ideias para Reels de Café', 
+      messages: [
+        { role: 'assistant', content: 'Olá! 👋 Sou seu assistente TrendlyAI. Como posso impulsionar suas ideias hoje?' }
+      ] 
+    }
+  ]);
+  const [activeConversationId, setActiveConversationId] = useState(conversations[0].id);
+  const [messageInput, setMessageInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
   // Sidebar state
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
-  // Conversations state
-  const [conversations, setConversations] = useState([
-    { id: 1, title: 'Ideias para Reels de Café', timestamp: 'Agora', isActive: true }
-  ]);
-  const [activeConversationId, setActiveConversationId] = useState(1);
-  const [editingConversationId, setEditingConversationId] = useState(null);
-  const [conversationMenuId, setConversationMenuId] = useState(null);
-  
-  // Dropdowns state
+  // Dropdown states
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showCreditsTooltip, setShowCreditsTooltip] = useState(false);
+  const [conversationMenuId, setConversationMenuId] = useState(null);
+  
+  // Input state
+  const [isSearchEnabled, setIsSearchEnabled] = useState(true);
+  const [isInputFocused, setIsInputFocused] = useState(false);
   
   // Refs
-  const messagesRef = useRef(null);
   const textareaRef = useRef(null);
+  const chatAreaRef = useRef(null);
+  const chatContentRef = useRef(null);
 
   // Initialize messages on component mount or when conversation changes
   useEffect(() => {
