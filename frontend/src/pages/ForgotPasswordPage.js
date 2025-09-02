@@ -1,60 +1,134 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Lock, CheckCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowLeft, MailCheck, Lock } from 'lucide-react';
 import { useBackground } from '../contexts/BackgroundContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const ForgotPasswordPage = () => {
-  const navigate = useNavigate();
   const { currentBackground } = useBackground();
+  const { resetPassword } = useAuth();
   const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [isEmailSent, setIsEmailSent] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleEmailChange = (e) => {
+  const handleInputChange = (e) => {
     setEmail(e.target.value);
-    if (emailError) {
-      setEmailError('');
-    }
+    // Clear error when user starts typing
+    if (error) setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError('');
 
-    // Clear previous errors
-    setEmailError('');
-    setShowSuccess(false);
-
-    // Validate email
+    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setEmailError('Por favor, insira um e-mail válido.');
+      setError('Por favor, insira um e-mail válido.');
+      setIsLoading(false);
       return;
     }
 
-    // Show loading
-    setIsLoading(true);
-
     try {
-      // Simulate sending email (replace with real Supabase integration)
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const { data, error: resetError } = await resetPassword(email);
+      
+      if (resetError) {
+        console.error('Reset password error:', resetError);
+        
+        // Handle specific error types
+        if (resetError.message.includes('user not found')) {
+          setError('Não encontramos uma conta com este e-mail.');
+        } else if (resetError.message.includes('rate limit')) {
+          setError('Muitas tentativas. Tente novamente em alguns minutos.');
+        } else {
+          setError(resetError.message || 'Erro ao enviar e-mail. Tente novamente.');
+        }
+        return;
+      }
 
-      // Show success message
-      setShowSuccess(true);
-      setEmail('');
-
-      console.log('E-mail de recuperação enviado para:', email);
-
+      console.log('Password reset email sent successfully:', data);
+      setIsEmailSent(true);
+      
     } catch (error) {
-      // Handle error
-      setEmailError('Erro ao enviar e-mail. Tente novamente.');
-      console.error('Erro ao enviar e-mail de recuperação:', error);
-
+      console.error('Reset password error:', error);
+      setError('Erro inesperado. Tente novamente.');
     } finally {
-      // Restore button
       setIsLoading(false);
     }
   };
+
+  // Success state
+  if (isEmailSent) {
+    return (
+      <div 
+        className="min-h-screen flex flex-col items-center justify-center font-['Inter'] text-white p-4 bg-black"
+        style={{
+          backgroundImage: `url("${currentBackground.value}?w=800&q=80")`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
+
+        <main className="w-full max-w-md flex flex-col items-center">
+          {/* Logo */}
+          <img 
+            src="https://i.ibb.co/DfMChfL8/Trendly-AI-branco.webp?w=800&q=80" 
+            alt="Logo da TrendlyAI" 
+            className="w-48 mb-10 animate-fade-in-up object-cover"
+          />
+
+          {/* Success Card */}
+          <div className="w-full liquid-glass rounded-3xl p-8 flex flex-col items-center text-center">
+            <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mb-6">
+              <MailCheck className="w-8 h-8 text-emerald-400" strokeWidth={1.5} />
+            </div>
+
+            <h2 className="text-2xl font-semibold tracking-tight mb-4 font-['Geist']">
+              E-mail Enviado!
+            </h2>
+
+            <p className="text-white/70 mb-6 leading-relaxed">
+              Enviamos as instruções de recuperação para{' '}
+              <span className="font-semibold text-white">{email}</span>.
+              <br />
+              Verifique sua caixa de entrada e spam.
+            </p>
+
+            <div className="w-full space-y-4">
+              <Link
+                to="/login"
+                className="w-full flex items-center justify-center text-white text-[15px] font-semibold py-3 rounded-xl bg-white/10 border border-white/20 shadow-lg hover:bg-white/15 hover:-translate-y-1 hover:shadow-2xl active:-translate-y-0.5 active:scale-[0.99] transition-all duration-300"
+              >
+                Voltar para Login
+              </Link>
+
+              <button
+                onClick={() => {
+                  setIsEmailSent(false);
+                  setEmail('');
+                  setError('');
+                }}
+                className="w-full text-white/60 hover:text-white text-sm transition-colors duration-300"
+              >
+                Tentar com outro e-mail
+              </button>
+            </div>
+
+            {/* Security Badge */}
+            <div className="flex items-center justify-center gap-2 text-xs text-white/40 mt-6">
+              <Lock className="w-3 h-3" strokeWidth={1.5} />
+              <span>Protegido por Supabase</span>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div 
