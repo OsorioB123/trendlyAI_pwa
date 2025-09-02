@@ -53,31 +53,32 @@ const ChatPage = () => {
   const messagesRef = useRef(null);
   const textareaRef = useRef(null);
 
-  // Mock conversations data
-  const conversations = [
-    { id: 1, title: 'Ideias para Reels de Café', time: 'Agora', active: true },
-    { id: 2, title: 'Estratégia de Marketing Digital', time: '2h atrás', active: false },
-    { id: 3, title: 'Roteiro para YouTube', time: 'Ontem', active: false }
-  ];
-
-  // Thinking animation texts
-  const thinkingTexts = ['Pensando...', 'Processando...', 'Analisando...', 'Computando...', 'Quase lá...'];
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
+  // Initialize messages on component mount or when conversation changes
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    // Check if coming from home page with a message
+    const homeMessage = location.state?.message;
+    if (homeMessage) {
+      startNewConversationWithMessage(homeMessage);
+    } else {
+      // Default welcome message
+      setMessages([
+        {
+          id: 1,
+          type: 'assistant',
+          content: 'Olá! 👋 Sou seu assistente TrendlyAI. Como posso impulsionar suas ideias hoje?',
+          timestamp: new Date()
+        }
+      ]);
+    }
+  }, [location.state]);
 
-  const adjustTextareaHeight = () => {
+  // Auto-resize textarea
+  useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      const newHeight = Math.min(Math.max(textareaRef.current.scrollHeight, 52), 200);
-      textareaRef.current.style.height = newHeight + 'px';
+      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 200) + 'px';
     }
-  };
+  }, [inputValue]);
 
   const createThinkingMessage = () => {
     return {
