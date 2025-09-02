@@ -152,7 +152,7 @@ const ForgotPasswordPage = () => {
           className="w-48 mb-10 animate-fade-in-up object-cover"
         />
 
-        {/* Recovery Card */}
+        {/* Reset Password Card */}
         <div 
           className="w-full liquid-glass rounded-3xl p-8 flex flex-col animate-fade-in-up" 
           style={{ animationDelay: '100ms' }}
@@ -166,85 +166,86 @@ const ForgotPasswordPage = () => {
               <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
               Voltar para o login
             </Link>
-            <div 
-              className="w-full mt-6 animate-fade-in-up" 
+            <h2 
+              className="text-2xl font-semibold tracking-tight mt-6 animate-fade-in-up font-['Geist']" 
               style={{ animationDelay: '300ms' }}
             >
-              <h2 className="text-2xl font-semibold tracking-tight mb-2 font-['Geist']">
-                Recuperar Senha
-              </h2>
-              <p className="text-white/70 text-sm leading-relaxed">
-                Digite seu e-mail e enviaremos um link para você redefinir sua senha.
-              </p>
-            </div>
-          </div>
-
-          {/* Recovery Form */}
-          <form 
-            onSubmit={handleSubmit} 
-            className="w-full flex flex-col gap-5 mt-8" 
-            noValidate
-          >
-            <div 
-              className="animate-fade-in-up" 
+              Recuperar Senha
+            </h2>
+            <p 
+              className="text-white/70 text-sm mt-2 animate-fade-in-up" 
               style={{ animationDelay: '400ms' }}
             >
+              Digite seu e-mail e enviaremos instruções para redefinir sua senha.
+            </p>
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mt-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 text-sm">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="mt-6">
+            {/* Email Input */}
+            <div 
+              className="animate-fade-in-up" 
+              style={{ animationDelay: '500ms' }}
+            >
+              <label htmlFor="email" className="block text-sm font-medium text-white/80 mb-2">
+                E-mail cadastrado
+              </label>
               <input
                 type="email"
                 id="email"
                 name="email"
-                placeholder="seu.email@exemplo.com"
                 value={email}
-                onChange={handleEmailChange}
-                className={`form-input w-full rounded-xl px-4 py-3 text-sm text-white placeholder-white/50 bg-black/20 border transition-all duration-300 outline-none focus:bg-black/25 focus:border-white/40 focus:ring-4 focus:ring-white/10 ${
-                  emailError ? 'border-rose-400' : 'border-white/15'
-                }`}
+                onChange={handleInputChange}
+                disabled={isLoading}
+                className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-white/50 bg-black/20 border border-white/15 transition-all duration-300 outline-none focus:bg-black/25 focus:border-white/40 focus:ring-4 focus:ring-white/10 disabled:opacity-50"
+                placeholder="seu@email.com"
                 required
               />
-              {emailError && (
-                <p className="error-message show text-rose-400 text-xs mt-1">
-                  {emailError}
-                </p>
-              )}
             </div>
 
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading}
-              className="primary-action-btn w-full text-white text-[15px] font-semibold py-3 rounded-xl shadow-lg animate-fade-in-up bg-white/10 border border-white/20 hover:bg-white/15 hover:-translate-y-1 hover:shadow-2xl active:-translate-y-0.5 active:scale-[0.99] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ animationDelay: '500ms' }}
+              disabled={isLoading || !email}
+              className="w-full text-white text-[15px] font-semibold py-3 rounded-xl bg-white/10 border border-white/20 shadow-lg hover:bg-white/15 hover:-translate-y-1 hover:shadow-2xl active:-translate-y-0.5 active:scale-[0.99] focus:outline-none focus-visible:ring-4 focus-visible:ring-white/10 transition-all duration-300 mt-6 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none animate-fade-in-up"
+              style={{ animationDelay: '600ms' }}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center gap-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white" />
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                   Enviando...
                 </div>
               ) : (
-                'Enviar Link de Recuperação'
+                'Enviar Instruções'
               )}
             </button>
           </form>
 
-          {/* Success Message */}
-          {showSuccess && (
-            <div className="success-message rounded-xl p-4 mt-4 animate-fade-in-up bg-green-500/10 border border-green-500/20 backdrop-blur-20">
-              <div className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 shrink-0" strokeWidth={1.5} />
-                <div>
-                  <h3 className="text-green-400 font-medium text-sm">E-mail enviado com sucesso!</h3>
-                  <p className="text-green-300/70 text-xs mt-1 leading-relaxed">
-                    Verifique sua caixa de entrada e siga as instruções no e-mail para redefinir sua senha.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Links */}
+          <div 
+            className="flex flex-col items-center gap-3 text-center mt-6"
+            style={{ animationDelay: '700ms' }}
+          >
+            <Link 
+              to="/signup"
+              className="text-white/60 hover:text-white text-xs transition-colors duration-300 animate-fade-in-up"
+              style={{ animationDelay: '700ms' }}
+            >
+              Não tem uma conta?{' '}
+              <span className="font-semibold text-white">Crie uma aqui</span>
+            </Link>
+          </div>
 
           {/* Security Badge */}
           <div 
-            className="mt-auto pt-8 flex items-center justify-center gap-2 text-xs text-white/40 animate-fade-in-up" 
-            style={{ animationDelay: '600ms' }}
+            className="flex items-center justify-center gap-2 text-xs text-white/40 mt-6 animate-fade-in-up" 
+            style={{ animationDelay: '800ms' }}
           >
             <Lock className="w-3 h-3" strokeWidth={1.5} />
             <span>Protegido por Supabase</span>
