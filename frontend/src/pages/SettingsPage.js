@@ -211,89 +211,72 @@ const SettingsPage = () => {
     switch (activeTab) {
       case 'profile':
         return (
-          <div className="bg-white/8 backdrop-blur-lg border border-white/14 rounded-2xl p-8 md:p-10">
-            <div className="grid grid-cols-1 gap-y-10">
-              {/* Avatar Section */}
-              <div className="flex items-center gap-6">
-                <label className="group relative flex-shrink-0 cursor-pointer">
-                  <input 
-                    ref={fileInputRef}
-                    type="file" 
-                    className="hidden" 
-                    accept="image/png, image/jpeg, image/gif"
-                    onChange={handleAvatarChange}
-                  />
-                  <img 
-                    src={profileData.avatar} 
-                    alt="Avatar" 
-                    className="w-20 h-20 rounded-full object-cover transition-all duration-300 ring-1 ring-white/10 group-hover:ring-white/20"
-                  />
-                  <div className="absolute inset-0 rounded-full flex items-center justify-center bg-black/0 group-hover:bg-black/60 transition-all duration-200">
-                    <Camera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+          <section className="settings-panel is-active animate-fade-in">
+            <div className="liquid-glass p-8 md:p-10">
+              <div className="grid grid-cols-1 gap-y-10">
+                {/* Avatar Section */}
+                <div className="flex items-center gap-6">
+                  <label className="group relative flex-shrink-0 cursor-pointer">
+                    <input 
+                      ref={fileInputRef}
+                      type="file" 
+                      className="hidden" 
+                      accept="image/png, image/jpeg, image/gif"
+                      onChange={handleAvatarChange}
+                    />
+                    <img 
+                      src={profileData.avatar} 
+                      alt="Avatar" 
+                      className="w-20 h-20 rounded-full object-cover transition-all duration-300 ring-1 ring-white/10 group-hover:ring-white/20"
+                    />
+                    <div className="absolute inset-0 rounded-full flex items-center justify-center bg-black/0 group-hover:bg-black/50 transition-all duration-200">
+                      <Camera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                    </div>
+                  </label>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">Sua Foto de Perfil</h3>
+                    <p className="text-sm text-white/70">Clique na imagem para alterar.</p>
                   </div>
-                </label>
-                <div>
-                  <h3 className="text-lg font-semibold text-white">Sua Foto de Perfil</h3>
-                  <p className="text-sm text-white/70">Clique na imagem para alterar.</p>
                 </div>
-              </div>
 
-              {/* Profile Fields */}
-              <div className="space-y-6">
-                {['name', 'username', 'bio'].map((field) => (
-                  <div 
-                    key={field}
-                    className={`relative p-3 rounded-lg transition-all cursor-pointer hover:bg-white/4 ${
-                      editingField === field ? 'bg-white/4' : ''
-                    }`}
-                  >
-                    <label className="block text-sm font-medium text-white/70 mb-2 capitalize">
-                      {field === 'username' ? 'Nome de Usuário' : field === 'bio' ? 'Bio' : 'Nome'}
-                    </label>
-                    <div className="flex justify-between items-center">
-                      <div 
-                        className="flex-1 cursor-pointer"
-                        onClick={() => setEditingField(field)}
-                      >
-                        <div 
-                          contentEditable={editingField === field}
-                          suppressContentEditableWarning
-                          className={`text-white text-base leading-relaxed focus:outline-none ${
-                            editingField === field ? 'border-b-2 border-white pb-1' : ''
-                          }`}
-                          onKeyDown={(e) => handleKeyDown(e, field)}
-                          onBlur={(e) => handleFieldEdit(field, e.target.textContent)}
-                        >
-                          {profileData[field]}
-                        </div>
-                      </div>
-                      <Edit2 
-                        className={`w-4 h-4 text-white/60 transition-opacity ${
-                          editingField === field ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                        }`}
-                        onClick={() => setEditingField(field)}
-                      />
+                {/* Profile Fields */}
+                <div className="space-y-6">
+                  {['name', 'username', 'bio'].map((field) => (
+                    <ProfileField
+                      key={field}
+                      field={field}
+                      value={profileData[field]}
+                      isEditing={currentEditingField === field}
+                      onStartEdit={() => startEditing(field)}
+                      onSave={(value) => saveField(field, value)}
+                      onCancel={() => setCurrentEditingField(null)}
+                    />
+                  ))}
+                </div>
+
+                {/* Theme Selection */}
+                <div className="border-t border-white/10 pt-10">
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-white font-['Geist']">Ambiente do Estúdio</h3>
+                    <p className="mt-1 text-sm text-white/70">Escolha o gradiente que define seu espaço de trabalho.</p>
+                  </div>
+
+                  <div className="w-full hide-scrollbar overflow-x-auto lg:overflow-x-visible mt-4 py-4">
+                    <div className="flex items-center gap-4 py-4 lg:grid lg:grid-cols-6 lg:gap-x-4 lg:gap-y-6 lg:p-0">
+                      {themes.map((theme) => (
+                        <ThemeSphere
+                          key={theme.id}
+                          theme={theme}
+                          isSelected={currentBackground.id === theme.id}
+                          onClick={() => handleThemeChange(theme.id)}
+                        />
+                      ))}
                     </div>
                   </div>
-                ))}
-              </div>
-
-              {/* Theme Selector */}
-              <div className="border-t border-white/10 pt-10">
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-white">Ambiente do Estúdio</h3>
-                  <p className="mt-1 text-sm text-white/70">
-                    Escolha o gradiente que define seu espaço de trabalho.
-                  </p>
                 </div>
-                <ThemeSelector 
-                  themes={availableBackgrounds}
-                  onThemeSelect={handleThemeChange}
-                  selectedTheme={currentBackground.id}
-                />
               </div>
             </div>
-          </div>
+          </section>
         );
 
       case 'security':
