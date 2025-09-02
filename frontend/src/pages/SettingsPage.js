@@ -608,4 +608,167 @@ const SettingsPage = () => {
   );
 };
 
+// Profile Field Component
+const ProfileField = ({ field, value, isEditing, onStartEdit, onSave, onCancel }) => {
+  const [editValue, setEditValue] = useState(value);
+  const fieldRef = useRef(null);
+
+  useEffect(() => {
+    if (isEditing && fieldRef.current) {
+      fieldRef.current.focus();
+      fieldRef.current.select();
+    }
+  }, [isEditing]);
+
+  const handleSave = () => {
+    onSave(editValue);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      setEditValue(value);
+      onCancel();
+    }
+  };
+
+  const fieldLabels = {
+    name: 'Nome',
+    username: 'Nome de Usuário',
+    bio: 'Bio'
+  };
+
+  return (
+    <div className="profile-field p-3 rounded-lg transition-all cursor-pointer min-h-[60px] flex flex-col justify-center hover:bg-white/4">
+      <label className="block text-sm font-medium text-white/70 mb-2">{fieldLabels[field]}</label>
+      <div className="profile-text relative flex justify-between items-center w-full">
+        <div className="profile-field-content relative flex-1 cursor-pointer p-1">
+          {isEditing ? (
+            <input
+              ref={fieldRef}
+              type="text"
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onBlur={handleSave}
+              onKeyDown={handleKeyDown}
+              className="profile-field-text w-full bg-transparent text-white text-base leading-6 outline-none border-b-2 border-white pb-1"
+            />
+          ) : (
+            <div 
+              onClick={onStartEdit}
+              className="profile-field-text text-white text-base leading-6 transition-all cursor-pointer"
+            >
+              {value}
+            </div>
+          )}
+        </div>
+        {!isEditing && (
+          <Edit2 
+            onClick={onStartEdit}
+            className="edit-icon w-4 h-4 text-white/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer p-1"
+            strokeWidth={1.5}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Security Field Component
+const SecurityField = ({ label, value, onAction, actionLabel, isDescription = false }) => {
+  return (
+    <div className="security-field p-4 rounded-lg transition-all flex justify-between items-center flex-wrap gap-2 hover:bg-white/5">
+      <div className="flex-1 min-w-0">
+        <label className="block text-sm font-medium text-white/70 mb-1">{label}</label>
+        <span className={`text-white ${isDescription ? 'text-white/80 text-sm' : 'break-all'}`}>
+          {value}
+        </span>
+      </div>
+      <button
+        onClick={onAction}
+        className="change-btn bg-none border border-white/20 text-white/80 px-4 py-1.5 rounded-md text-sm cursor-pointer transition-all flex-shrink-0 hover:bg-white/10 hover:text-white"
+      >
+        {actionLabel}
+      </button>
+    </div>
+  );
+};
+
+// Notification Toggle Component
+const NotificationToggle = ({ title, description, checked, onChange }) => {
+  return (
+    <div className="flex items-center justify-between info-group p-4 rounded-lg transition-all hover:bg-white/5">
+      <div className="flex-1 mr-4">
+        <p className="text-white font-medium">{title}</p>
+        <p className="text-sm text-white/70">{description}</p>
+      </div>
+      <div 
+        onClick={onChange}
+        className={`w-11 h-6 rounded-full p-1 cursor-pointer transition-all flex-shrink-0 ${
+          checked ? 'bg-white' : 'bg-white/20 hover:bg-white/30'
+        }`}
+      >
+        <div 
+          className={`w-4 h-4 rounded-full transition-transform ${
+            checked ? 'bg-gray-900 transform translate-x-5' : 'bg-white'
+          }`}
+        />
+      </div>
+    </div>
+  );
+};
+
+// Theme Sphere Component
+const ThemeSphere = ({ theme, isSelected, onClick }) => {
+  return (
+    <div className="flex-shrink-0 snap-center lg:flex lg:justify-center">
+      <button
+        onClick={onClick}
+        className={`theme-sphere relative w-20 h-20 rounded-full cursor-pointer border-2 overflow-hidden transition-all duration-300 hover:scale-110 ${
+          isSelected ? 'border-white scale-110' : 'border-transparent'
+        }`}
+        style={{
+          backgroundImage: `url(${theme.value})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
+        {isSelected && (
+          <div className="check-icon absolute inset-0 flex items-center justify-center bg-black/40 rounded-full transition-all duration-300">
+            <Check className="w-6 h-6 text-white" strokeWidth={1.5} />
+          </div>
+        )}
+      </button>
+    </div>
+  );
+};
+
+// Modal Component
+const Modal = ({ isOpen, onClose, title, description, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal-backdrop fixed inset-0 bg-black/50 backdrop-blur-8 z-100 flex items-center justify-center p-4 transition-all duration-300">
+      <div className="modal bg-white/8 backdrop-blur-20 border border-white/14 rounded-2xl p-8 max-w-md w-full transition-all duration-300">
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h3 className="text-xl font-semibold text-white mb-2 font-['Geist']">{title}</h3>
+            <p className="text-white/70 text-sm mb-6">{description}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-white/60 hover:text-white transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+};
+
 export default SettingsPage;
