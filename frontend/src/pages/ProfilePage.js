@@ -341,7 +341,7 @@ const ProfilePage = () => {
                 </div>
                 <div className="metric-pill bg-white/8 border border-white/12 rounded-full px-4 py-2 text-sm font-medium text-white flex items-center gap-2 hover:bg-white/15 hover:-translate-y-0.5 transition-all duration-300">
                   <Flame className="w-4 h-4" />
-                  Streak: 5 Dias
+                  Streak: {profile.streak_days || 0} Dias
                 </div>
               </div>
               
