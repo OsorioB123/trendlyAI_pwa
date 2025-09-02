@@ -8,8 +8,6 @@ import {
   X, 
   Plus, 
   ChevronLeft,
-  PanelLeftClose,
-  PanelLeftOpen,
   MoreHorizontal,
   Edit,
   Trash2,
