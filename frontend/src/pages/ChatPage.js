@@ -87,137 +87,133 @@ const ChatPage = () => {
     }
   }, [conversations, activeConversationId]);
 
-  const startNewConversationWithMessage = (message) => {
+  const handleNewConversationWithMessage = (message) => {
     const newConversation = {
       id: Date.now(),
       title: message.substring(0, 30) + (message.length > 30 ? '...' : ''),
-      timestamp: 'Agora',
-      isActive: true
+      messages: [
+        { role: 'assistant', content: 'Olá! 👋 Sou seu assistente TrendlyAI. Como posso impulsionar suas ideias hoje?' },
+        { role: 'user', content: message }
+      ]
     };
     
-    // Update conversations
-    setConversations(prev => [
-      newConversation,
-      ...prev.map(conv => ({ ...conv, isActive: false }))
-    ]);
-    
+    setConversations(prev => [newConversation, ...prev]);
     setActiveConversationId(newConversation.id);
-    
-    // Set initial messages
-    setMessages([
-      {
-        id: 1,
-        type: 'assistant',
-        content: 'Olá! 👋 Sou seu assistente TrendlyAI. Como posso impulsionar suas ideias hoje?',
-        timestamp: new Date()
-      },
-      {
-        id: 2,
-        type: 'user',
-        content: message,
-        timestamp: new Date()
-      }
-    ]);
     
     // Simulate AI response
     setTimeout(() => {
-      setMessages(prev => [...prev, {
-        id: 3,
-        type: 'assistant',
-        content: 'Ótima pergunta! Vou te ajudar com isso. Deixe-me pensar nas melhores estratégias para o seu caso...',
-        timestamp: new Date()
-      }]);
+      simulateAIResponse(newConversation.id);
     }, 1000);
   };
 
-  const startNewConversation = () => {
+  const handleNewConversation = () => {
     const newConversation = {
       id: Date.now(),
       title: 'Nova Conversa',
-      timestamp: 'Agora',
-      isActive: true
+      messages: [
+        { role: 'assistant', content: 'Pode começar! Sobre o que vamos conversar?' }
+      ]
     };
     
-    setConversations(prev => [
-      newConversation,
-      ...prev.map(conv => ({ ...conv, isActive: false }))
-    ]);
-    
+    setConversations(prev => [newConversation, ...prev]);
     setActiveConversationId(newConversation.id);
-    setMessages([
-      {
-        id: 1,
-        type: 'assistant',
-        content: 'Olá! 👋 Sou seu assistente TrendlyAI. Como posso impulsionar suas ideias hoje?',
-        timestamp: new Date()
-      }
-    ]);
-    
-    // Close mobile sidebar
     setIsMobileSidebarOpen(false);
+    
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
   };
 
   const selectConversation = (conversationId) => {
-    setConversations(prev => prev.map(conv => ({
-      ...conv,
-      isActive: conv.id === conversationId
-    })));
     setActiveConversationId(conversationId);
     setIsMobileSidebarOpen(false);
+    setConversationMenuId(null);
   };
 
-  const editConversationTitle = (conversationId, newTitle) => {
-    setConversations(prev => prev.map(conv => 
-      conv.id === conversationId ? { ...conv, title: newTitle } : conv
-    ));
-    setEditingConversationId(null);
+  const renameConversation = (conversationId) => {
+    const conversation = conversations.find(c => c.id === conversationId);
+    if (!conversation) return;
+    
+    const newTitle = prompt('Digite o novo nome para a conversa:', conversation.title);
+    if (newTitle && newTitle.trim()) {
+      setConversations(prev => 
+        prev.map(c => c.id === conversationId ? { ...c, title: newTitle.trim() } : c)
+      );
+    }
+    setConversationMenuId(null);
   };
 
   const deleteConversation = (conversationId) => {
-    setConversations(prev => prev.filter(conv => conv.id !== conversationId));
-    if (activeConversationId === conversationId && conversations.length > 1) {
-      // Switch to first remaining conversation
-      const remaining = conversations.filter(conv => conv.id !== conversationId);
+    if (!confirm('Tem certeza que deseja excluir esta conversa?')) return;
+    
+    setConversations(prev => prev.filter(c => c.id !== conversationId));
+    
+    if (activeConversationId === conversationId) {
+      const remaining = conversations.filter(c => c.id !== conversationId);
       if (remaining.length > 0) {
-        selectConversation(remaining[0].id);
+        setActiveConversationId(remaining[0].id);
+      } else {
+        handleNewConversation();
+        return;
       }
     }
     setConversationMenuId(null);
   };
 
-  const sendMessage = async () => {
-    if (!inputValue.trim() || isLoading) return;
+  const sendMessage = () => {
+    const message = messageInput.trim();
+    if (!message) return;
     
-    const userMessage = {
-      id: Date.now(),
-      type: 'user',
-      content: inputValue.trim(),
-      timestamp: new Date()
-    };
+    const activeConversation = conversations.find(c => c.id === activeConversationId);
+    if (!activeConversation) return;
     
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
-    setIsLoading(true);
+    // Add user message
+    setConversations(prev => 
+      prev.map(c => 
+        c.id === activeConversationId 
+          ? { ...c, messages: [...c.messages, { role: 'user', content: message }] }
+          : c
+      )
+    );
     
     // Update conversation title if it's still "Nova Conversa"
-    const activeConv = conversations.find(conv => conv.id === activeConversationId);
-    if (activeConv && activeConv.title === 'Nova Conversa') {
-      const newTitle = userMessage.content.substring(0, 30) + (userMessage.content.length > 30 ? '...' : '');
-      editConversationTitle(activeConversationId, newTitle);
+    if (activeConversation.title === 'Nova Conversa') {
+      const newTitle = message.substring(0, 30) + (message.length > 30 ? '...' : '');
+      setConversations(prev => 
+        prev.map(c => 
+          c.id === activeConversationId 
+            ? { ...c, title: newTitle }
+            : c
+        )
+      );
     }
     
-    // Simulate AI response
+    setMessageInput('');
+    simulateAIResponse(activeConversationId);
+  };
+
+  const simulateAIResponse = (conversationId) => {
+    setIsLoading(true);
+    
     setTimeout(() => {
-      const aiMessage = {
-        id: Date.now() + 1,
-        type: 'assistant',
-        content: 'Essa é uma excelente pergunta! Vou te ajudar a explorar essa ideia. Baseado no que você mencionou, posso sugerir algumas abordagens interessantes...',
-        timestamp: new Date()
-      };
+      const responses = [
+        'Esta é uma resposta simulada. Integre com sua API de IA para gerar respostas reais.',
+        'Ótima pergunta! Vou te ajudar com isso. Deixe-me pensar nas melhores estratégias para o seu caso...',
+        'Entendo perfeitamente! Baseado no que você mencionou, posso sugerir algumas abordagens interessantes...',
+        'Excelente ideia! Vamos trabalhar juntos para desenvolver isso. Aqui estão algumas sugestões...'
+      ];
       
-      setMessages(prev => [...prev, aiMessage]);
+      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+      
+      setConversations(prev => 
+        prev.map(c => 
+          c.id === conversationId 
+            ? { ...c, messages: [...c.messages, { role: 'assistant', content: randomResponse }] }
+            : c
+        )
+      );
       setIsLoading(false);
-    }, 1500);
+    }, 2000);
   };
 
   const handleKeyPress = (e) => {
@@ -234,6 +230,18 @@ const ChatPage = () => {
   const toggleDesktopSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  const toggleSearch = () => {
+    setIsSearchEnabled(!isSearchEnabled);
+  };
+
+  const closeAllMenus = () => {
+    setShowNotifications(false);
+    setShowProfileDropdown(false);
+    setShowCreditsTooltip(false);
+  };
+
+  const activeConversation = conversations.find(c => c.id === activeConversationId);
 
   return (
     <div 
