@@ -45,8 +45,7 @@ const ChatPage = () => {
   const [messageInput, setMessageInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  // Sidebar state
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  // Sidebar state (desktop always open, only mobile toggles)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   // Dropdown states
@@ -54,6 +53,14 @@ const ChatPage = () => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showCreditsTooltip, setShowCreditsTooltip] = useState(false);
   const [conversationMenuId, setConversationMenuId] = useState(null);
+  
+  // Rename functionality
+  const [editingConversationId, setEditingConversationId] = useState(null);
+  const [editingTitle, setEditingTitle] = useState('');
+  
+  // Delete confirmation modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [conversationToDelete, setConversationToDelete] = useState(null);
   
   // Input state
   const [isSearchEnabled, setIsSearchEnabled] = useState(true);
