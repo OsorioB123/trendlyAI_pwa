@@ -8,11 +8,14 @@ import {
   Edit2, 
   CheckCircle,
   X,
-  Check
+  Check,
+  Loader
 } from 'lucide-react';
 import { useBackground } from '../contexts/BackgroundContext';
+import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/layout/Header';
 import { HeaderVariant } from '../types/header';
+import { uploadImage, compressImage } from '../utils/supabaseStorage';
 
 const SettingsPage = () => {
   const navigate = useNavigate();
