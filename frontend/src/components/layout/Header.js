@@ -56,10 +56,31 @@ const Header = ({ variant = HeaderVariant.PRIMARY, onMenuToggle, showMobileSideb
     navigate('/home');
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('trendlyai-user-authenticated');
-    localStorage.removeItem('trendlyai-onboarding-completed');
-    navigate('/login');
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    
+    try {
+      // Close profile dropdown
+      setShowProfile(false);
+      
+      // Sign out from Supabase
+      const { error } = await signOut();
+      
+      if (error) {
+        console.error('Logout error:', error);
+        // Even if there's an error, we'll still redirect to login
+      }
+      
+      // Navigate to login page
+      navigate('/login');
+      
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Still redirect on error
+      navigate('/login');
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   const closeAllMenus = () => {
