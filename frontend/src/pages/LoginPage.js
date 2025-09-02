@@ -62,16 +62,15 @@ const LoginPage = () => {
     <div 
       className="min-h-screen flex items-center justify-center bg-black text-white font-['Inter'] antialiased selection:bg-white/10 selection:text-white"
       style={{
-        backgroundImage: 'radial-gradient(1200px 600px at 70% -10%, rgba(120,119,198,0.18) 0%, transparent 60%), radial-gradient(900px 500px at -10% 100%, rgba(56,189,248,0.14) 0%, transparent 60%)'
+        backgroundImage: `url("${currentBackground.value}?w=800&q=80")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
       }}
     >
-      {/* Background Image */}
-      <div 
-        className="fixed top-0 w-full h-screen bg-cover bg-center -z-10" 
-        style={{
-          backgroundImage: `url("${currentBackground.value}")`
-        }}
-      />
+      {/* Background overlay */}
+      <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
 
       <main className="w-full max-w-md px-4">
         <div className="w-full flex flex-col items-center">
