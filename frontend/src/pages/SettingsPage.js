@@ -356,10 +356,14 @@ const SettingsPage = () => {
                     <img 
                       src={profile?.avatar_url || '/default-avatar.png'} 
                       alt="Avatar" 
-                      className="w-20 h-20 rounded-full object-cover transition-all duration-300 ring-1 ring-white/10 group-hover:ring-white/20"
+                      className={`w-20 h-20 rounded-full object-cover transition-all duration-300 ring-1 ring-white/10 group-hover:ring-white/20 ${uploading ? 'opacity-50' : ''}`}
                     />
                     <div className="absolute inset-0 rounded-full flex items-center justify-center bg-black/0 group-hover:bg-black/50 transition-all duration-200">
-                      <Camera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                      {uploading ? (
+                        <Loader className="w-6 h-6 text-white animate-spin" />
+                      ) : (
+                        <Camera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                      )}
                     </div>
                   </label>
                   <div>
