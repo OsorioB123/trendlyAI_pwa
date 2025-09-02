@@ -46,12 +46,18 @@ export const AuthProvider = ({ children }) => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id)
+        console.log('🔄 Auth state changed:', event, {
+          hasSession: !!session,
+          hasUser: !!session?.user,
+          userId: session?.user?.id,
+          userEmail: session?.user?.email
+        })
         
         setSession(session)
         setUser(session?.user ?? null)
 
         if (session?.user) {
+          console.log('👤 User session found, loading profile...')
           try {
             // Load or create user profile with timeout
             const profilePromise = loadUserProfile(session.user.id)
@@ -60,20 +66,24 @@ export const AuthProvider = ({ children }) => {
             )
             
             await Promise.race([profilePromise, timeoutPromise])
+            console.log('✅ Profile loading completed successfully')
             
             // Handle profile creation on signup
             if (event === 'SIGNED_UP') {
+              console.log('📝 Creating profile for new signup...')
               await createUserProfile(session.user)
             }
           } catch (error) {
-            console.error('Profile loading failed or timed out:', error)
+            console.error('❌ Profile loading failed or timed out:', error)
             // Continue with auth flow even if profile loading fails
           }
         } else {
+          console.log('🚫 No user session, clearing profile')
           setProfile(null)
         }
         
         // Always ensure loading is set to false after auth state change
+        console.log('✅ Auth state change complete - setting loading to false')
         setLoading(false)
       }
     )
