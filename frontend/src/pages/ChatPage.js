@@ -19,10 +19,11 @@ import {
   Gem,
   LogOut,
   Info,
-  CheckCircle
+  CheckCircle,
+  Sparkles,
+  Pencil
 } from 'lucide-react';
 import { useBackground } from '../contexts/BackgroundContext';
-import '../components/styles/header.css';
 
 const ChatPage = () => {
   const navigate = useNavigate();
