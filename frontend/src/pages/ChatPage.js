@@ -298,11 +298,11 @@ const ChatPage = () => {
         onClick={() => setIsMobileSidebarOpen(false)}
       />
 
-      {/* Conversations Sidebar */}
+      {/* Conversations Sidebar - Always visible on desktop */}
       <aside 
         className={`fixed top-0 left-0 w-[85%] sm:w-80 h-full z-50 transform transition-transform duration-300 md:relative md:transform-none ${
           isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } ${!isSidebarOpen ? 'md:-translate-x-full' : 'md:translate-x-0'}`}
+        } md:translate-x-0`}
       >
         <div className="liquid-glass w-full h-full flex flex-col rounded-none md:rounded-3xl md:m-4 md:h-[calc(100vh-2rem)]">
           {/* Sidebar Header */}
