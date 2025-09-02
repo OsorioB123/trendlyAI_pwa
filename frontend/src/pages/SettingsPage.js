@@ -56,6 +56,21 @@ const SettingsPage = () => {
   const fileInputRef = useRef(null);
   const indicatorRef = useRef(null);
 
+  const themes = [
+    { id: 'default', value: 'https://i.ibb.co/Tx5Xxb2P/grad-1.webp' },
+    { id: 'theme-2', value: 'https://i.ibb.co/TBV2V62G/grad-2.webp' },
+    { id: 'theme-3', value: 'https://i.ibb.co/dsNWJkJf/grad-3.webp' },
+    { id: 'theme-4', value: 'https://i.ibb.co/HfKNrwFH/grad-4.webp' },
+    { id: 'theme-5', value: 'https://i.ibb.co/RT6rQFKx/grad-5.webp' },
+    { id: 'theme-6', value: 'https://i.ibb.co/F4N8zZ5S/grad-6.webp' },
+    { id: 'theme-7', value: 'https://i.ibb.co/cSHNFQJZ/grad-7.webp' },
+    { id: 'theme-8', value: 'https://i.ibb.co/BJ4stZv/grad-8.webp' },
+    { id: 'theme-9', value: 'https://i.ibb.co/yn3Z0ZsK/grad-9.webp' },
+    { id: 'theme-10', value: 'https://i.ibb.co/d49qW7f6/grad-10.webp' },
+    { id: 'theme-11', value: 'https://i.ibb.co/TD15qTjy/grad-11.webp' },
+    { id: 'theme-12', value: 'https://i.ibb.co/JwVj3XGH/grad-12.webp' }
+  ];
+
   const tabs = [
     { id: 'profile', label: 'Perfil', icon: UserCircle2 },
     { id: 'security', label: 'Segurança', icon: Lock },
