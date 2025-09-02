@@ -653,11 +653,6 @@ const ChatPage = () => {
                 }`}
                 style={{ animation: 'fadeInUpBubble 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}
               >
-                {message.role === 'assistant' && (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-emerald-400 flex items-center justify-center font-semibold text-sm shrink-0">
-                    AI
-                  </div>
-                )}
                 <div 
                   className={`message-bubble max-w-[85%] border-radius-18 p-3 ${
                     message.role === 'user' 
