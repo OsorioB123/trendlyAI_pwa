@@ -83,8 +83,8 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL(destination, req.url))
     }
 
-    // Redirect to onboarding if not completed (except for onboarding route itself)
-    if (!hasOnboarded && !isOnboardingRoute && !isPublicRoute) {
+    // Redirect to onboarding if not completed (except for onboarding route itself and auth routes)
+    if (!hasOnboarded && !isOnboardingRoute && !isAuthRoute && !isPublicRoute) {
       console.log(`Redirecting user to onboarding from ${req.nextUrl.pathname}`)
       return NextResponse.redirect(new URL('/onboarding', req.url))
     }
