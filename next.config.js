@@ -3,9 +3,19 @@ const nextConfig = {
   reactStrictMode: true,
   serverExternalPackages: ['@supabase/supabase-js'],
   images: {
-    domains: [
-      'gugfvihfkimixnetcayg.supabase.co',
-      'images.unsplash.com',
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'gugfvihfkimixnetcayg.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.ibb.co',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
   },

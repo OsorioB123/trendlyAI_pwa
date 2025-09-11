@@ -31,11 +31,6 @@
     }
   ],
   "redirects": [
-    {
-      "source": "/",
-      "destination": "/login",
-      "permanent": false
-    }
   ],
   "env": {
     "NODE_ENV": "production"
