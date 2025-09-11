@@ -42,7 +42,7 @@ export async function middleware(req: NextRequest) {
   const protectedRoutes = ['/dashboard', '/tools', '/tracks', '/chat', '/profile', '/settings']
   const authRoutes = ['/login', '/register', '/forgot-password']
   const onboardingRoute = '/onboarding'
-  const publicRoutes = ['/', '/debug-auth', '/test-supabase']
+  const publicRoutes = ['/', '/debug-auth', '/test-supabase', '/register']
   
   const isProtectedRoute = protectedRoutes.some(route => 
     req.nextUrl.pathname.startsWith(route)
@@ -63,8 +63,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/login', req.url))
   }
 
-  // Redirect unauthenticated users to login for protected routes
-  if (!user && isProtectedRoute) {
+  // Redirect unauthenticated users to login for protected routes (but allow public routes)
+  if (!user && isProtectedRoute && !isPublicRoute) {
     const redirectUrl = new URL('/login', req.url)
     redirectUrl.searchParams.set('redirectTo', req.nextUrl.pathname)
     return NextResponse.redirect(redirectUrl)
