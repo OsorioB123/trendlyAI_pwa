@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowRight, Check, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowRight, Check } from 'lucide-react'
 import { useBackground } from '../../contexts/BackgroundContext'
 import { useAuth } from '../../contexts/AuthContext'
-import { hasCompletedOnboarding, getOnboardingRedirectPath } from '../../lib/onboarding'
+import { hasCompletedOnboarding } from '../../lib/onboarding'
 import OnboardingButton from '../../components/onboarding/OnboardingButton'
 
 interface OnboardingSlide {
@@ -41,6 +41,22 @@ const SLIDES: OnboardingSlide[] = [
   }
 ]
 
+// Themes array - exact from HTML reference
+const THEMES = [
+  { id: 'default', name: 'Padrão Trendly', value: 'https://i.ibb.co/Tx5Xxb2P/grad-1.webp' },
+  { id: 'theme-2', name: 'Ambiente 2', value: 'https://i.ibb.co/TBV2V62G/grad-2.webp' },
+  { id: 'theme-3', name: 'Ambiente 3', value: 'https://i.ibb.co/dsNWJkJf/grad-3.webp' },
+  { id: 'theme-4', name: 'Ambiente 4', value: 'https://i.ibb.co/HfKNrwFH/grad-4.webp' },
+  { id: 'theme-5', name: 'Ambiente 5', value: 'https://i.ibb.co/RT6rQFKx/grad-5.webp' },
+  { id: 'theme-6', name: 'Ambiente 6', value: 'https://i.ibb.co/F4N8zZ5S/grad-6.webp' },
+  { id: 'theme-7', name: 'Ambiente 7', value: 'https://i.ibb.co/cSHNFQJZ/grad-7.webp' },
+  { id: 'theme-8', name: 'Ambiente 8', value: 'https://i.ibb.co/BJ4stZv/grad-8.webp' },
+  { id: 'theme-9', name: 'Ambiente 9', value: 'https://i.ibb.co/yn3Z0ZsK/grad-9.webp' },
+  { id: 'theme-10', name: 'Ambiente 10', value: 'https://i.ibb.co/d49qW7f6/grad-10.webp' },
+  { id: 'theme-11', name: 'Ambiente 11', value: 'https://i.ibb.co/TD15qTjy/grad-11.webp' },
+  { id: 'theme-12', name: 'Ambiente 12', value: 'https://i.ibb.co/JwVj3XGH/grad-12.webp' },
+]
+
 interface ThemeSphereProps {
   theme: {
     id: string
@@ -56,10 +72,8 @@ function ThemeSphere({ theme, isSelected, onSelect, isInView = true }: ThemeSphe
   return (
     <div className="flex-shrink-0 snap-center relative flex justify-center p-4">
       {theme.id === 'default' && (
-        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap z-10">
-          <div className="backdrop-blur-xl bg-white/12 border border-white/16 shadow-lg rounded-full px-3 py-1 text-xs font-medium text-white">
-            Padrão Trendly
-          </div>
+        <div className="liquid-glass-tag absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap z-10">
+          Padrão Trendly
         </div>
       )}
       
@@ -67,29 +81,18 @@ function ThemeSphere({ theme, isSelected, onSelect, isInView = true }: ThemeSphe
         data-theme-id={theme.id}
         onClick={() => onSelect(theme.id)}
         className={`
-          relative w-[120px] h-[120px] rounded-full cursor-pointer
-          border-2 overflow-hidden transition-all duration-400
-          ${isSelected ? 'border-white shadow-[0_0_20px_rgba(255,255,255,0.5)]' : 'border-transparent'}
-          ${isInView ? 'transform scale-100 opacity-100' : 'transform scale-90 opacity-50'}
-          hover:scale-105 hover:border-white/50
+          theme-sphere
+          ${isSelected ? 'is-selected' : ''}
+          ${isInView ? 'is-in-view' : ''}
         `}
         style={{
-          background: `url(${theme.value}) center/cover`,
-        }}
+          '--sphere-bg': `url(${theme.value})`
+        } as React.CSSProperties}
         aria-label={`Selecionar tema ${theme.name}`}
       >
-        {/* 3D glow effect */}
-        <div className="absolute inset-0 rounded-full bg-gradient-radial from-white/35 via-transparent to-transparent opacity-60 mix-blend-overlay pointer-events-none" />
-        
-        {/* Inner shadow for depth */}
-        <div className="absolute inset-0 rounded-full shadow-[inset_0_0_25px_5px_rgba(0,0,0,0.3)] pointer-events-none" />
-        
-        {/* Check icon overlay */}
-        {isSelected && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full backdrop-blur-sm transition-all duration-300">
-            <Check className="w-8 h-8 text-white" strokeWidth={2} />
-          </div>
-        )}
+        <div className="check-icon">
+          <Check className="w-8 h-8 text-white" strokeWidth={1.5} />
+        </div>
       </button>
     </div>
   )
@@ -99,9 +102,10 @@ export default function OnboardingPage() {
   const [currentSlide, setCurrentSlide] = useState(1)
   const [selectedTheme, setSelectedTheme] = useState('default')
   const [isLoading, setIsLoading] = useState(false)
+  const [themesInitialized, setThemesInitialized] = useState(false)
   
   const router = useRouter()
-  const { availableBackgrounds, changeBackground } = useBackground()
+  const { changeBackground } = useBackground()
   const { isAuthenticated, user, completeOnboarding } = useAuth()
   
   const themesGalleryRef = useRef<HTMLDivElement>(null)
@@ -121,11 +125,11 @@ export default function OnboardingPage() {
     }
   }, [isAuthenticated, user, router])
 
-  // Setup intersection observer for mobile theme selection
+  // Setup intersection observer for mobile theme selection (exact from HTML)
   useEffect(() => {
     if (currentSlide !== 3 || !themesTrackRef.current || window.innerWidth >= 1024) return
 
-    const spheres = themesTrackRef.current.querySelectorAll('button')
+    const spheres = themesTrackRef.current.querySelectorAll('.theme-sphere')
     const options = {
       root: themesGalleryRef.current,
       rootMargin: '0px',
@@ -135,9 +139,13 @@ export default function OnboardingPage() {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          const themeId = entry.target.getAttribute('data-theme-id')
+          const currentSphere = entry.target as HTMLElement
+          const themeId = currentSphere.dataset.themeId
           if (themeId) {
             setSelectedTheme(themeId)
+            // Update sphere states
+            spheres.forEach(s => s.classList.remove('is-in-view', 'is-selected'))
+            currentSphere.classList.add('is-in-view', 'is-selected')
           }
         }
       })
@@ -146,16 +154,35 @@ export default function OnboardingPage() {
     spheres.forEach(sphere => observer.observe(sphere))
 
     return () => observer.disconnect()
-  }, [currentSlide])
+  }, [currentSlide, themesInitialized])
+
+  const showSlide = useCallback((slideNumber: number) => {
+    setCurrentSlide(slideNumber)
+    
+    // Initialize theme selector when slide 3 is shown
+    if (slideNumber === 3 && !themesInitialized) {
+      setThemesInitialized(true)
+      // Scroll to selected theme on mobile
+      if (window.innerWidth < 1024) {
+        setTimeout(() => {
+          const selectedElement = document.querySelector(`[data-theme-id="${selectedTheme}"]`)?.parentElement
+          if (selectedElement) {
+            selectedElement.scrollIntoView({ behavior: 'auto', inline: 'center' })
+          }
+        }, 100)
+      }
+    }
+  }, [selectedTheme, themesInitialized])
 
   const handleNext = useCallback(async () => {
     if (currentSlide < SLIDES.length) {
-      setCurrentSlide(prev => prev + 1)
+      showSlide(currentSlide + 1)
     } else {
       // Complete onboarding
       setIsLoading(true)
       
       try {
+        console.log(`Onboarding concluído! Tema selecionado: ${selectedTheme}`)
         // Save selected theme
         await changeBackground(selectedTheme)
         
@@ -170,10 +197,11 @@ export default function OnboardingPage() {
         setIsLoading(false)
       }
     }
-  }, [currentSlide, selectedTheme, changeBackground, router])
+  }, [currentSlide, selectedTheme, changeBackground, completeOnboarding, router, showSlide])
 
   const handleSkip = useCallback(async () => {
     try {
+      console.log("Navegar para a próxima página (pulou)")
       // Set default theme
       await changeBackground('default')
       
@@ -186,12 +214,19 @@ export default function OnboardingPage() {
       console.error('Error skipping onboarding:', error)
       router.push('/dashboard')
     }
-  }, [changeBackground, router])
+  }, [changeBackground, completeOnboarding, router])
 
   const handleThemeSelect = (themeId: string) => {
     setSelectedTheme(themeId)
+    
+    // Update visual states for all spheres
+    document.querySelectorAll('.theme-sphere').forEach(sphere => {
+      sphere.classList.remove('is-selected')
+    })
+    document.querySelector(`[data-theme-id="${themeId}"]`)?.classList.add('is-selected')
+    
     if (window.innerWidth < 1024 && themesTrackRef.current) {
-      const selectedElement = themesTrackRef.current.querySelector(`[data-theme-id="${themeId}"]`)
+      const selectedElement = themesTrackRef.current.querySelector(`[data-theme-id="${themeId}"]`)?.parentElement
       if (selectedElement) {
         selectedElement.scrollIntoView({ behavior: 'smooth', inline: 'center' })
       }
@@ -199,7 +234,9 @@ export default function OnboardingPage() {
   }
 
   const handleDotClick = (slideNumber: number) => {
-    setCurrentSlide(slideNumber)
+    if (currentSlide !== slideNumber) {
+      showSlide(slideNumber)
+    }
   }
 
   const renderSlideContent = () => {
@@ -209,30 +246,32 @@ export default function OnboardingPage() {
     if (currentSlide === 3) {
       // Theme selection slide
       return (
-        <div className="slide-content-theme flex flex-col h-full">
+        <div className="slide-content-theme">
           <section className="text-center pt-8 pb-4 flex-shrink-0">
-            <h2 className="text-3xl font-semibold tracking-tight animate-fade-in-up font-geist">
+            <h2 className="text-3xl font-semibold tracking-tight animate-entry font-geist">
               {slide.title}
             </h2>
-            <p className="mt-2 text-white/80 animate-fade-in-up [animation-delay:150ms]">
+            <p className="mt-2 text-white/80 animate-entry delay-1">
               {slide.description}
             </p>
           </section>
           
-          <section className="flex-grow flex flex-col items-center justify-center min-h-0 py-8 animate-fade-in-up [animation-delay:300ms]">
+          <section className="flex-grow flex flex-col items-center justify-center min-h-0 py-8 animate-entry delay-2">
             <div 
+              id="themes-gallery"
               ref={themesGalleryRef}
-              className="w-full scrollbar-hide overflow-x-auto lg:overflow-x-visible pb-4"
+              className="w-full hide-scrollbar overflow-x-auto lg:overflow-x-visible pb-4"
             >
               <ol 
+                id="themes-track"
                 ref={themesTrackRef}
                 className="flex items-center gap-6 lg:p-0 lg:grid lg:grid-cols-4 lg:gap-8 lg:max-w-3xl lg:mx-auto"
-                style={{ 
+                style={window.innerWidth < 1024 ? { 
                   scrollSnapType: 'x mandatory',
-                  padding: window.innerWidth < 1024 ? '0 calc(50vw - 60px)' : undefined
-                }}
+                  padding: '0 calc(50vw - 60px)'
+                } : {}}
               >
-                {availableBackgrounds.map((theme) => (
+                {THEMES.map((theme) => (
                   <li key={theme.id}>
                     <ThemeSphere
                       theme={theme}
@@ -252,67 +291,98 @@ export default function OnboardingPage() {
     // Regular slide
     return (
       <div>
-        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4 animate-fade-in-up font-geist">
+        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4 fade-in-up font-geist">
           {slide.title}
         </h1>
-        <p className="text-base text-white/80 max-w-md animate-fade-in-up [animation-delay:150ms]">
+        <p className="text-base text-white/80 max-w-md fade-in-up" style={{ animationDelay: '0.15s' }}>
           {slide.description}
         </p>
       </div>
     )
   }
 
-  const getBackgroundImage = () => {
-    if (currentSlide === 3) {
-      const selectedBg = availableBackgrounds.find(bg => bg.id === selectedTheme)
+  const getSlideBackground = (slideNumber: number) => {
+    if (slideNumber === 3) {
+      const selectedBg = THEMES.find(bg => bg.id === selectedTheme)
       return selectedBg?.value
     }
     
-    const slide = SLIDES.find(s => s.id === currentSlide)
+    const slide = SLIDES.find(s => s.id === slideNumber)
     return slide?.backgroundImage
   }
 
   return (
-    <div className="min-h-screen overflow-hidden relative">
-      {/* Background System */}
+    <div className="min-h-screen overflow-hidden relative" style={{ backgroundColor: 'var(--bg-main)' }}>
+      {/* Background placeholders for slides 1, 2, 4 - exact from HTML */}
       <div 
-        className="fixed inset-0 bg-cover bg-center transition-all duration-600 ease-in-out"
-        style={{ 
-          backgroundImage: `url(${getBackgroundImage()})`,
-          zIndex: -10
-        }}
+        className={`slide-background ${currentSlide === 1 ? 'active' : ''}`} 
+        style={{ backgroundImage: `url('${getSlideBackground(1)}')` }}
       />
+      <div 
+        className={`slide-background ${currentSlide === 2 ? 'active' : ''}`} 
+        style={{ backgroundImage: `url('${getSlideBackground(2)}')` }}
+      />
+      <div 
+        className={`slide-background ${currentSlide === 4 ? 'active' : ''}`} 
+        style={{ backgroundImage: `url('${getSlideBackground(4)}')` }}
+      />
+
+      {/* Background container for theme slides */}
+      <div className={currentSlide === 3 ? '' : 'hidden'}>
+        {THEMES.map((theme) => (
+          <div
+            key={theme.id}
+            className={`background-layer ${selectedTheme === theme.id ? 'is-active' : ''}`}
+            style={{ backgroundImage: `url(${theme.value})` }}
+          />
+        ))}
+      </div>
       
       {/* Overlay gradient */}
       <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
 
       <main className="absolute inset-0 z-10 flex flex-col justify-end px-6 sm:px-8 pb-10">
-        <div className="relative flex-1 min-h-0 flex items-end">
-          <div className="w-full max-w-2xl">
-            {renderSlideContent()}
+        <div id="slides-container" className="relative flex-1 min-h-0">
+          {/* Slide 1 */}
+          <div className={`slide ${currentSlide === 1 ? 'active' : ''}`}>
+            {currentSlide === 1 && renderSlideContent()}
+          </div>
+          
+          {/* Slide 2 */}
+          <div className={`slide ${currentSlide === 2 ? 'active' : ''}`}>
+            {currentSlide === 2 && renderSlideContent()}
+          </div>
+          
+          {/* Slide 3 - Theme Selection */}
+          <div className={`slide ${currentSlide === 3 ? 'active' : ''}`}>
+            {currentSlide === 3 && renderSlideContent()}
+          </div>
+
+          {/* Slide 4 */}
+          <div className={`slide ${currentSlide === 4 ? 'active' : ''}`}>
+            {currentSlide === 4 && renderSlideContent()}
           </div>
         </div>
         
-        {/* Navigation Controls */}
+        {/* Navigation Controls - exact from HTML */}
         <div className="flex-shrink-0 mt-8">
           {/* Dots indicator */}
-          <div className="flex items-center space-x-2 mb-10 animate-fade-in-up [animation-delay:300ms]">
+          <div className="flex items-center space-x-2 mb-10 fade-in-up" style={{ animationDelay: '0.3s' }}>
             {SLIDES.map((_, index) => (
-              <button
+              <div
                 key={index}
-                className={`h-1.5 rounded-full cursor-pointer transition-all duration-400 ${
-                  currentSlide === index + 1 
-                    ? 'w-6 bg-white' 
-                    : 'w-1.5 bg-white/30 hover:bg-white/50'
-                }`}
+                className="slide-dot"
+                style={{
+                  width: currentSlide === index + 1 ? '24px' : '6px',
+                  backgroundColor: currentSlide === index + 1 ? 'white' : 'rgba(255, 255, 255, 0.3)'
+                }}
                 onClick={() => handleDotClick(index + 1)}
-                aria-label={`Ir para slide ${index + 1}`}
               />
             ))}
           </div>
           
           {/* Action buttons */}
-          <div className="flex items-center justify-between animate-fade-in-up [animation-delay:450ms]">
+          <div className="flex items-center justify-between fade-in-up" style={{ animationDelay: '0.45s' }}>
             <OnboardingButton 
               variant="secondary"
               onClick={handleSkip}
