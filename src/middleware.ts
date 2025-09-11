@@ -30,13 +30,16 @@ export async function middleware(req: NextRequest) {
     }
   )
 
-  // IMPORTANT: Avoid writing any logic between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser()
+    user = authUser
+  } catch (error) {
+    console.error('Middleware auth error:', error)
+    // Continue without user if auth fails
+  }
 
   // Define protected routes
   const protectedRoutes = ['/dashboard', '/tools', '/tracks', '/chat', '/profile', '/settings']
@@ -53,22 +56,30 @@ export async function middleware(req: NextRequest) {
   const isOnboardingRoute = req.nextUrl.pathname === onboardingRoute
   const isPublicRoute = publicRoutes.includes(req.nextUrl.pathname)
 
+  // Debug logs
+  console.log(`Middleware: ${req.nextUrl.pathname} | User: ${user ? 'YES' : 'NO'} | Protected: ${isProtectedRoute} | Auth: ${isAuthRoute} | Public: ${isPublicRoute}`)
+
   // Redirect authenticated users away from auth pages to dashboard (but allow public routes)
   if (user && isAuthRoute) {
+    console.log(`Redirecting logged user from ${req.nextUrl.pathname} to /dashboard`)
     return NextResponse.redirect(new URL('/dashboard', req.url))
   }
 
   // Redirect unauthenticated users away from onboarding
   if (!user && isOnboardingRoute) {
+    console.log(`Redirecting unauth user from onboarding to /login`)
     return NextResponse.redirect(new URL('/login', req.url))
   }
 
   // Redirect unauthenticated users to login for protected routes (but allow public routes)
   if (!user && isProtectedRoute && !isPublicRoute) {
+    console.log(`Redirecting unauth user from ${req.nextUrl.pathname} to /login`)
     const redirectUrl = new URL('/login', req.url)
     redirectUrl.searchParams.set('redirectTo', req.nextUrl.pathname)
     return NextResponse.redirect(redirectUrl)
   }
+
+  console.log(`Allowing access to ${req.nextUrl.pathname}`)
 
   return supabaseResponse
 }
