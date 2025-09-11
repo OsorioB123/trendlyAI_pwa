@@ -222,7 +222,7 @@ export default function DashboardPage() {
             <div className="min-h-[40vh] flex flex-col items-center justify-center mt-12 mb-6">
               <div className="mb-6 text-center">
                 <h2 className="text-3xl font-semibold text-white tracking-tight font-sans">
-                  {greeting.split('').map((char, index) => (
+                  {`${greeting}, ${userName}`.split('').map((char, index) => (
                     <span
                       key={index}
                       className="inline-block animate-fade-in"
@@ -233,7 +233,7 @@ export default function DashboardPage() {
                     >
                       {char === ' ' ? '\u00A0' : char}
                     </span>
-                  ))}, {userName}
+                  ))}
                 </h2>
               </div>
               

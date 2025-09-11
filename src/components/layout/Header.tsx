@@ -208,7 +208,7 @@ export default function Header({
               </button>
 
               {showNotifications && (
-                <div className={`dropdown-menu liquid-glass-opaque absolute top-full right-0 mt-2 p-2 w-80 z-50 transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[top_right] ${showNotifications ? 'show' : ''}`}>
+                <div className={`dropdown-menu liquid-glass-opaque absolute top-full right-0 mt-2 p-2 w-72 md:w-80 z-50 transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[top_right] ${showNotifications ? 'show' : ''}`}>
                   <div className="p-2 flex justify-between items-center">
                     <h4 className="text-white font-semibold text-sm">Notificações</h4>
                     <button className="text-xs text-white/60 hover:text-white transition-colors">
@@ -242,7 +242,11 @@ export default function Header({
                   closeAllMenus()
                   setShowProfile(!showProfile)
                 }}
-                className="w-11 h-11 rounded-full flex items-center justify-center transition-all ring-2 ring-transparent hover:ring-white/30 backdrop-blur-[20px] bg-white/10 border border-white/14 shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-white/15 hover:scale-105 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)]"
+                className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ring-2 ring-transparent backdrop-blur-[20px] border border-white/14 shadow-[0_4px_12px_rgba(0,0,0,0.2)] ${
+                  showProfile 
+                    ? 'bg-white/20 ring-white/40 scale-105 shadow-[0_8px_24px_rgba(0,0,0,0.3)]' 
+                    : 'bg-white/10 hover:bg-white/15 hover:ring-white/30 hover:scale-105 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)]'
+                }`}
               >
                 <div className="w-9 h-9 rounded-full overflow-hidden">
                   <img 
@@ -254,7 +258,7 @@ export default function Header({
               </button>
 
               {showProfile && (
-                <div className={`dropdown-menu absolute top-full right-0 mt-2 p-4 w-72 z-50 backdrop-blur-[24px] bg-[rgba(30,30,40,0.85)] border border-white/14 shadow-[0_8px_24px_rgba(0,0,0,0.3)] rounded-2xl transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[top_right] ${showProfile ? 'show' : ''}`}>
+                <div className={`dropdown-menu absolute top-full right-0 mt-2 p-4 w-64 md:w-72 z-50 backdrop-blur-[24px] bg-[rgba(30,30,40,0.85)] border border-white/14 shadow-[0_8px_24px_rgba(0,0,0,0.3)] rounded-2xl transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[top_right] ${showProfile ? 'show' : ''}`}>
                   {/* Profile Header */}
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
@@ -272,32 +276,6 @@ export default function Header({
                     </div>
                   </div>
 
-                  {/* Profile Info Card */}
-                  <div className="mb-4 p-3 rounded-lg backdrop-blur-[20px] bg-white/5 border border-white/10">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-medium text-white/80">Informações da Conta</span>
-                      <Info className="w-3.5 h-3.5 text-white/60" />
-                    </div>
-                    <div className="space-y-1.5 text-xs text-white/70">
-                      <div className="flex justify-between">
-                        <span>Email:</span>
-                        <span className="text-white/90 truncate ml-2">{user?.email || 'N/A'}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Plano:</span>
-                        <span className="text-white/90">{profile?.subscription_tier || 'Gratuito'}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Membro desde:</span>
-                        <span className="text-white/90">
-                          {profile?.created_at 
-                            ? new Date(profile.created_at).toLocaleDateString('pt-BR')
-                            : 'Recente'
-                          }
-                        </span>
-                      </div>
-                    </div>
-                  </div>
 
                   {/* Profile Button */}
                   <button 
@@ -322,9 +300,13 @@ export default function Header({
                           <Info className="w-3.5 h-3.5" />
                         </button>
                         {showCreditsTooltip && (
-                          <div className={`credit-tooltip backdrop-blur-[24px] bg-white/10 border border-white/14 shadow-[0_8px_24px_rgba(0,0,0,0.3)] absolute bottom-full right-0 mb-2 p-3 w-64 rounded-xl transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[bottom_right] ${showCreditsTooltip ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-[5px] scale-[0.98] pointer-events-none'}`}>
+                          <div className={`credit-tooltip backdrop-blur-[24px] bg-[rgba(30,30,40,0.85)] border border-white/14 shadow-[0_8px_24px_rgba(0,0,0,0.3)] absolute bottom-full right-0 mb-2 p-3 w-64 rounded-xl transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[bottom_right] ${showCreditsTooltip ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-[5px] scale-[0.98] pointer-events-none'}`}>
                             <p className="text-xs text-white/90">
-                              Seus créditos são usados para conversas com a Salina e se renovam a cada 24h. Precisa de mais? <button onClick={() => router.push('/subscription')} className="font-semibold text-[#2fd159] hover:underline">Torne-se um Maestro</button> para ter acesso ilimitado.
+                              Seus créditos são usados para conversas com a Salina e se renovam a cada 24h. Precisa de mais? <button onClick={() => {
+                                setShowCreditsTooltip(false)
+                                setShowProfile(false)
+                                router.push('/subscription')
+                              }} className="font-semibold text-[#2fd159] hover:underline">Torne-se um Maestro</button> para ter acesso ilimitado.
                             </p>
                           </div>
                         )}
