@@ -34,7 +34,9 @@
       "Bash(git push:*)",
       "Bash(gh auth:*)",
       "WebFetch(domain:trendly-ai-pwa.vercel.app)",
-      "WebFetch(domain:supabase.com)"
+      "WebFetch(domain:supabase.com)",
+      "Bash(grep:*)",
+      "Bash(sed:*)"
     ],
     "deny": [],
     "ask": []

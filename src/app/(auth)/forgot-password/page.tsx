@@ -93,7 +93,7 @@ export default function ForgotPasswordPage() {
 
             <div className="w-full space-y-4">
               <Link
-                href="/auth/login"
+                href="/login"
                 className="w-full flex items-center justify-center text-white text-[15px] font-semibold py-3 rounded-xl bg-white/10 border border-white/20 shadow-lg hover:bg-white/15 hover:-translate-y-1 hover:shadow-2xl active:-translate-y-0.5 active:scale-[0.99] transition-all duration-300"
               >
                 Voltar para Login
@@ -139,7 +139,7 @@ export default function ForgotPasswordPage() {
         <div className="w-full rounded-3xl p-8 flex flex-col animate-fade-in-up backdrop-blur-2xl bg-white/10 border border-white/15 shadow-2xl">
           <div>
             <Link 
-              href="/auth/login"
+              href="/login"
               className="flex items-center text-white/60 hover:text-white text-sm font-medium gap-1.5 -ml-2 p-2 rounded-lg hover:bg-white/10 transition-all duration-300 animate-fade-in-up"
             >
               <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
@@ -199,7 +199,7 @@ export default function ForgotPasswordPage() {
           {/* Links */}
           <div className="flex flex-col items-center gap-3 text-center mt-6">
             <Link 
-              href="/auth/register"
+              href="/register"
               className="text-white/60 hover:text-white text-xs transition-colors duration-300 animate-fade-in-up"
             >
               Não tem uma conta?{' '}

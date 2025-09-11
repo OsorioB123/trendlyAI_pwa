@@ -241,7 +241,7 @@ export default function RegisterPage() {
 
             <div className="w-full space-y-4">
               <button
-                onClick={() => router.push('/auth/login')}
+                onClick={() => router.push('/login')}
                 className="w-full text-white text-[15px] font-semibold py-3 rounded-xl bg-white/10 border border-white/20 shadow-lg hover:bg-white/15 hover:-translate-y-1 hover:shadow-2xl active:-translate-y-0.5 active:scale-[0.99] transition-all duration-300"
               >
                 Ir para Login
@@ -274,7 +274,7 @@ export default function RegisterPage() {
         <div className="w-full liquid-glass rounded-3xl p-8 flex flex-col animate-fade-in-up backdrop-blur-2xl bg-white/10 border border-white/15 shadow-2xl">
           <div>
             <Link 
-              href="/auth/login"
+              href="/login"
               className="flex items-center text-white/60 hover:text-white text-sm font-medium gap-1.5 -ml-2 p-2 rounded-lg hover:bg-white/10 transition-all duration-300 animate-fade-in-up"
             >
               <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />

@@ -210,14 +210,14 @@ export default function LoginPage() {
             {/* Links */}
             <div className="flex flex-col items-center gap-3 text-center">
               <Link 
-                href="/auth/register"
+                href="/register"
                 className="text-white/60 hover:text-white text-xs transition-colors duration-300"
               >
                 Não tem uma conta?{' '}
                 <span className="font-semibold text-white">Crie uma aqui</span>
               </Link>
               <Link 
-                href="/auth/forgot-password"
+                href="/forgot-password"
                 className="text-white/60 hover:text-white text-xs transition-colors duration-300"
               >
                 Esqueceu sua senha?
