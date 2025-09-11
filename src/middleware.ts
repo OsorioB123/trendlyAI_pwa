@@ -42,6 +42,7 @@ export async function middleware(req: NextRequest) {
   const protectedRoutes = ['/dashboard', '/tools', '/tracks', '/chat', '/profile', '/settings']
   const authRoutes = ['/login', '/register', '/forgot-password']
   const onboardingRoute = '/onboarding'
+  const publicRoutes = ['/', '/debug-auth', '/test-supabase']
   
   const isProtectedRoute = protectedRoutes.some(route => 
     req.nextUrl.pathname.startsWith(route)
@@ -50,10 +51,11 @@ export async function middleware(req: NextRequest) {
     req.nextUrl.pathname === route
   )
   const isOnboardingRoute = req.nextUrl.pathname === onboardingRoute
+  const isPublicRoute = publicRoutes.includes(req.nextUrl.pathname)
 
-  // Redirect authenticated users away from auth pages to onboarding or dashboard
+  // Redirect authenticated users away from auth pages to dashboard (but allow public routes)
   if (user && isAuthRoute) {
-    return NextResponse.redirect(new URL('/onboarding', req.url))
+    return NextResponse.redirect(new URL('/dashboard', req.url))
   }
 
   // Redirect unauthenticated users away from onboarding
