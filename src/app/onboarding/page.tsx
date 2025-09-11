@@ -288,7 +288,7 @@ export default function OnboardingPage() {
       )
     }
 
-    // Regular slide
+    // Regular slide - match HTML reference exactly
     return (
       <div>
         <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4 fade-in-up font-geist">
@@ -315,23 +315,27 @@ export default function OnboardingPage() {
     <div className="min-h-screen overflow-hidden relative" style={{ backgroundColor: 'var(--bg-main)' }}>
       {/* Background placeholders for slides 1, 2, 4 - exact from HTML */}
       <div 
+        id="slide-bg-1"
         className={`slide-background ${currentSlide === 1 ? 'active' : ''}`} 
-        style={{ backgroundImage: `url('${getSlideBackground(1)}')` }}
+        style={{ backgroundImage: `url('https://i.ibb.co/602fn0G5/tela-1.webp')` }}
       />
       <div 
+        id="slide-bg-2"
         className={`slide-background ${currentSlide === 2 ? 'active' : ''}`} 
-        style={{ backgroundImage: `url('${getSlideBackground(2)}')` }}
+        style={{ backgroundImage: `url('https://i.ibb.co/0j3FZ1fm/tela-2.webp')` }}
       />
       <div 
+        id="slide-bg-4"
         className={`slide-background ${currentSlide === 4 ? 'active' : ''}`} 
-        style={{ backgroundImage: `url('${getSlideBackground(4)}')` }}
+        style={{ backgroundImage: `url('https://i.ibb.co/zTV6nP2q/tela-4.webp')` }}
       />
 
-      {/* Background container for theme slides */}
-      <div className={currentSlide === 3 ? '' : 'hidden'}>
+      {/* Background container for theme slides - exact structure from HTML */}
+      <div id="background-container" className={currentSlide === 3 ? '' : 'hidden'}>
         {THEMES.map((theme) => (
           <div
             key={theme.id}
+            id={`bg-${theme.id}`}
             className={`background-layer ${selectedTheme === theme.id ? 'is-active' : ''}`}
             style={{ backgroundImage: `url(${theme.value})` }}
           />
