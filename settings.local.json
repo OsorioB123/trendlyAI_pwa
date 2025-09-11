@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(tree:*)",
+      "Bash(npm install:*)",
+      "Bash(npm search:*)",
+      "Bash(claude mcp add:*)",
+      "Bash(cat:*)",
+      "Read(//c/Users/bruno/**)",
+      "Bash(npm ls:*)",
+      "Bash(claude mcp:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
