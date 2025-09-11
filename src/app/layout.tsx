@@ -1,14 +1,7 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { AuthProvider } from "../contexts/AuthContext";
 import { BackgroundProvider } from "../contexts/BackgroundContext";
 import "./globals.css";
-
-const inter = Inter({ 
-  subsets: ["latin"],
-  variable: '--font-inter',
-  display: 'swap'
-});
 
 export const metadata: Metadata = {
   title: "TrendlyAI - Plataforma de Criação de Conteúdo com IA",
@@ -33,7 +26,7 @@ export default function RootLayout({
       <head>
         <link href="https://unpkg.com/@geist-ui/fonts/geist-sans.css" rel="stylesheet" />
       </head>
-      <body className={`${inter.variable} font-sans`}>
+      <body className="font-sans">
         <AuthProvider>
           <BackgroundProvider>
             {children}
