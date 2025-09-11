@@ -27,8 +27,8 @@ export default function Carousel({
     const scrollLeft = track.scrollLeft
     const maxScrollLeft = track.scrollWidth - track.clientWidth
 
-    setCanScrollLeft(scrollLeft > 10)
-    setCanScrollRight(scrollLeft < maxScrollLeft - 10)
+    setCanScrollLeft(scrollLeft > 5)
+    setCanScrollRight(scrollLeft < maxScrollLeft - 5)
 
     // If no overflow, disable both buttons
     if (track.scrollWidth <= track.clientWidth) {
@@ -44,12 +44,28 @@ export default function Carousel({
     const items = Array.from(track.children) as HTMLElement[]
     if (items.length === 0) return
 
-    // Get the gap from the CSS class
+    // Calculate viewport width and scroll amount
+    const containerWidth = track.clientWidth
     const gap = 24 // 6 * 4px (gap-6 = 1.5rem = 24px)
-    const itemWidth = items[0].offsetWidth + gap
     
-    // Scroll by exactly one item width to move to next card
-    track.scrollBy({ left: itemWidth, behavior: 'smooth' })
+    // On mobile (< 640px): scroll by 85% + gap
+    // On tablet (640-1024px): scroll by 50% + gap  
+    // On desktop (> 1024px): scroll by 33.333% + gap
+    let scrollAmount: number
+    
+    if (window.innerWidth < 640) {
+      scrollAmount = containerWidth * 0.85 + gap
+    } else if (window.innerWidth < 1024) {
+      scrollAmount = containerWidth * 0.5 + gap
+    } else {
+      scrollAmount = containerWidth * 0.333 + gap
+    }
+    
+    // Scroll by calculated amount
+    track.scrollBy({ left: scrollAmount, behavior: 'smooth' })
+    
+    // Update scroll state after a delay to account for smooth scrolling
+    setTimeout(updateScrollState, 150)
   }
 
   const scrollPrev = () => {
@@ -59,12 +75,28 @@ export default function Carousel({
     const items = Array.from(track.children) as HTMLElement[]
     if (items.length === 0) return
 
-    // Get the gap from the CSS class
+    // Calculate viewport width and scroll amount  
+    const containerWidth = track.clientWidth
     const gap = 24 // 6 * 4px (gap-6 = 1.5rem = 24px)
-    const itemWidth = items[0].offsetWidth + gap
     
-    // Scroll by exactly one item width to move to previous card
-    track.scrollBy({ left: -itemWidth, behavior: 'smooth' })
+    // On mobile (< 640px): scroll by 85% + gap
+    // On tablet (640-1024px): scroll by 50% + gap
+    // On desktop (> 1024px): scroll by 33.333% + gap
+    let scrollAmount: number
+    
+    if (window.innerWidth < 640) {
+      scrollAmount = containerWidth * 0.85 + gap
+    } else if (window.innerWidth < 1024) {
+      scrollAmount = containerWidth * 0.5 + gap
+    } else {
+      scrollAmount = containerWidth * 0.333 + gap
+    }
+    
+    // Scroll by calculated amount
+    track.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
+    
+    // Update scroll state after a delay to account for smooth scrolling
+    setTimeout(updateScrollState, 150)
   }
 
   useEffect(() => {
@@ -77,6 +109,7 @@ export default function Carousel({
         if (entry.isIntersecting) {
           track.addEventListener('scroll', updateScrollState, { passive: true })
           window.addEventListener('resize', updateScrollState)
+          // Initial state update
           updateScrollState()
         } else {
           track.removeEventListener('scroll', updateScrollState)
@@ -87,6 +120,9 @@ export default function Carousel({
 
     observer.observe(track)
     
+    // Initial scroll state setup
+    setTimeout(updateScrollState, 100)
+    
     return () => {
       observer.disconnect()
       track.removeEventListener('scroll', updateScrollState)
@@ -94,23 +130,32 @@ export default function Carousel({
     }
   }, [])
 
+  // Update scroll state on children change
+  useEffect(() => {
+    if (trackRef.current) {
+      setTimeout(updateScrollState, 100)
+    }
+  }, [children])
+
   return (
     <div className={`relative ${className}`} id={id}>
       {showNavigation && (
         <>
           <button 
-            className={`absolute top-1/2 -left-6 transform -translate-y-1/2 w-12 h-12 rounded-full hidden lg:flex items-center justify-center z-10 liquid-glass-pill text-white transition-all duration-200 ${!canScrollLeft ? 'opacity-40 cursor-not-allowed' : 'hover:scale-105'}`}
+            className={`absolute top-1/2 -left-4 lg:-left-6 transform -translate-y-1/2 w-10 h-10 lg:w-12 lg:h-12 rounded-full hidden md:flex items-center justify-center z-20 liquid-glass-pill text-white transition-all duration-300 ${!canScrollLeft ? 'opacity-30 cursor-not-allowed' : 'hover:scale-110 active:scale-95'}`}
             onClick={scrollPrev}
             disabled={!canScrollLeft}
+            aria-label="Scroll to previous items"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-4 h-4 lg:w-5 lg:h-5" />
           </button>
           <button 
-            className={`absolute top-1/2 -right-6 transform -translate-y-1/2 w-12 h-12 rounded-full hidden lg:flex items-center justify-center z-10 liquid-glass-pill text-white transition-all duration-200 ${!canScrollRight ? 'opacity-40 cursor-not-allowed' : 'hover:scale-105'}`}
+            className={`absolute top-1/2 -right-4 lg:-right-6 transform -translate-y-1/2 w-10 h-10 lg:w-12 lg:h-12 rounded-full hidden md:flex items-center justify-center z-20 liquid-glass-pill text-white transition-all duration-300 ${!canScrollRight ? 'opacity-30 cursor-not-allowed' : 'hover:scale-110 active:scale-95'}`}
             onClick={scrollNext}
             disabled={!canScrollRight}
+            aria-label="Scroll to next items"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-4 h-4 lg:w-5 lg:h-5" />
           </button>
         </>
       )}

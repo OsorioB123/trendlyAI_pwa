@@ -584,6 +584,28 @@ body {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
+.liquid-glass-pill:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+.liquid-glass-pill:active {
+  transform: scale(0.95);
+  transition: all 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.liquid-glass-pill:disabled {
+  cursor: not-allowed;
+  opacity: 0.3;
+  transform: none;
+}
+
+.liquid-glass-pill:disabled:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 .liquid-glass-opaque {
   backdrop-filter: blur(24px);
   background-color: rgba(30, 30, 40, 0.85);

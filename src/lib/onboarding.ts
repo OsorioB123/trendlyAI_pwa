@@ -1,83 +1,86 @@
 /**
  * Onboarding utility functions
+ * Manages user onboarding status and flow
  */
 
-export const ONBOARDING_STORAGE_KEY = 'trendlyai-onboarding-completed'
+const ONBOARDING_STORAGE_KEY = 'trendly-onboarding-completed'
 
 /**
  * Check if user has completed onboarding
  */
 export function hasCompletedOnboarding(): boolean {
   if (typeof window === 'undefined') return false
-  return localStorage.getItem(ONBOARDING_STORAGE_KEY) === 'true'
+  
+  try {
+    return localStorage.getItem(ONBOARDING_STORAGE_KEY) === 'true'
+  } catch (error) {
+    console.error('Error checking onboarding status:', error)
+    return false
+  }
 }
 
 /**
- * Server-safe version to check onboarding status from cookies/headers
- * Used by middleware where localStorage is not available
- */
-export function hasCompletedOnboardingFromCookies(cookies?: { [key: string]: string }): boolean {
-  if (!cookies) return false
-  return cookies[ONBOARDING_STORAGE_KEY] === 'true'
-}
-
-/**
- * Mark onboarding as completed
+ * Mark onboarding as complete
  */
 export function markOnboardingComplete(): void {
-  if (typeof window !== 'undefined') {
+  if (typeof window === 'undefined') return
+  
+  try {
     localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true')
-    // Also set a cookie for server-side consistency
-    document.cookie = `${ONBOARDING_STORAGE_KEY}=true; path=/; max-age=31536000; SameSite=Lax`
+  } catch (error) {
+    console.error('Error marking onboarding complete:', error)
   }
 }
 
 /**
- * Clear onboarding completion status
+ * Clear onboarding status (useful for logout or reset)
  */
 export function clearOnboardingStatus(): void {
-  if (typeof window !== 'undefined') {
+  if (typeof window === 'undefined') return
+  
+  try {
     localStorage.removeItem(ONBOARDING_STORAGE_KEY)
-    // Also clear the cookie
-    document.cookie = `${ONBOARDING_STORAGE_KEY}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`
+  } catch (error) {
+    console.error('Error clearing onboarding status:', error)
   }
 }
 
 /**
- * Get redirect path after onboarding completion
+ * Determine if onboarding should be shown
+ * Takes into account user profile and completion status
  */
-export function getOnboardingRedirectPath(): string {
-  // Check if there's a redirect URL in query params or session storage
-  if (typeof window !== 'undefined') {
-    const urlParams = new URLSearchParams(window.location.search)
-    const redirect = urlParams.get('redirect')
-    if (redirect) {
-      return decodeURIComponent(redirect)
-    }
-    
-    const sessionRedirect = sessionStorage.getItem('trendlyai-auth-redirect')
-    if (sessionRedirect) {
-      sessionStorage.removeItem('trendlyai-auth-redirect')
-      return sessionRedirect
-    }
+export function shouldShowOnboarding(userProfile?: any): boolean {
+  // If user hasn't completed onboarding, show it
+  if (!hasCompletedOnboarding()) {
+    return true
   }
   
-  return '/dashboard'
+  // If user profile is missing key information, show onboarding
+  if (userProfile && (!userProfile.display_name || !userProfile.onboarding_completed)) {
+    return true
+  }
+  
+  return false
 }
 
 /**
- * Check if user should see onboarding
- * Returns true if user is authenticated but hasn't completed onboarding
+ * Reset onboarding for testing purposes
  */
-export function shouldShowOnboarding(isAuthenticated: boolean): boolean {
-  if (!isAuthenticated) return false
-  return !hasCompletedOnboarding()
+export function resetOnboarding(): void {
+  clearOnboardingStatus()
 }
 
 /**
- * Handle onboarding completion with proper cleanup
+ * Check onboarding status from cookies (for middleware)
+ * This is used in server-side middleware where localStorage is not available
  */
-export async function completeOnboarding(): Promise<string> {
-  markOnboardingComplete()
-  return getOnboardingRedirectPath()
+export function hasCompletedOnboardingFromCookies(cookies?: any): boolean {
+  if (!cookies) return false
+  
+  try {
+    return cookies.get('trendly-onboarding-completed')?.value === 'true'
+  } catch (error) {
+    console.error('Error checking onboarding status from cookies:', error)
+    return false
+  }
 }

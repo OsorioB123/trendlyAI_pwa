@@ -293,7 +293,7 @@ export default function DashboardPage() {
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
-                <Carousel>
+                <Carousel id="continue-tracks-carousel" className="pb-2">
                   {MOCK_TRACKS.map((track) => (
                     <TrackCard
                       key={track.id}
@@ -319,7 +319,7 @@ export default function DashboardPage() {
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
-                <Carousel>
+                <Carousel id="recommended-tracks-carousel" className="pb-2">
                   {MOCK_RECOMMENDED_TRACKS.map((track) => (
                     <TrackCard
                       key={track.id}
@@ -345,7 +345,7 @@ export default function DashboardPage() {
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
-                <Carousel>
+                <Carousel id="recommended-tools-carousel" className="pb-2">
                   {MOCK_TOOLS.map((tool) => (
                     <ToolCard
                       key={tool.id}

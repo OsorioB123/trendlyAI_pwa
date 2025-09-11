@@ -70,17 +70,29 @@ export default function Header({
     try {
       setShowProfile(false)
       
+      // Clear any local storage if needed
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('supabase.auth.token')
+        localStorage.removeItem('sb-auth-token')
+      }
+      
       const { error } = await signOut()
       
       if (error) {
         console.error('Logout error:', error)
       }
       
-      router.push('/login')
+      // Add a small delay to ensure auth state is updated
+      setTimeout(() => {
+        router.replace('/login')
+      }, 100)
       
     } catch (error) {
       console.error('Logout error:', error)
-      router.push('/login')
+      // Even if there's an error, navigate to login
+      setTimeout(() => {
+        router.replace('/login')
+      }, 100)
     } finally {
       setIsLoggingOut(false)
     }
@@ -257,6 +269,33 @@ export default function Header({
                       <p className="text-sm text-white/70 flex items-center gap-1.5">
                         ✨ <span>{profile?.level || 'Explorador'}</span>
                       </p>
+                    </div>
+                  </div>
+
+                  {/* Profile Info Card */}
+                  <div className="mb-4 p-3 rounded-lg backdrop-blur-[20px] bg-white/5 border border-white/10">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-medium text-white/80">Informações da Conta</span>
+                      <Info className="w-3.5 h-3.5 text-white/60" />
+                    </div>
+                    <div className="space-y-1.5 text-xs text-white/70">
+                      <div className="flex justify-between">
+                        <span>Email:</span>
+                        <span className="text-white/90 truncate ml-2">{user?.email || 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Plano:</span>
+                        <span className="text-white/90">{profile?.subscription_tier || 'Gratuito'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Membro desde:</span>
+                        <span className="text-white/90">
+                          {profile?.created_at 
+                            ? new Date(profile.created_at).toLocaleDateString('pt-BR')
+                            : 'Recente'
+                          }
+                        </span>
+                      </div>
                     </div>
                   </div>
 

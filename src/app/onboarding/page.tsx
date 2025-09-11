@@ -1,48 +1,17 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
 import { ArrowRight, Check } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useBackground } from '../../contexts/BackgroundContext'
-import { useAuth } from '../../contexts/AuthContext'
-import { hasCompletedOnboarding } from '../../lib/onboarding'
-import OnboardingButton from '../../components/onboarding/OnboardingButton'
 
-interface OnboardingSlide {
-  id: number
-  title: string
-  description: string
-  backgroundImage?: string
+interface Theme {
+  id: string
+  name: string
+  value: string
 }
 
-const SLIDES: OnboardingSlide[] = [
-  {
-    id: 1,
-    title: 'A tela em branco. O maior inimigo da criatividade.',
-    description: 'Por anos, as ferramentas nos deram mais botões, mas nunca uma direção. Elas nos deixaram sozinhos com o nosso maior desafio.',
-    backgroundImage: 'https://i.ibb.co/602fn0G5/tela-1.webp'
-  },
-  {
-    id: 2,
-    title: 'E se você tivesse um gênio como co-piloto?',
-    description: 'Apresentando Salina, sua mente estratégica pessoal. Ela não te dá ferramentas. Ela conversa, guia e co-cria com você, transformando intenção em excelência.',
-    backgroundImage: 'https://i.ibb.co/0j3FZ1fm/tela-2.webp'
-  },
-  {
-    id: 3,
-    title: 'Defina a energia do seu estúdio.',
-    description: 'Escolha o ambiente que inspira seu trabalho hoje.'
-  },
-  {
-    id: 4,
-    title: 'Bem-vindo ao seu novo estúdio criativo.',
-    description: 'Explore trilhas de aprendizado, domine ferramentas de precisão e converse com a Salina para transformar qualquer ideia em seu próximo grande projeto. O poder é seu.',
-    backgroundImage: 'https://i.ibb.co/zTV6nP2q/tela-4.webp'
-  }
-]
-
-// Themes array - exact from HTML reference
-const THEMES = [
+const THEMES: Theme[] = [
   { id: 'default', name: 'Padrão Trendly', value: 'https://i.ibb.co/Tx5Xxb2P/grad-1.webp' },
   { id: 'theme-2', name: 'Ambiente 2', value: 'https://i.ibb.co/TBV2V62G/grad-2.webp' },
   { id: 'theme-3', name: 'Ambiente 3', value: 'https://i.ibb.co/dsNWJkJf/grad-3.webp' },
@@ -57,368 +26,381 @@ const THEMES = [
   { id: 'theme-12', name: 'Ambiente 12', value: 'https://i.ibb.co/JwVj3XGH/grad-12.webp' },
 ]
 
+// Theme Sphere Component
 interface ThemeSphereProps {
-  theme: {
-    id: string
-    name: string
-    value: string
-  }
+  theme: Theme
   isSelected: boolean
+  isInView: boolean
   onSelect: (themeId: string) => void
-  isInView?: boolean
+  isDefault?: boolean
 }
 
-function ThemeSphere({ theme, isSelected, onSelect, isInView = true }: ThemeSphereProps) {
+function ThemeSphere({ theme, isSelected, isInView, onSelect, isDefault }: ThemeSphereProps) {
+  const handleClick = () => {
+    onSelect(theme.id)
+  }
+
   return (
-    <div className="flex-shrink-0 snap-center relative flex justify-center p-4">
-      {theme.id === 'default' && (
+    <li className="flex-shrink-0 snap-center relative flex justify-center p-4">
+      {isDefault && (
         <div className="liquid-glass-tag absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap z-10">
           Padrão Trendly
         </div>
       )}
-      
       <button
+        id={`theme-${theme.id}`}
+        className={`theme-sphere ${isSelected ? 'is-selected' : ''} ${isInView ? 'is-in-view' : ''}`}
+        style={{ '--sphere-bg': `url(${theme.value})` } as React.CSSProperties}
         data-theme-id={theme.id}
-        onClick={() => onSelect(theme.id)}
-        className={`
-          theme-sphere
-          ${isSelected ? 'is-selected' : ''}
-          ${isInView ? 'is-in-view' : ''}
-        `}
-        style={{
-          '--sphere-bg': `url(${theme.value})`
-        } as React.CSSProperties}
+        onClick={handleClick}
         aria-label={`Selecionar tema ${theme.name}`}
       >
         <div className="check-icon">
           <Check className="w-8 h-8 text-white" strokeWidth={1.5} />
         </div>
       </button>
+    </li>
+  )
+}
+
+// Slide Background Component
+interface SlideBackgroundProps {
+  slideNumber: number
+  currentSlide: number
+  backgroundUrl?: string
+}
+
+function SlideBackground({ slideNumber, currentSlide, backgroundUrl }: SlideBackgroundProps) {
+  if (!backgroundUrl) return null
+  
+  return (
+    <div 
+      className={`slide-background ${currentSlide === slideNumber ? 'active' : ''}`}
+      style={{ backgroundImage: `url(${backgroundUrl})` }}
+    />
+  )
+}
+
+// Theme Background Component
+interface ThemeBackgroundProps {
+  themes: Theme[]
+  selectedThemeId: string
+  isVisible: boolean
+}
+
+function ThemeBackground({ themes, selectedThemeId, isVisible }: ThemeBackgroundProps) {
+  return (
+    <div className={isVisible ? '' : 'hidden'}>
+      {themes.map((theme) => (
+        <div
+          key={theme.id}
+          className={`background-layer ${selectedThemeId === theme.id ? 'is-active' : ''}`}
+          style={{ backgroundImage: `url(${theme.value})` }}
+        />
+      ))}
     </div>
   )
 }
 
+// Main Onboarding Component
 export default function OnboardingPage() {
   const [currentSlide, setCurrentSlide] = useState(1)
-  const [selectedTheme, setSelectedTheme] = useState('default')
-  const [isLoading, setIsLoading] = useState(false)
+  const [selectedThemeId, setSelectedThemeId] = useState('default')
   const [themesInitialized, setThemesInitialized] = useState(false)
+  const [visibleThemes, setVisibleThemes] = useState<Set<string>>(new Set(['default']))
   
   const router = useRouter()
   const { changeBackground } = useBackground()
-  const { isAuthenticated, user, completeOnboarding } = useAuth()
+  const observerRef = useRef<IntersectionObserver | null>(null)
   
-  const themesGalleryRef = useRef<HTMLDivElement>(null)
-  const themesTrackRef = useRef<HTMLOListElement>(null)
+  const totalSlides = 4
 
-  // Redirect if not authenticated or already completed onboarding
-  useEffect(() => {
-    if (!isAuthenticated && !user) {
-      router.push('/login')
-      return
+  // Handle slide navigation
+  const showSlide = useCallback((slideNumber: number) => {
+    setCurrentSlide(slideNumber)
+    
+    // Initialize theme selector on slide 3
+    if (slideNumber === 3 && !themesInitialized) {
+      setThemesInitialized(true)
+      
+      // Setup intersection observer for mobile
+      if (window.innerWidth < 1024) {
+        setTimeout(() => {
+          const selectedElement = document.getElementById(`theme-${selectedThemeId}`)
+          if (selectedElement?.parentElement) {
+            selectedElement.parentElement.scrollIntoView({ 
+              behavior: 'auto', 
+              inline: 'center' 
+            })
+          }
+        }, 100)
+        
+        setupIntersectionObserver()
+      }
     }
     
-    // If user has already completed onboarding, redirect to dashboard
-    if (isAuthenticated && hasCompletedOnboarding()) {
-      router.push('/dashboard')
-      return
+    // Restart animations for current slide
+    setTimeout(() => {
+      const slide = document.getElementById(`slide-${slideNumber}`)
+      if (slide) {
+        const fadeElements = slide.querySelectorAll('.fade-in-up, .animate-entry')
+        fadeElements.forEach(el => {
+          const element = el as HTMLElement
+          element.style.animation = 'none'
+          // Force reflow
+          element.offsetHeight
+          element.style.animation = ''
+        })
+      }
+    }, 50)
+  }, [selectedThemeId, themesInitialized])
+
+  // Setup intersection observer for mobile theme selection
+  const setupIntersectionObserver = useCallback(() => {
+    if (observerRef.current) {
+      observerRef.current.disconnect()
     }
-  }, [isAuthenticated, user, router])
 
-  // Setup intersection observer for mobile theme selection (exact from HTML)
-  useEffect(() => {
-    if (currentSlide !== 3 || !themesTrackRef.current || window.innerWidth >= 1024) return
+    const themesGallery = document.getElementById('themes-gallery')
+    if (!themesGallery) return
 
-    const spheres = themesTrackRef.current.querySelectorAll('.theme-sphere')
     const options = {
-      root: themesGalleryRef.current,
+      root: themesGallery,
       rootMargin: '0px',
       threshold: 0.8
     }
 
-    const observer = new IntersectionObserver((entries) => {
+    observerRef.current = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const currentSphere = entry.target as HTMLElement
-          const themeId = currentSphere.dataset.themeId
+        const sphereButton = entry.target.querySelector('.theme-sphere') as HTMLElement
+        if (sphereButton && entry.isIntersecting) {
+          const themeId = sphereButton.getAttribute('data-theme-id')
           if (themeId) {
-            setSelectedTheme(themeId)
-            // Update sphere states
-            spheres.forEach(s => s.classList.remove('is-in-view', 'is-selected'))
-            currentSphere.classList.add('is-in-view', 'is-selected')
+            setSelectedThemeId(themeId)
+            setVisibleThemes(prev => new Set([...prev, themeId]))
           }
         }
       })
     }, options)
 
-    spheres.forEach(sphere => observer.observe(sphere))
+    // Observe all theme sphere containers
+    const sphereContainers = document.querySelectorAll('#themes-track li')
+    sphereContainers.forEach(container => {
+      observerRef.current?.observe(container)
+    })
+  }, [])
 
-    return () => observer.disconnect()
-  }, [currentSlide, themesInitialized])
-
-  const showSlide = useCallback((slideNumber: number) => {
-    setCurrentSlide(slideNumber)
+  // Handle theme selection
+  const handleThemeSelect = useCallback((themeId: string) => {
+    setSelectedThemeId(themeId)
     
-    // Initialize theme selector when slide 3 is shown
-    if (slideNumber === 3 && !themesInitialized) {
-      setThemesInitialized(true)
-      // Scroll to selected theme on mobile
-      if (window.innerWidth < 1024) {
-        setTimeout(() => {
-          const selectedElement = document.querySelector(`[data-theme-id="${selectedTheme}"]`)?.parentElement
-          if (selectedElement) {
-            selectedElement.scrollIntoView({ behavior: 'auto', inline: 'center' })
-          }
-        }, 100)
+    // Scroll to selected theme on mobile
+    if (window.innerWidth < 1024) {
+      const selectedElement = document.getElementById(`theme-${themeId}`)
+      if (selectedElement?.parentElement) {
+        selectedElement.parentElement.scrollIntoView({ 
+          behavior: 'smooth', 
+          inline: 'center' 
+        })
       }
     }
-  }, [selectedTheme, themesInitialized])
+  }, [])
 
+  // Handle next button click
   const handleNext = useCallback(async () => {
-    if (currentSlide < SLIDES.length) {
+    if (currentSlide < totalSlides) {
       showSlide(currentSlide + 1)
     } else {
       // Complete onboarding
-      setIsLoading(true)
+      console.log(`Onboarding concluído! Tema selecionado: ${selectedThemeId}`)
       
-      try {
-        console.log(`Onboarding concluído! Tema selecionado: ${selectedTheme}`)
-        // Save selected theme
-        await changeBackground(selectedTheme)
-        
-        // Complete onboarding using AuthContext method
-        completeOnboarding()
-        
-        // Navigate to dashboard
-        router.push('/dashboard')
-      } catch (error) {
-        console.error('Error completing onboarding:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-  }, [currentSlide, selectedTheme, changeBackground, completeOnboarding, router, showSlide])
-
-  const handleSkip = useCallback(async () => {
-    try {
-      console.log("Navegar para a próxima página (pulou)")
-      // Set default theme
-      await changeBackground('default')
-      
-      // Complete onboarding using AuthContext method
-      completeOnboarding()
+      // Save selected theme
+      await changeBackground(selectedThemeId)
       
       // Navigate to dashboard
       router.push('/dashboard')
-    } catch (error) {
-      console.error('Error skipping onboarding:', error)
-      router.push('/dashboard')
     }
-  }, [changeBackground, completeOnboarding, router])
+  }, [currentSlide, totalSlides, selectedThemeId, changeBackground, router, showSlide])
 
-  const handleThemeSelect = (themeId: string) => {
-    setSelectedTheme(themeId)
-    
-    // Update visual states for all spheres
-    document.querySelectorAll('.theme-sphere').forEach(sphere => {
-      sphere.classList.remove('is-selected')
-    })
-    document.querySelector(`[data-theme-id="${themeId}"]`)?.classList.add('is-selected')
-    
-    if (window.innerWidth < 1024 && themesTrackRef.current) {
-      const selectedElement = themesTrackRef.current.querySelector(`[data-theme-id="${themeId}"]`)?.parentElement
-      if (selectedElement) {
-        selectedElement.scrollIntoView({ behavior: 'smooth', inline: 'center' })
-      }
-    }
-  }
+  // Handle skip
+  const handleSkip = useCallback(() => {
+    console.log("Navegar para a próxima página (pulou)")
+    router.push('/dashboard')
+  }, [router])
 
-  const handleDotClick = (slideNumber: number) => {
+  // Handle dot navigation
+  const handleDotClick = useCallback((slideNumber: number) => {
     if (currentSlide !== slideNumber) {
       showSlide(slideNumber)
     }
-  }
+  }, [currentSlide, showSlide])
 
-  const renderSlideContent = () => {
-    const slide = SLIDES.find(s => s.id === currentSlide)
-    if (!slide) return null
+  // Initialize first slide
+  useEffect(() => {
+    showSlide(1)
+  }, [showSlide])
 
-    if (currentSlide === 3) {
-      // Theme selection slide
-      return (
-        <div className="slide-content-theme">
-          <section className="text-center pt-8 pb-4 flex-shrink-0">
-            <h2 className="text-3xl font-semibold tracking-tight animate-entry font-geist">
-              {slide.title}
-            </h2>
-            <p className="mt-2 text-white/80 animate-entry delay-1">
-              {slide.description}
-            </p>
-          </section>
-          
-          <section className="flex-grow flex flex-col items-center justify-center min-h-0 py-8 animate-entry delay-2">
-            <div 
-              id="themes-gallery"
-              ref={themesGalleryRef}
-              className="w-full hide-scrollbar overflow-x-auto lg:overflow-x-visible pb-4"
-            >
-              <ol 
-                id="themes-track"
-                ref={themesTrackRef}
-                className="flex items-center gap-6 lg:p-0 lg:grid lg:grid-cols-4 lg:gap-8 lg:max-w-3xl lg:mx-auto"
-                style={window.innerWidth < 1024 ? { 
-                  scrollSnapType: 'x mandatory',
-                  padding: '0 calc(50vw - 60px)'
-                } : {}}
-              >
-                {THEMES.map((theme) => (
-                  <li key={theme.id}>
-                    <ThemeSphere
-                      theme={theme}
-                      isSelected={selectedTheme === theme.id}
-                      onSelect={handleThemeSelect}
-                      isInView={true}
-                    />
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </section>
-        </div>
-      )
+  // Cleanup intersection observer
+  useEffect(() => {
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+      }
     }
-
-    // Regular slide - match HTML reference exactly
-    return (
-      <div>
-        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4 fade-in-up font-geist">
-          {slide.title}
-        </h1>
-        <p className="text-base text-white/80 max-w-md fade-in-up" style={{ animationDelay: '0.15s' }}>
-          {slide.description}
-        </p>
-      </div>
-    )
-  }
-
-  const getSlideBackground = (slideNumber: number) => {
-    if (slideNumber === 3) {
-      const selectedBg = THEMES.find(bg => bg.id === selectedTheme)
-      return selectedBg?.value
-    }
-    
-    const slide = SLIDES.find(s => s.id === slideNumber)
-    return slide?.backgroundImage
-  }
+  }, [])
 
   return (
-    <div className="min-h-screen overflow-hidden relative" style={{ backgroundColor: 'var(--bg-main)' }}>
-      {/* Background placeholders for slides 1, 2, 4 - exact from HTML */}
-      <div 
-        id="slide-bg-1"
-        className={`slide-background ${currentSlide === 1 ? 'active' : ''}`} 
-        style={{ backgroundImage: `url('https://i.ibb.co/602fn0G5/tela-1.webp')` }}
+    <div className="min-h-screen overflow-hidden relative">
+      {/* Fixed slide backgrounds for slides 1, 2, 4 */}
+      <SlideBackground 
+        slideNumber={1} 
+        currentSlide={currentSlide}
+        backgroundUrl="https://i.ibb.co/602fn0G5/tela-1.webp"
       />
-      <div 
-        id="slide-bg-2"
-        className={`slide-background ${currentSlide === 2 ? 'active' : ''}`} 
-        style={{ backgroundImage: `url('https://i.ibb.co/0j3FZ1fm/tela-2.webp')` }}
+      <SlideBackground 
+        slideNumber={2} 
+        currentSlide={currentSlide}
+        backgroundUrl="https://i.ibb.co/0j3FZ1fm/tela-2.webp"
       />
-      <div 
-        id="slide-bg-4"
-        className={`slide-background ${currentSlide === 4 ? 'active' : ''}`} 
-        style={{ backgroundImage: `url('https://i.ibb.co/zTV6nP2q/tela-4.webp')` }}
+      <SlideBackground 
+        slideNumber={4} 
+        currentSlide={currentSlide}
+        backgroundUrl="https://i.ibb.co/zTV6nP2q/tela-4.webp"
       />
 
-      {/* Background container for theme slides - exact structure from HTML */}
-      <div id="background-container" className={currentSlide === 3 ? '' : 'hidden'}>
-        {THEMES.map((theme) => (
-          <div
-            key={theme.id}
-            id={`bg-${theme.id}`}
-            className={`background-layer ${selectedTheme === theme.id ? 'is-active' : ''}`}
-            style={{ backgroundImage: `url(${theme.value})` }}
-          />
-        ))}
-      </div>
-      
-      {/* Overlay gradient */}
+      {/* Dynamic theme backgrounds for slide 3 */}
+      <ThemeBackground 
+        themes={THEMES}
+        selectedThemeId={selectedThemeId}
+        isVisible={currentSlide === 3}
+      />
+
+      {/* Gradient overlay */}
       <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
 
+      {/* Main content */}
       <main className="absolute inset-0 z-10 flex flex-col justify-end px-6 sm:px-8 pb-10">
-        <div id="slides-container" className="relative flex-1 min-h-0">
+        <div className="relative flex-1 min-h-0">
+          
           {/* Slide 1 */}
           <div className={`slide ${currentSlide === 1 ? 'active' : ''}`}>
-            {currentSlide === 1 && renderSlideContent()}
+            <div>
+              <h1 className="text-3xl md:text-4xl fade-in-up font-semibold tracking-tight mb-4 font-geist">
+                A tela em branco. O maior inimigo da criatividade.
+              </h1>
+              <p className="fade-in-up max-w-md text-base text-white/80" style={{ animationDelay: '0.15s' }}>
+                Por anos, as ferramentas nos deram mais botões, mas nunca uma direção. Elas nos deixaram sozinhos com o nosso maior desafio.
+              </p>
+            </div>
           </div>
           
           {/* Slide 2 */}
           <div className={`slide ${currentSlide === 2 ? 'active' : ''}`}>
-            {currentSlide === 2 && renderSlideContent()}
+            <div>
+              <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4 fade-in-up font-geist">
+                E se você tivesse um gênio como co-piloto?
+              </h1>
+              <p className="text-base text-white/80 mb-6 fade-in-up max-w-md" style={{ animationDelay: '0.15s' }}>
+                Apresentando Salina, sua mente estratégica pessoal. Ela não te dá ferramentas. Ela conversa, guia e co-cria com você, transformando intenção em excelência.
+              </p>
+            </div>
           </div>
           
           {/* Slide 3 - Theme Selection */}
           <div className={`slide ${currentSlide === 3 ? 'active' : ''}`}>
-            {currentSlide === 3 && renderSlideContent()}
+            <div className="slide-content-theme">
+              <section className="text-center pt-8 pb-4 flex-shrink-0">
+                <h2 className="text-3xl font-semibold tracking-tight animate-entry font-geist">
+                  Defina a energia do seu estúdio.
+                </h2>
+                <p className="mt-2 text-white/80 animate-entry delay-1">
+                  Escolha o ambiente que inspira seu trabalho hoje.
+                </p>
+              </section>
+              
+              <section className="flex-grow flex flex-col items-center justify-center min-h-0 py-8 animate-entry delay-2">
+                <div id="themes-gallery" className="w-full hide-scrollbar overflow-x-auto lg:overflow-x-visible pb-4">
+                  <ol id="themes-track" className="flex items-center gap-6 lg:p-0 lg:grid lg:grid-cols-4 lg:gap-8 lg:max-w-3xl lg:mx-auto">
+                    {THEMES.map((theme, index) => (
+                      <ThemeSphere
+                        key={theme.id}
+                        theme={theme}
+                        isSelected={selectedThemeId === theme.id}
+                        isInView={visibleThemes.has(theme.id)}
+                        onSelect={handleThemeSelect}
+                        isDefault={index === 0}
+                      />
+                    ))}
+                  </ol>
+                </div>
+              </section>
+            </div>
           </div>
 
           {/* Slide 4 */}
           <div className={`slide ${currentSlide === 4 ? 'active' : ''}`}>
-            {currentSlide === 4 && renderSlideContent()}
+            <div>
+              <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4 fade-in-up font-geist">
+                Bem-vindo ao seu novo estúdio criativo.
+              </h1>
+              <p className="text-base text-white/80 mb-6 fade-in-up max-w-md" style={{ animationDelay: '0.15s' }}>
+                Explore trilhas de aprendizado, domine ferramentas de precisão e converse com a Salina para transformar qualquer ideia em seu próximo grande projeto. O poder é seu.
+              </p>
+            </div>
           </div>
         </div>
         
-        {/* Navigation Controls - exact from HTML */}
+        {/* Bottom Controls */}
         <div className="flex-shrink-0 mt-8">
-          {/* Dots indicator */}
+          {/* Progress Dots */}
           <div className="flex items-center space-x-2 mb-10 fade-in-up" style={{ animationDelay: '0.3s' }}>
-            {SLIDES.map((_, index) => (
-              <div
-                key={index}
-                className="slide-dot"
-                style={{
-                  width: currentSlide === index + 1 ? '24px' : '6px',
-                  backgroundColor: currentSlide === index + 1 ? 'white' : 'rgba(255, 255, 255, 0.3)'
-                }}
-                onClick={() => handleDotClick(index + 1)}
-              />
-            ))}
+            {Array.from({ length: totalSlides }, (_, i) => {
+              const slideNumber = i + 1
+              const isActive = currentSlide === slideNumber
+              
+              return (
+                <div
+                  key={slideNumber}
+                  className="slide-dot"
+                  style={{
+                    width: isActive ? '24px' : '6px',
+                    backgroundColor: isActive ? 'white' : 'rgba(255, 255, 255, 0.3)'
+                  }}
+                  onClick={() => handleDotClick(slideNumber)}
+                />
+              )
+            })}
           </div>
           
-          {/* Action buttons */}
+          {/* Action Buttons */}
           <div className="flex items-center justify-between fade-in-up" style={{ animationDelay: '0.45s' }}>
-            <OnboardingButton 
-              variant="secondary"
+            <button
               onClick={handleSkip}
+              className="text-white/70 hover:text-white px-6 py-3.5 rounded-full font-medium transition-colors"
             >
               Pular
-            </OnboardingButton>
+            </button>
             
-            <OnboardingButton 
-              variant="primary"
+            <button
               onClick={handleNext}
-              disabled={isLoading}
+              className="primary-button-glow"
             >
-              {isLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                  Carregando...
-                </>
-              ) : currentSlide === SLIDES.length ? (
-                <>
-                  Começar
-                  <Check className="ml-2 h-5 w-5" strokeWidth={1.75} />
-                </>
-              ) : (
-                <>
-                  Próximo
-                  <ArrowRight className="ml-2 h-5 w-5" strokeWidth={1.75} />
-                </>
-              )}
-            </OnboardingButton>
+              <div className="border-glow" />
+              <span className="relative z-10 flex items-center">
+                {currentSlide === totalSlides ? (
+                  <>
+                    Começar <Check className="ml-2 h-5 w-5" strokeWidth={1.75} />
+                  </>
+                ) : (
+                  <>
+                    Próximo <ArrowRight className="ml-2 h-5 w-5" strokeWidth={1.75} />
+                  </>
+                )}
+              </span>
+            </button>
           </div>
           
-          {/* Home indicator */}
+          {/* Home Indicator */}
           <div className="w-[134px] h-[5px] bg-white/40 rounded-full mx-auto mt-8" />
         </div>
       </main>
