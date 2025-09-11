@@ -439,8 +439,188 @@ INSERT INTO public.tools (name, description, category, icon, is_active, is_premi
 ('Gerador de Hashtags', 'Encontre as hashtags perfeitas para seu conteúdo', 'Social Media', 'Hash', true, false);
 
 -- =====================================================
+-- SUBSCRIPTION TABLES
+-- =====================================================
+
+-- Subscription Plans (Master data)
+CREATE TABLE public.subscription_plans (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  description TEXT,
+  price_brl DECIMAL(10,2) NOT NULL,
+  price_usd DECIMAL(10,2),
+  billing_interval TEXT NOT NULL CHECK (billing_interval IN ('month', 'year')),
+  credits_limit INTEGER DEFAULT 0,
+  features JSONB DEFAULT '{}',
+  is_active BOOLEAN DEFAULT true,
+  stripe_price_id TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- User Subscriptions
+CREATE TABLE public.subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  plan_id UUID REFERENCES public.subscription_plans(id) ON DELETE RESTRICT,
+  stripe_subscription_id TEXT UNIQUE,
+  status TEXT NOT NULL CHECK (status IN ('active', 'paused', 'canceled', 'past_due', 'incomplete')),
+  current_period_start TIMESTAMPTZ,
+  current_period_end TIMESTAMPTZ,
+  pause_until TIMESTAMPTZ,
+  cancel_at TIMESTAMPTZ,
+  canceled_at TIMESTAMPTZ,
+  trial_start TIMESTAMPTZ,
+  trial_end TIMESTAMPTZ,
+  credits_used INTEGER DEFAULT 0,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id)
+);
+
+-- Payment Methods
+CREATE TABLE public.payment_methods (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  stripe_payment_method_id TEXT UNIQUE,
+  type TEXT NOT NULL CHECK (type IN ('credit_card', 'pix', 'bank_transfer')),
+  brand TEXT,
+  last_four TEXT,
+  exp_month INTEGER,
+  exp_year INTEGER,
+  is_default BOOLEAN DEFAULT false,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Billing History
+CREATE TABLE public.billing_history (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  subscription_id UUID REFERENCES public.subscriptions(id) ON DELETE CASCADE,
+  stripe_invoice_id TEXT UNIQUE,
+  amount_brl DECIMAL(10,2) NOT NULL,
+  amount_usd DECIMAL(10,2),
+  tax_amount DECIMAL(10,2) DEFAULT 0,
+  status TEXT NOT NULL CHECK (status IN ('pending', 'paid', 'failed', 'refunded')),
+  billing_date DATE NOT NULL,
+  due_date DATE,
+  paid_at TIMESTAMPTZ,
+  description TEXT,
+  invoice_url TEXT,
+  receipt_url TEXT,
+  payment_method_id UUID REFERENCES public.payment_methods(id) ON DELETE SET NULL,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS for subscription tables
+ALTER TABLE public.subscription_plans ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payment_methods ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_history ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for subscription_plans (public read)
+CREATE POLICY "Anyone can view active subscription plans" 
+ON public.subscription_plans FOR SELECT 
+TO authenticated 
+USING (is_active = true);
+
+-- RLS Policies for subscriptions
+CREATE POLICY "Users can view their own subscription" 
+ON public.subscriptions FOR SELECT 
+TO authenticated 
+USING (user_id = auth.uid());
+
+CREATE POLICY "Users can update their own subscription" 
+ON public.subscriptions FOR UPDATE 
+TO authenticated 
+USING (user_id = auth.uid());
+
+CREATE POLICY "Users can insert their own subscription" 
+ON public.subscriptions FOR INSERT 
+TO authenticated 
+WITH CHECK (user_id = auth.uid());
+
+-- RLS Policies for payment_methods
+CREATE POLICY "Users can view their own payment methods" 
+ON public.payment_methods FOR SELECT 
+TO authenticated 
+USING (user_id = auth.uid());
+
+CREATE POLICY "Users can manage their own payment methods" 
+ON public.payment_methods FOR ALL 
+TO authenticated 
+USING (user_id = auth.uid())
+WITH CHECK (user_id = auth.uid());
+
+-- RLS Policies for billing_history
+CREATE POLICY "Users can view their own billing history" 
+ON public.billing_history FOR SELECT 
+TO authenticated 
+USING (user_id = auth.uid());
+
+-- Indexes for performance
+CREATE INDEX idx_subscriptions_user_id ON public.subscriptions(user_id);
+CREATE INDEX idx_subscriptions_status ON public.subscriptions(status);
+CREATE INDEX idx_subscriptions_stripe ON public.subscriptions(stripe_subscription_id);
+CREATE INDEX idx_payment_methods_user_id ON public.payment_methods(user_id);
+CREATE INDEX idx_payment_methods_default ON public.payment_methods(user_id, is_default) WHERE is_default = true;
+CREATE INDEX idx_billing_history_user_id ON public.billing_history(user_id);
+CREATE INDEX idx_billing_history_date ON public.billing_history(billing_date DESC);
+CREATE INDEX idx_billing_history_subscription ON public.billing_history(subscription_id);
+
+-- Triggers for updating updated_at
+CREATE TRIGGER update_subscription_plans_updated_at 
+  BEFORE UPDATE ON public.subscription_plans 
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_subscriptions_updated_at 
+  BEFORE UPDATE ON public.subscriptions 
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_payment_methods_updated_at 
+  BEFORE UPDATE ON public.payment_methods 
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_billing_history_updated_at 
+  BEFORE UPDATE ON public.billing_history 
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Function to ensure only one default payment method per user
+CREATE OR REPLACE FUNCTION ensure_single_default_payment_method()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.is_default = true THEN
+    UPDATE public.payment_methods 
+    SET is_default = false 
+    WHERE user_id = NEW.user_id AND id != NEW.id;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER payment_method_default_trigger
+  BEFORE INSERT OR UPDATE ON public.payment_methods
+  FOR EACH ROW EXECUTE FUNCTION ensure_single_default_payment_method();
+
+-- Sample subscription plans data
+INSERT INTO public.subscription_plans (name, description, price_brl, price_usd, billing_interval, credits_limit, features) VALUES
+('Mestre Criador', 'Plano completo para criadores profissionais', 29.90, 5.99, 'month', 5000, 
+ '{"unlimited_insights": true, "priority_support": true, "advanced_analytics": true, "custom_templates": true}'),
+('Explorador', 'Plano básico para começar sua jornada', 0.00, 0.00, 'month', 50, 
+ '{"basic_insights": true, "community_support": true}'),
+('Mestre Criador Anual', 'Plano anual com desconto especial', 299.00, 59.99, 'year', 60000,
+ '{"unlimited_insights": true, "priority_support": true, "advanced_analytics": true, "custom_templates": true, "annual_discount": true}');
+
+-- =====================================================
 -- ENABLE REALTIME (Run in Supabase dashboard)
 -- =====================================================
 -- ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
 -- ALTER PUBLICATION supabase_realtime ADD TABLE public.conversations;
 -- ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;
+-- ALTER PUBLICATION supabase_realtime ADD TABLE public.subscriptions;
+-- ALTER PUBLICATION supabase_realtime ADD TABLE public.billing_history;
