@@ -40,7 +40,7 @@ export default function ToolCard({
     return (
       <div className="min-w-[320px] p-2">
         <div 
-          className="prompt-card relative cursor-pointer group p-6 rounded-2xl backdrop-blur-[10px] bg-white/5 border border-white/10 hover:bg-white/8 hover:translate-y-[-4px] hover:shadow-[0_8px_20px_rgba(0,0,0,0.3)] transition-all duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
+          className="prompt-card relative cursor-pointer group p-6 rounded-2xl liquid-glass hover:bg-white/8 hover:translate-y-[-2px] transition-all duration-200 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
           onClick={() => onClick?.(tool)}
         >
         {/* Favorite Button */}
@@ -92,7 +92,7 @@ export default function ToolCard({
   return (
     <div className="min-w-[280px] p-2">
       <div 
-        className="prompt-card relative cursor-pointer group h-full p-6 rounded-2xl backdrop-blur-[10px] bg-white/5 border border-white/10 hover:bg-white/8 hover:translate-y-[-4px] hover:shadow-[0_8px_20px_rgba(0,0,0,0.3)] transition-all duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
+        className="prompt-card relative cursor-pointer group h-full p-6 rounded-2xl liquid-glass hover:bg-white/8 hover:translate-y-[-2px] transition-all duration-200 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
         onClick={() => onClick?.(tool)}
       >
       {/* Favorite Button */}

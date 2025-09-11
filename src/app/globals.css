@@ -120,18 +120,15 @@ body {
 .rounded-2xl { border-radius: 1rem; }
 .rounded-full { border-radius: 9999px; }
 
-/* Effects */
-.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); }
-.shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
+/* Effects - Clean and minimal */
 .backdrop-blur-md { backdrop-filter: blur(12px); }
 .backdrop-blur-lg { backdrop-filter: blur(16px); }
 
-/* Interactive States */
-.transition-all { transition: all 0.3s ease; }
+/* Interactive States - Clean and minimal */
+.transition-all { transition: all 0.2s ease; }
 .hover\:bg-white\/15:hover { background-color: rgba(255, 255, 255, 0.15); }
 .hover\:from-purple-700:hover { background: linear-gradient(90deg, #7e22ce, #1d4ed8); }
 .hover\:to-blue-700:hover { background: linear-gradient(90deg, #9333ea, #1d4ed8); }
-.hover\:shadow-xl:hover { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
 .hover\:scale-105:hover { transform: scale(1.05); }
 
 /* Form Elements */
@@ -460,15 +457,11 @@ body {
 
 /* === TrendlyAI COMPONENT STYLES - Exact match from HTML reference === */
 
-/* Arsenal Card Component Styles */
+/* Arsenal Card Component Styles - Clean and minimal */
 .arsenal-card {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   background-size: cover;
   background-position: center;
-}
-.arsenal-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3);
 }
 
 /* Card Overlay Styles */
@@ -500,23 +493,15 @@ body {
   opacity: 1;
 }
 
-/* Prompt Card Component Styles */
+/* Prompt Card Component Styles - Clean and minimal */
 .prompt-card {
   position: relative;
   overflow: hidden;
-  background-color: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
   border-radius: 16px;
   padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
-              box-shadow 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
-              opacity 0.3s ease;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+              background-color 0.2s ease;
   cursor: pointer;
-}
-.prompt-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
 }
 
 /* Header Dropdown Styles */
@@ -637,129 +622,28 @@ body {
   }
 }
 
-/* Enhanced Search Bar Styles */
+/* Enhanced Search Bar Styles - Simplified and elegant */
 .enhanced-search-bar {
   position: relative;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.enhanced-search-bar input {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.enhanced-search-bar:focus-within input,
-.enhanced-search-bar:hover input {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15), 
-              0 0 25px rgba(255, 255, 255, 0.1),
-              0 8px 32px rgba(255, 255, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .enhanced-search-bar:focus-within {
-  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.15));
-  transform: scale(1.02);
+  transform: scale(1.01);
 }
 
-/* Glowing white outline effect */
-.search-glow {
-  position: relative;
-}
-
-.search-glow::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.25) 0%, 
-    rgba(255, 255, 255, 0.1) 25%, 
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0.1) 75%,
-    rgba(255, 255, 255, 0.25) 100%);
-  border-radius: inherit;
-  opacity: 0;
-  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  z-index: -1;
-  animation: glow-pulse 3s ease-in-out infinite;
-}
-
-@keyframes glow-pulse {
-  0%, 100% { 
-    background-size: 100% 100%; 
-    opacity: 0;
-  }
-  50% { 
-    background-size: 110% 110%; 
-    opacity: 0.3;
-  }
-}
-
-.search-glow:focus-within::before,
-.search-glow:hover::before {
-  opacity: 1;
-  animation: glow-active 2s ease-in-out infinite;
-}
-
-@keyframes glow-active {
-  0%, 100% { 
-    transform: scale(1) rotate(0deg);
-  }
-  50% { 
-    transform: scale(1.05) rotate(1deg);
-  }
-}
-
-/* Fluid motion for interactive elements */
-.fluid-motion {
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.fluid-motion:hover {
-  transform: translateY(-3px) scale(1.02);
-}
-
-.fluid-motion:active {
-  transform: translateY(0) scale(0.98);
-  transition: all 0.15s ease;
-}
-
-/* Enhanced card animations */
+/* Enhanced card animations - Clean and minimal */
 .arsenal-card,
 .prompt-card {
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.arsenal-card:hover,
-.prompt-card:hover {
-  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.1));
-}
-
-/* Button enhancements */
+/* Button enhancements - Subtle and clean */
 button {
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-button:hover {
-  filter: brightness(1.1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 button:active {
   transform: scale(0.95);
   transition: all 0.1s ease;
-}
-
-/* Tooltip improvements */
-.credit-tooltip {
-  backdrop-filter: blur(24px);
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5), 
-              0 0 10px rgba(255, 255, 255, 0.1);
-}
-
-/* Shadow overflow fixes */
-.min-w-\[280px\],
-.min-w-\[320px\] {
-  filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.25));
 }

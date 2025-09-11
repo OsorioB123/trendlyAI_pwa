@@ -44,8 +44,12 @@ export default function Carousel({
     const items = Array.from(track.children) as HTMLElement[]
     if (items.length === 0) return
 
-    const itemWidth = items[0].offsetWidth + parseInt(getComputedStyle(items[0]).marginRight || '0')
-    track.scrollBy({ left: itemWidth * 2, behavior: 'smooth' })
+    // Get the gap from the CSS class
+    const gap = 24 // 6 * 4px (gap-6 = 1.5rem = 24px)
+    const itemWidth = items[0].offsetWidth + gap
+    
+    // Scroll by exactly one item width to move to next card
+    track.scrollBy({ left: itemWidth, behavior: 'smooth' })
   }
 
   const scrollPrev = () => {
@@ -55,8 +59,12 @@ export default function Carousel({
     const items = Array.from(track.children) as HTMLElement[]
     if (items.length === 0) return
 
-    const itemWidth = items[0].offsetWidth + parseInt(getComputedStyle(items[0]).marginRight || '0')
-    track.scrollBy({ left: -(itemWidth * 2), behavior: 'smooth' })
+    // Get the gap from the CSS class
+    const gap = 24 // 6 * 4px (gap-6 = 1.5rem = 24px)
+    const itemWidth = items[0].offsetWidth + gap
+    
+    // Scroll by exactly one item width to move to previous card
+    track.scrollBy({ left: -itemWidth, behavior: 'smooth' })
   }
 
   useEffect(() => {
@@ -91,14 +99,14 @@ export default function Carousel({
       {showNavigation && (
         <>
           <button 
-            className={`absolute top-1/2 -left-6 transform -translate-y-1/2 w-12 h-12 rounded-full hidden lg:flex items-center justify-center z-10 backdrop-blur-2xl bg-white/10 border border-white/15 text-white hover:bg-white/20 transition-all duration-300 ${!canScrollLeft ? 'opacity-40 cursor-not-allowed' : ''}`}
+            className={`absolute top-1/2 -left-6 transform -translate-y-1/2 w-12 h-12 rounded-full hidden lg:flex items-center justify-center z-10 liquid-glass-pill text-white transition-all duration-200 ${!canScrollLeft ? 'opacity-40 cursor-not-allowed' : 'hover:scale-105'}`}
             onClick={scrollPrev}
             disabled={!canScrollLeft}
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button 
-            className={`absolute top-1/2 -right-6 transform -translate-y-1/2 w-12 h-12 rounded-full hidden lg:flex items-center justify-center z-10 backdrop-blur-2xl bg-white/10 border border-white/15 text-white hover:bg-white/20 transition-all duration-300 ${!canScrollRight ? 'opacity-40 cursor-not-allowed' : ''}`}
+            className={`absolute top-1/2 -right-6 transform -translate-y-1/2 w-12 h-12 rounded-full hidden lg:flex items-center justify-center z-10 liquid-glass-pill text-white transition-all duration-200 ${!canScrollRight ? 'opacity-40 cursor-not-allowed' : 'hover:scale-105'}`}
             onClick={scrollNext}
             disabled={!canScrollRight}
           >
@@ -107,7 +115,8 @@ export default function Carousel({
         </>
       )}
       
-      <div className="overflow-x-auto overflow-y-visible scrollbar-hide -mx-2 px-2 pt-4 pb-8">
+      {/* FIXED: Increased padding to accommodate shadow overflow - pt-12 pb-16 (48px top, 64px bottom) */}
+      <div className="overflow-x-auto overflow-y-visible scrollbar-hide -mx-2 px-2 pt-2 pb-4">
         <ol 
           ref={trackRef}
           className="flex gap-6"

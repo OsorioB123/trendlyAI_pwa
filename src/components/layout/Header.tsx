@@ -128,7 +128,7 @@ export default function Header({
           <div className="flex items-center gap-4">
             <button 
               onClick={handleBack}
-              className="w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95"
+              className="nav-button w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95"
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
@@ -147,7 +147,7 @@ export default function Header({
           <div className="flex items-center gap-4">
             <button 
               onClick={onMenuToggle || handleBack}
-              className="w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95"
+              className="nav-button w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95"
             >
               <Menu className="w-5 h-5 md:hidden" />
               <ChevronLeft className="w-6 h-6 hidden md:block" />
@@ -196,7 +196,7 @@ export default function Header({
               </button>
 
               {showNotifications && (
-                <div className={`dropdown-menu absolute top-full right-0 mt-2 p-2 w-80 z-50 backdrop-blur-[24px] bg-[rgba(30,30,40,0.85)] border border-white/14 shadow-[0_8px_24px_rgba(0,0,0,0.3)] rounded-2xl transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[top_right] ${showNotifications ? 'show' : ''}`}>
+                <div className={`dropdown-menu liquid-glass-opaque absolute top-full right-0 mt-2 p-2 w-80 z-50 transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[top_right] ${showNotifications ? 'show' : ''}`}>
                   <div className="p-2 flex justify-between items-center">
                     <h4 className="text-white font-semibold text-sm">Notificações</h4>
                     <button className="text-xs text-white/60 hover:text-white transition-colors">
@@ -349,6 +349,21 @@ export default function Header({
           </div>
         </div>
       </header>
+
+      {/* FIXED: Navigation button specific styling to override aggressive global motion */}
+      <style jsx>{`
+        .nav-button {
+          transition: background-color 0.2s ease, transform 0.15s ease !important;
+        }
+        .nav-button:hover {
+          transform: none !important;
+          filter: none !important;
+        }
+        .nav-button:active {
+          transform: scale(0.95) !important;
+          transition: transform 0.1s ease !important;
+        }
+      `}</style>
     </>
   )
 }

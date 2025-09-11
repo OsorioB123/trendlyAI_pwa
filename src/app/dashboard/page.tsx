@@ -254,10 +254,10 @@ export default function DashboardPage() {
                   </div>
                 )}
                 
-                {/* Search/Command Bar */}
+                {/* FIXED: Search/Command Bar - Exact match to HTML reference */}
                 <div className={`enhanced-search-bar search-glow fluid-motion transition-all duration-[400ms] ${isCommandFocused ? 'scale-[1.02]' : ''}`}>
                   <form onSubmit={handleCommandSubmit}>
-                    <div className={`flex gap-3 bg-white/10 border rounded-2xl p-4 backdrop-blur-md items-center transition-all duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isCommandFocused ? 'border-white/30 bg-white/15' : 'border-white/15'}`}>
+                    <div className={`flex gap-3 backdrop-blur-md border rounded-2xl p-4 items-center transition-all duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isCommandFocused ? 'border-white/30 bg-white/15' : 'border-white/15 bg-white/10'}`}>
                       <input
                         type="text"
                         placeholder="O que vamos criar hoje?"

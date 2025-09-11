@@ -38,7 +38,7 @@ export default function TrackCard({
     return (
       <div className="min-w-[280px] p-2">
         <div 
-          className="arsenal-card group rounded-2xl overflow-hidden relative h-80 cursor-pointer transition-all duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:translate-y-[-8px] hover:scale-[1.02] hover:shadow-[0_24px_48px_rgba(0,0,0,0.3)]"
+          className="arsenal-card group rounded-2xl overflow-hidden relative h-80 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:translate-y-[-4px] hover:scale-[1.01]"
           style={{ 
             backgroundImage: `url('${track.backgroundImage}')`,
             backgroundSize: 'cover',
@@ -101,7 +101,7 @@ export default function TrackCard({
   return (
     <div className="min-w-[280px] p-2">
       <div 
-        className="rounded-2xl overflow-hidden shadow-2xl relative h-64 cursor-pointer group hover:-translate-y-2 transition-all duration-300"
+        className="rounded-2xl overflow-hidden relative h-64 cursor-pointer group hover:-translate-y-1 transition-all duration-200"
         onClick={() => onClick?.(track)}
       >
         <img 
