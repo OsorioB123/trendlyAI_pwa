@@ -30,6 +30,7 @@ body {
 .items-center { align-items: center; }
 .justify-center { justify-content: center; }
 .justify-between { justify-content: space-between; }
+.\!justify-center { justify-content: center !important; }
 .gap-4 { gap: 1rem; }
 .gap-6 { gap: 1.5rem; }
 .gap-8 { gap: 2rem; }
@@ -389,7 +390,7 @@ body {
   z-index: 3;
 }
 
-/* Mobile responsive behavior */
+/* Mobile responsive behavior - exact from HTML reference */
 @media (max-width: 1023px) {
   #themes-track { 
     scroll-snap-type: x mandatory; 
@@ -402,6 +403,32 @@ body {
   .theme-sphere.is-in-view { 
     transform: scale(1); 
     opacity: 1; 
+  }
+}
+
+/* Desktop responsive */
+@media (min-width: 1024px) {
+  .lg\:grid-cols-4 { 
+    grid-template-columns: repeat(4, minmax(0, 1fr)); 
+  }
+  .lg\:gap-8 { 
+    gap: 2rem; 
+  }
+  .lg\:max-w-3xl { 
+    max-width: 48rem; 
+  }
+  .lg\:mx-auto { 
+    margin-left: auto; 
+    margin-right: auto; 
+  }
+  .lg\:p-0 { 
+    padding: 0; 
+  }
+  .lg\:overflow-x-visible { 
+    overflow-x: visible; 
+  }
+  .lg\:max-w-md {
+    max-width: 28rem;
   }
 }
 

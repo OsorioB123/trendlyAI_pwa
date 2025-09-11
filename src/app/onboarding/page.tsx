@@ -36,7 +36,10 @@ interface ThemeSphereProps {
 }
 
 function ThemeSphere({ theme, isSelected, isInView, onSelect, isDefault }: ThemeSphereProps) {
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    console.log('ThemeSphere clicked:', theme.id) // Debug log
     onSelect(theme.id)
   }
 
@@ -54,6 +57,7 @@ function ThemeSphere({ theme, isSelected, isInView, onSelect, isDefault }: Theme
         data-theme-id={theme.id}
         onClick={handleClick}
         aria-label={`Selecionar tema ${theme.name}`}
+        type="button"
       >
         <div className="check-icon">
           <Check className="w-8 h-8 text-white" strokeWidth={1.5} />
@@ -115,17 +119,19 @@ export default function OnboardingPage() {
   
   const totalSlides = 4
 
-  // Handle slide navigation
+  // Handle slide navigation - exact match from HTML reference
   const showSlide = useCallback((slideNumber: number) => {
+    console.log('showSlide called with:', slideNumber) // Debug log
     setCurrentSlide(slideNumber)
     
-    // Initialize theme selector on slide 3
+    // Initialize theme selector on slide 3 - ONLY when actually navigating to slide 3
     if (slideNumber === 3 && !themesInitialized) {
+      console.log('Initializing theme selector for slide 3') // Debug log
       setThemesInitialized(true)
       
       // Setup intersection observer for mobile
-      if (window.innerWidth < 1024) {
-        setTimeout(() => {
+      setTimeout(() => {
+        if (typeof window !== 'undefined' && window.innerWidth < 1024) {
           const selectedElement = document.getElementById(`theme-${selectedThemeId}`)
           if (selectedElement?.parentElement) {
             selectedElement.parentElement.scrollIntoView({ 
@@ -133,30 +139,40 @@ export default function OnboardingPage() {
               inline: 'center' 
             })
           }
-        }, 100)
+          setupIntersectionObserver()
+        }
         
-        setupIntersectionObserver()
-      }
+        // Ensure default theme is selected and visible
+        if (typeof document !== 'undefined') {
+          const defaultSphere = document.getElementById(`theme-${selectedThemeId}`)
+          if (defaultSphere) {
+            defaultSphere.classList.add('is-selected', 'is-in-view')
+          }
+        }
+      }, 100)
     }
     
     // Restart animations for current slide
     setTimeout(() => {
-      const slide = document.getElementById(`slide-${slideNumber}`)
-      if (slide) {
-        const fadeElements = slide.querySelectorAll('.fade-in-up, .animate-entry')
-        fadeElements.forEach(el => {
-          const element = el as HTMLElement
-          element.style.animation = 'none'
-          // Force reflow
-          element.offsetHeight
-          element.style.animation = ''
-        })
+      if (typeof document !== 'undefined') {
+        const slide = document.getElementById(`slide-${slideNumber}`)
+        if (slide) {
+          const fadeElements = slide.querySelectorAll('.fade-in-up, .animate-entry')
+          fadeElements.forEach(el => {
+            const element = el as HTMLElement
+            element.style.animation = 'none'
+            // Force reflow
+            element.offsetHeight
+            element.style.animation = ''
+          })
+        }
       }
     }, 50)
   }, [selectedThemeId, themesInitialized])
 
-  // Setup intersection observer for mobile theme selection
+  // Setup intersection observer for mobile theme selection - exact from HTML reference
   const setupIntersectionObserver = useCallback(() => {
+    if (typeof document === 'undefined') return
     if (observerRef.current) {
       observerRef.current.disconnect()
     }
@@ -172,12 +188,23 @@ export default function OnboardingPage() {
 
     observerRef.current = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        const sphereButton = entry.target.querySelector('.theme-sphere') as HTMLElement
-        if (sphereButton && entry.isIntersecting) {
-          const themeId = sphereButton.getAttribute('data-theme-id')
-          if (themeId) {
-            setSelectedThemeId(themeId)
-            setVisibleThemes(prev => new Set([...prev, themeId]))
+        if (entry.isIntersecting) {
+          const sphereButton = entry.target.querySelector('.theme-sphere') as HTMLElement
+          if (sphereButton) {
+            const themeId = sphereButton.getAttribute('data-theme-id')
+            if (themeId) {
+              // Auto-select the centered theme on mobile scroll
+              setSelectedThemeId(themeId)
+              setVisibleThemes(prev => new Set([...prev, themeId]))
+              
+              // Update visual state for all spheres
+              if (typeof document !== 'undefined') {
+                document.querySelectorAll('.theme-sphere').forEach(sphere => {
+                  sphere.classList.remove('is-in-view', 'is-selected')
+                })
+                sphereButton.classList.add('is-in-view', 'is-selected')
+              }
+            }
           }
         }
       })
@@ -190,12 +217,24 @@ export default function OnboardingPage() {
     })
   }, [])
 
-  // Handle theme selection
+  // Handle theme selection - CRITICAL: Must NOT trigger slide navigation
   const handleThemeSelect = useCallback((themeId: string) => {
+    console.log('Theme selected:', themeId) // Debug log
     setSelectedThemeId(themeId)
     
+    // Update visual state for all spheres immediately
+    if (typeof document !== 'undefined') {
+      document.querySelectorAll('.theme-sphere').forEach(sphere => {
+        sphere.classList.remove('is-selected')
+      })
+      const selectedSphere = document.getElementById(`theme-${themeId}`)
+      if (selectedSphere) {
+        selectedSphere.classList.add('is-selected')
+      }
+    }
+    
     // Scroll to selected theme on mobile
-    if (window.innerWidth < 1024) {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       const selectedElement = document.getElementById(`theme-${themeId}`)
       if (selectedElement?.parentElement) {
         selectedElement.parentElement.scrollIntoView({ 
@@ -235,10 +274,16 @@ export default function OnboardingPage() {
     }
   }, [currentSlide, showSlide])
 
-  // Initialize first slide
+  // Initialize first slide - only once on mount
   useEffect(() => {
+    console.log('Component mounted, showing slide 1')
     showSlide(1)
-  }, [showSlide])
+  }, []) // Empty dependency array - only run once
+
+  // Debug effect to catch unwanted showSlide calls
+  useEffect(() => {
+    console.log('Current slide changed to:', currentSlide)
+  }, [currentSlide])
 
   // Cleanup intersection observer
   useEffect(() => {
@@ -278,13 +323,13 @@ export default function OnboardingPage() {
       {/* Gradient overlay */}
       <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
 
-      {/* Main content */}
+      {/* Main content - Exact layout match from HTML reference */}
       <main className="absolute inset-0 z-10 flex flex-col justify-end px-6 sm:px-8 pb-10">
-        <div className="relative flex-1 min-h-0">
+        <div id="slides-container" className="relative flex-1 min-h-0">
           
-          {/* Slide 1 */}
-          <div className={`slide ${currentSlide === 1 ? 'active' : ''}`}>
-            <div>
+          {/* Slide 1 - Bottom-left positioning on desktop, centered on mobile */}
+          <div id="slide-1" className={`slide ${currentSlide === 1 ? 'active' : ''}`}>
+            <div className="lg:max-w-md">
               <h1 className="text-3xl md:text-4xl fade-in-up font-semibold tracking-tight mb-4 font-geist">
                 A tela em branco. O maior inimigo da criatividade.
               </h1>
@@ -294,9 +339,9 @@ export default function OnboardingPage() {
             </div>
           </div>
           
-          {/* Slide 2 */}
-          <div className={`slide ${currentSlide === 2 ? 'active' : ''}`}>
-            <div>
+          {/* Slide 2 - Bottom-left positioning on desktop, centered on mobile */}
+          <div id="slide-2" className={`slide ${currentSlide === 2 ? 'active' : ''}`}>
+            <div className="lg:max-w-md">
               <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4 fade-in-up font-geist">
                 E se você tivesse um gênio como co-piloto?
               </h1>
@@ -306,8 +351,8 @@ export default function OnboardingPage() {
             </div>
           </div>
           
-          {/* Slide 3 - Theme Selection */}
-          <div className={`slide ${currentSlide === 3 ? 'active' : ''}`}>
+          {/* Slide 3 - Theme Selection - Centered layout for this slide */}
+          <div id="slide-3" className={`slide ${currentSlide === 3 ? 'active' : ''}` + " !justify-center"}>
             <div className="slide-content-theme">
               <section className="text-center pt-8 pb-4 flex-shrink-0">
                 <h2 className="text-3xl font-semibold tracking-tight animate-entry font-geist">
@@ -337,9 +382,9 @@ export default function OnboardingPage() {
             </div>
           </div>
 
-          {/* Slide 4 */}
-          <div className={`slide ${currentSlide === 4 ? 'active' : ''}`}>
-            <div>
+          {/* Slide 4 - Bottom-left positioning on desktop, centered on mobile */}
+          <div id="slide-4" className={`slide ${currentSlide === 4 ? 'active' : ''}`}>
+            <div className="lg:max-w-md">
               <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4 fade-in-up font-geist">
                 Bem-vindo ao seu novo estúdio criativo.
               </h1>
