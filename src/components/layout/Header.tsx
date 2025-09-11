@@ -76,11 +76,11 @@ export default function Header({
         console.error('Logout error:', error)
       }
       
-      router.push('/auth/login')
+      router.push('/login')
       
     } catch (error) {
       console.error('Logout error:', error)
-      router.push('/auth/login')
+      router.push('/login')
     } finally {
       setIsLoggingOut(false)
     }
@@ -274,7 +274,8 @@ export default function Header({
                       <h6 className="text-xs font-medium text-white/80">Créditos Mensais da Salina</h6>
                       <div className="relative" ref={creditsRef}>
                         <button 
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation()
                             setShowCreditsTooltip(!showCreditsTooltip)
                           }}
                           className="text-white/60 hover:text-white transition-colors"

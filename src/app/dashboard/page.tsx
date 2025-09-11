@@ -255,9 +255,9 @@ export default function DashboardPage() {
                 )}
                 
                 {/* Search/Command Bar */}
-                <div className={`${isCommandFocused ? 'ring-2 ring-white/20' : ''} transition-all duration-300`}>
+                <div className={`enhanced-search-bar search-glow fluid-motion transition-all duration-[400ms] ${isCommandFocused ? 'scale-[1.02]' : ''}`}>
                   <form onSubmit={handleCommandSubmit}>
-                    <div className="flex gap-3 bg-white/10 border-white/15 border rounded-2xl p-4 backdrop-blur-md items-center">
+                    <div className={`flex gap-3 bg-white/10 border rounded-2xl p-4 backdrop-blur-md items-center transition-all duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isCommandFocused ? 'border-white/30 bg-white/15' : 'border-white/15'}`}>
                       <input
                         type="text"
                         placeholder="O que vamos criar hoje?"
@@ -269,7 +269,7 @@ export default function DashboardPage() {
                       />
                       <button 
                         type="submit" 
-                        className="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 border border-white/15 hover:bg-white/15 backdrop-blur-lg transition-all duration-300"
+                        className="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 border border-white/15 hover:bg-white/15 backdrop-blur-lg transition-all duration-300 fluid-motion hover:scale-110 active:scale-95"
                       >
                         <Send className="w-4 h-4 text-white" />
                       </button>

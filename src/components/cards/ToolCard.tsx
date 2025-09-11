@@ -38,22 +38,23 @@ export default function ToolCard({
   }
   if (variant === 'compact') {
     return (
-      <div 
-        className="prompt-card relative cursor-pointer group min-w-[320px] p-6 rounded-2xl backdrop-blur-[10px] bg-white/5 border border-white/10 hover:bg-white/8 hover:translate-y-[-4px] hover:shadow-[0_8px_20px_rgba(0,0,0,0.3)] transition-all duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
-        onClick={() => onClick?.(tool)}
-      >
+      <div className="min-w-[320px] p-2">
+        <div 
+          className="prompt-card relative cursor-pointer group p-6 rounded-2xl backdrop-blur-[10px] bg-white/5 border border-white/10 hover:bg-white/8 hover:translate-y-[-4px] hover:shadow-[0_8px_20px_rgba(0,0,0,0.3)] transition-all duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
+          onClick={() => onClick?.(tool)}
+        >
         {/* Favorite Button */}
         <button 
-          className={`absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 transition-all duration-200 ease-in-out active:scale-90 ${favoriteLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isFavorited ? 'animate-[pop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)]' : ''}`}
+          className={`absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center rounded-full backdrop-blur-sm bg-white/5 hover:bg-white/10 transition-all duration-200 ease-in-out active:scale-90 opacity-60 hover:opacity-100 ${favoriteLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isFavorited ? 'animate-[pop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] opacity-100' : ''}`}
           onClick={handleFavoriteClick}
           disabled={favoriteLoading}
           aria-label={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
           title={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
         >
-          <Heart className={`w-5 h-5 transition-all duration-200 ${
+          <Heart className={`w-4 h-4 transition-all duration-200 ${
             isFavorited 
               ? 'text-red-500 fill-red-500' 
-              : 'text-white/80 hover:text-white'
+              : 'text-white/70 hover:text-white'
           }`} />
         </button>
         <div className="relative z-10">
@@ -83,27 +84,29 @@ export default function ToolCard({
           </p>
         </div>
       </div>
+      </div>
     )
   }
 
   // Full variant (for recommendations and main sections)
   return (
-    <div 
-      className="prompt-card relative cursor-pointer group min-w-[280px] h-full p-6 rounded-2xl backdrop-blur-[10px] bg-white/5 border border-white/10 hover:bg-white/8 hover:translate-y-[-4px] hover:shadow-[0_8px_20px_rgba(0,0,0,0.3)] transition-all duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
-      onClick={() => onClick?.(tool)}
-    >
+    <div className="min-w-[280px] p-2">
+      <div 
+        className="prompt-card relative cursor-pointer group h-full p-6 rounded-2xl backdrop-blur-[10px] bg-white/5 border border-white/10 hover:bg-white/8 hover:translate-y-[-4px] hover:shadow-[0_8px_20px_rgba(0,0,0,0.3)] transition-all duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
+        onClick={() => onClick?.(tool)}
+      >
       {/* Favorite Button */}
       <button 
-        className={`absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 transition-all duration-200 ease-in-out active:scale-90 ${favoriteLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isFavorited ? 'animate-[pop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)]' : ''}`}
+        className={`absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center rounded-full backdrop-blur-sm bg-white/5 hover:bg-white/10 transition-all duration-200 ease-in-out active:scale-90 opacity-60 hover:opacity-100 ${favoriteLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isFavorited ? 'animate-[pop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] opacity-100' : ''}`}
         onClick={handleFavoriteClick}
         disabled={favoriteLoading}
         aria-label={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
         title={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
       >
-        <Heart className={`w-5 h-5 transition-all duration-200 ${
+        <Heart className={`w-4 h-4 transition-all duration-200 ${
           isFavorited 
             ? 'text-red-500 fill-red-500' 
-            : 'text-white/80 hover:text-white'
+            : 'text-white/70 hover:text-white'
         }`} />
       </button>
       <div className="relative z-10 flex flex-col h-full">
@@ -133,6 +136,7 @@ export default function ToolCard({
           </div>
         </div>
       </div>
+    </div>
     </div>
   )
 }
