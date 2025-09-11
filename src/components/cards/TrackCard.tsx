@@ -1,22 +1,43 @@
 'use client'
 
+import { useState } from 'react'
+import { Heart } from 'lucide-react'
 import { Track } from '../../types/track'
 
 interface TrackCardProps {
   track: Track
   variant?: 'compact' | 'full'
   onClick?: (track: Track) => void
+  onFavorite?: (track: Track) => void
+  isFavorited?: boolean
 }
 
 export default function TrackCard({ 
   track, 
   variant = 'full', 
-  onClick 
+  onClick,
+  onFavorite,
+  isFavorited = false
 }: TrackCardProps) {
+  const [favoriteLoading, setFavoriteLoading] = useState(false)
+
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (favoriteLoading) return
+    
+    setFavoriteLoading(true)
+    try {
+      await onFavorite?.(track)
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error)
+    } finally {
+      setFavoriteLoading(false)
+    }
+  }
   if (variant === 'compact') {
     return (
       <div 
-        className="group rounded-2xl overflow-hidden relative h-80 cursor-pointer min-w-[280px] hover:-translate-y-2 transition-all duration-300"
+        className="arsenal-card group rounded-2xl overflow-hidden relative h-80 cursor-pointer min-w-[280px] transition-all duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:translate-y-[-8px] hover:scale-[1.02] hover:shadow-[0_24px_48px_rgba(0,0,0,0.3)]"
         style={{ 
           backgroundImage: `url('${track.backgroundImage}')`,
           backgroundSize: 'cover',
@@ -24,12 +45,26 @@ export default function TrackCard({
         }}
         onClick={() => onClick?.(track)}
       >
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6">
+        {/* Favorite Button */}
+        <button 
+          className={`absolute top-5 right-5 z-20 w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-[20px] bg-white/10 border border-white/15 transition-all duration-300 hover:bg-white/15 active:scale-90 ${favoriteLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isFavorited ? 'animate-[pop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)]' : ''}`}
+          onClick={handleFavoriteClick}
+          disabled={favoriteLoading}
+          aria-label={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+          title={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+        >
+          <Heart className={`w-5 h-5 transition-all duration-200 ${
+            isFavorited 
+              ? 'text-red-500 fill-red-500' 
+              : 'text-white/80 hover:text-white'
+          }`} />
+        </button>
+        <div className="card-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6 transition-all duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:bg-gradient-to-t group-hover:from-black/95 group-hover:via-black/60 group-hover:to-transparent">
           <h3 className="font-medium text-white text-xl mb-4">{track.title}</h3>
           
           {track.progress !== undefined && (
             <>
-              <div className="flex items-center justify-between text-sm mb-2 text-white/80">
+              <div className="progress-bar-label flex items-center justify-between text-sm mb-2 text-white/80 opacity-70 transition-opacity duration-300 group-hover:opacity-100">
                 <span>Progresso</span>
                 <span>{track.progress}%</span>
               </div>
@@ -42,8 +77,8 @@ export default function TrackCard({
             </>
           )}
           
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <button className="w-full py-3 font-medium rounded-xl backdrop-blur-2xl bg-white/10 border border-white/15 text-white hover:bg-white/20 transition-all duration-300">
+          <div className="card-hover-actions opacity-0 translate-y-[15px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] delay-100 group-hover:opacity-100 group-hover:translate-y-0">
+            <button className="w-full py-3 font-medium rounded-xl backdrop-blur-[20px] bg-white/10 border border-white/15 text-white hover:bg-white/15 transition-all duration-300">
               {track.progress === 100 ? 'Finalizar Trilha' : 
                track.progress && track.progress >= 90 ? 'Finalizar Trilha' : 
                'Continuar Trilha'}

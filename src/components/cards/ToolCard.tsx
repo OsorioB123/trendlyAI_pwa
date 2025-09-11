@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { Heart, Copy, ChevronDown, ArrowRight } from 'lucide-react'
 import { Tool } from '../../types/tool'
 
@@ -9,6 +10,7 @@ interface ToolCardProps {
   onClick?: (tool: Tool) => void
   onFavorite?: (tool: Tool) => void
   onCopy?: (tool: Tool) => void
+  isFavorited?: boolean
 }
 
 export default function ToolCard({ 
@@ -16,41 +18,49 @@ export default function ToolCard({
   variant = 'full', 
   onClick,
   onFavorite,
-  onCopy 
+  onCopy,
+  isFavorited = false
 }: ToolCardProps) {
+  const [favoriteLoading, setFavoriteLoading] = useState(false)
+
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (favoriteLoading) return
+    
+    setFavoriteLoading(true)
+    try {
+      await onFavorite?.(tool)
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error)
+    } finally {
+      setFavoriteLoading(false)
+    }
+  }
   if (variant === 'compact') {
     return (
       <div 
-        className="relative cursor-pointer group min-w-[320px] p-6 rounded-2xl backdrop-blur-2xl bg-white/10 border border-white/15 shadow-2xl hover:bg-white/15 transition-all duration-300"
+        className="prompt-card relative cursor-pointer group min-w-[320px] p-6 rounded-2xl backdrop-blur-[10px] bg-white/5 border border-white/10 hover:bg-white/8 hover:translate-y-[-4px] hover:shadow-[0_8px_20px_rgba(0,0,0,0.3)] transition-all duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
         onClick={() => onClick?.(tool)}
       >
+        {/* Favorite Button */}
+        <button 
+          className={`absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 transition-all duration-200 ease-in-out active:scale-90 ${favoriteLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isFavorited ? 'animate-[pop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)]' : ''}`}
+          onClick={handleFavoriteClick}
+          disabled={favoriteLoading}
+          aria-label={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+          title={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+        >
+          <Heart className={`w-5 h-5 transition-all duration-200 ${
+            isFavorited 
+              ? 'text-red-500 fill-red-500' 
+              : 'text-white/80 hover:text-white'
+          }`} />
+        </button>
         <div className="relative z-10">
-          <div className="flex items-start justify-between">
-            <div className="flex-1 pr-4">
-              <h3 className="text-lg font-semibold mb-1 text-white font-sans">{tool.title}</h3>
-              <p className="text-sm text-white/70">{tool.description}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <button 
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-white/10 border border-white/15 hover:bg-white/20 transition-all duration-300" 
-                aria-label="Favoritar"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onFavorite?.(tool)
-                }}
-              >
-                <Heart className="w-4 h-4 text-white/70 hover:text-red-400 transition-colors" />
-              </button>
-              <button 
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-white/10 border border-white/15 hover:bg-white/20 transition-all duration-300" 
-                aria-label="Copiar prompt"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onCopy?.(tool)
-                }}
-              >
-                <Copy className="w-4 h-4 text-white/70 hover:text-green-400 transition-colors" />
-              </button>
+          <div className="flex-grow">
+            <div className="pr-12">
+              <h3 className="text-lg font-semibold mb-2 text-white leading-snug tracking-tight">{tool.title}</h3>
+              <p className="text-sm text-white/70 line-clamp-2 leading-relaxed">{tool.description}</p>
             </div>
           </div>
           
@@ -79,16 +89,30 @@ export default function ToolCard({
   // Full variant (for recommendations and main sections)
   return (
     <div 
-      className="relative cursor-pointer group min-w-[280px] h-full p-6 rounded-2xl backdrop-blur-2xl bg-white/10 border border-white/15 shadow-2xl hover:bg-white/15 hover:-translate-y-1 transition-all duration-300"
+      className="prompt-card relative cursor-pointer group min-w-[280px] h-full p-6 rounded-2xl backdrop-blur-[10px] bg-white/5 border border-white/10 hover:bg-white/8 hover:translate-y-[-4px] hover:shadow-[0_8px_20px_rgba(0,0,0,0.3)] transition-all duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
       onClick={() => onClick?.(tool)}
     >
+      {/* Favorite Button */}
+      <button 
+        className={`absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 transition-all duration-200 ease-in-out active:scale-90 ${favoriteLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isFavorited ? 'animate-[pop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)]' : ''}`}
+        onClick={handleFavoriteClick}
+        disabled={favoriteLoading}
+        aria-label={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+        title={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+      >
+        <Heart className={`w-5 h-5 transition-all duration-200 ${
+          isFavorited 
+            ? 'text-red-500 fill-red-500' 
+            : 'text-white/80 hover:text-white'
+        }`} />
+      </button>
       <div className="relative z-10 flex flex-col h-full">
-        <div className="flex justify-between items-start mb-4 flex-grow">
-          <div className="flex-1">
-            <h3 className="text-lg font-medium text-white mb-2 leading-snug font-sans">
+        <div className="flex-grow">
+          <div className="pr-12">
+            <h3 className="text-lg font-semibold text-white mb-2 leading-snug tracking-tight">
               {tool.title}
             </h3>
-            <p className="text-sm text-white/70 leading-relaxed line-clamp-3">
+            <p className="text-sm text-white/70 leading-relaxed line-clamp-2">
               {tool.description}
             </p>
           </div>

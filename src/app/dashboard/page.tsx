@@ -104,6 +104,8 @@ export default function DashboardPage() {
   const [isCommandFocused, setIsCommandFocused] = useState(false)
   const [showToolModal, setShowToolModal] = useState(false)
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null)
+  const [favoriteTrackIds, setFavoriteTrackIds] = useState<number[]>([])
+  const [favoriteToolIds, setFavoriteToolIds] = useState<number[]>([])
 
   const icebreakers = [
     'Me dê ideias para um vídeo',
@@ -157,9 +159,24 @@ export default function DashboardPage() {
     setShowToolModal(true)
   }
 
-  const handleToolFavorite = (tool: Tool) => {
-    console.log('Tool favorited:', tool)
-    // TODO: Implementar sistema de favoritos
+  const handleTrackFavorite = async (track: Track) => {
+    console.log('Track favorite toggled:', track)
+    setFavoriteTrackIds(prev => 
+      prev.includes(track.id) 
+        ? prev.filter(id => id !== track.id)
+        : [...prev, track.id]
+    )
+    // TODO: Integrar com backend/localStorage para persistir favoritos
+  }
+
+  const handleToolFavorite = async (tool: Tool) => {
+    console.log('Tool favorite toggled:', tool)
+    setFavoriteToolIds(prev => 
+      prev.includes(tool.id) 
+        ? prev.filter(id => id !== tool.id)
+        : [...prev, tool.id]
+    )
+    // TODO: Integrar com backend/localStorage para persistir favoritos
   }
 
   const handleToolCopy = (tool: Tool) => {
@@ -283,6 +300,8 @@ export default function DashboardPage() {
                       track={track}
                       variant="compact"
                       onClick={handleTrackClick}
+                      onFavorite={handleTrackFavorite}
+                      isFavorited={favoriteTrackIds.includes(track.id)}
                     />
                   ))}
                 </Carousel>
@@ -307,6 +326,8 @@ export default function DashboardPage() {
                       track={track}
                       variant="full"
                       onClick={handleTrackClick}
+                      onFavorite={handleTrackFavorite}
+                      isFavorited={favoriteTrackIds.includes(track.id)}
                     />
                   ))}
                 </Carousel>
@@ -333,6 +354,7 @@ export default function DashboardPage() {
                       onClick={handleToolClick}
                       onFavorite={handleToolFavorite}
                       onCopy={handleToolCopy}
+                      isFavorited={favoriteToolIds.includes(tool.id)}
                     />
                   ))}
                 </Carousel>
