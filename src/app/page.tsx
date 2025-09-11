@@ -51,13 +51,13 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 
-                href="/auth/register"
+                href="/register"
                 className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl"
               >
                 Começar Gratuitamente
               </Link>
               <Link 
-                href="/auth/login"
+                href="/login"
                 className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl font-semibold text-lg hover:bg-white/15 transition-all duration-300"
               >
                 Fazer Login
@@ -127,7 +127,7 @@ export default function Home() {
             Junte-se a milhares de criadores que já estão usando a TrendlyAI
           </p>
           <Link 
-            href="/auth/register"
+            href="/register"
             className="inline-block px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl"
           >
             Criar Conta Gratuita
