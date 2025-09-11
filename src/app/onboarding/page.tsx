@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowRight, Check, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useBackground } from '../../contexts/BackgroundContext'
 import { useAuth } from '../../contexts/AuthContext'
-import { completeOnboarding, hasCompletedOnboarding } from '../../lib/onboarding'
+import { hasCompletedOnboarding, getOnboardingRedirectPath } from '../../lib/onboarding'
 import OnboardingButton from '../../components/onboarding/OnboardingButton'
 
 interface OnboardingSlide {
@@ -102,7 +102,7 @@ export default function OnboardingPage() {
   
   const router = useRouter()
   const { availableBackgrounds, changeBackground } = useBackground()
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, user, completeOnboarding } = useAuth()
   
   const themesGalleryRef = useRef<HTMLDivElement>(null)
   const themesTrackRef = useRef<HTMLOListElement>(null)
@@ -159,11 +159,11 @@ export default function OnboardingPage() {
         // Save selected theme
         await changeBackground(selectedTheme)
         
-        // Complete onboarding and get redirect path
-        const redirectPath = await completeOnboarding()
+        // Complete onboarding using AuthContext method
+        completeOnboarding()
         
-        // Navigate to appropriate page
-        router.push(redirectPath)
+        // Navigate to dashboard
+        router.push('/dashboard')
       } catch (error) {
         console.error('Error completing onboarding:', error)
       } finally {
@@ -177,11 +177,11 @@ export default function OnboardingPage() {
       // Set default theme
       await changeBackground('default')
       
-      // Complete onboarding and get redirect path
-      const redirectPath = await completeOnboarding()
+      // Complete onboarding using AuthContext method
+      completeOnboarding()
       
-      // Navigate to appropriate page
-      router.push(redirectPath)
+      // Navigate to dashboard
+      router.push('/dashboard')
     } catch (error) {
       console.error('Error skipping onboarding:', error)
       router.push('/dashboard')

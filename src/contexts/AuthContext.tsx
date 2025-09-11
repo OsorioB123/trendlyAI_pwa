@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
+import { hasCompletedOnboarding, markOnboardingComplete, clearOnboardingStatus, shouldShowOnboarding } from '../lib/onboarding'
 
 interface Profile {
   id: string
@@ -34,6 +35,11 @@ interface AuthContextType {
   updateAvatar: (avatarUrl: string) => Promise<{ data: any; error: any }>
   refreshProfile: () => Promise<{ error: any }>
   signInWithGoogle: () => Promise<{ data: any; error: any }>
+  // Onboarding-related methods
+  completeOnboarding: () => void
+  checkOnboardingStatus: () => boolean
+  needsOnboarding: boolean
+  // Helper methods
   isAuthenticated: boolean
   hasProfile: boolean
 }
@@ -53,6 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState<Profile | null>(null)
+  const [needsOnboarding, setNeedsOnboarding] = useState(false)
 
   useEffect(() => {
     // Get initial session
@@ -70,6 +77,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // Load user profile if authenticated
         if (session?.user) {
           await loadUserProfile(session.user.id)
+          // Check onboarding status
+          const shouldOnboard = shouldShowOnboarding(true)
+          setNeedsOnboarding(shouldOnboard)
+          console.log('Initial onboarding check:', shouldOnboard)
         }
       } catch (error) {
         console.error('Error in getInitialSession:', error)
@@ -105,7 +116,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             await Promise.race([profilePromise, timeoutPromise])
             console.log('✅ Profile loading completed successfully')
             
-            // Handle profile creation on signup
+            // Handle profile creation on signup and onboarding checks
             if (event === 'SIGNED_IN' && session?.user) {
               console.log('📝 Checking/creating profile for signed in user...')
               try {
@@ -115,14 +126,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 console.log('Creating profile for user without one')
                 await createUserProfile(session.user)
               }
+              
+              // Check onboarding status after profile is loaded/created
+              const shouldOnboard = shouldShowOnboarding(true)
+              setNeedsOnboarding(shouldOnboard)
+              console.log('Sign-in onboarding check:', shouldOnboard)
             }
           } catch (error) {
             console.error('❌ Profile loading failed or timed out:', error)
             // Continue with auth flow even if profile loading fails
           }
         } else {
-          console.log('🚫 No user session, clearing profile')
+          console.log('🚫 No user session, clearing profile and onboarding status')
           setProfile(null)
+          setNeedsOnboarding(false)
         }
         
         // Always ensure loading is set to false after auth state change
@@ -290,11 +307,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(null)
         setSession(null)
         setProfile(null)
+        setNeedsOnboarding(false)
         
-        // Clear any local storage data
+        // Clear any local storage data including onboarding status
+        clearOnboardingStatus()
         if (typeof window !== 'undefined') {
           localStorage.removeItem('trendlyai-user-authenticated')
-          localStorage.removeItem('trendlyai-onboarding-completed')
         }
       }
       
@@ -400,6 +418,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
+  // Onboarding-related methods
+  const completeOnboarding = () => {
+    markOnboardingComplete()
+    setNeedsOnboarding(false)
+    console.log('Onboarding marked as complete')
+  }
+
+  const checkOnboardingStatus = () => {
+    return hasCompletedOnboarding()
+  }
+
   const value = {
     user,
     session,
@@ -413,6 +442,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     updateAvatar,
     refreshProfile,
     signInWithGoogle,
+    // Onboarding-related methods
+    completeOnboarding,
+    checkOnboardingStatus,
+    needsOnboarding,
     // Helper methods
     isAuthenticated: !!user,
     hasProfile: !!profile,

@@ -13,11 +13,22 @@ export function hasCompletedOnboarding(): boolean {
 }
 
 /**
+ * Server-safe version to check onboarding status from cookies/headers
+ * Used by middleware where localStorage is not available
+ */
+export function hasCompletedOnboardingFromCookies(cookies?: { [key: string]: string }): boolean {
+  if (!cookies) return false
+  return cookies[ONBOARDING_STORAGE_KEY] === 'true'
+}
+
+/**
  * Mark onboarding as completed
  */
 export function markOnboardingComplete(): void {
   if (typeof window !== 'undefined') {
     localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true')
+    // Also set a cookie for server-side consistency
+    document.cookie = `${ONBOARDING_STORAGE_KEY}=true; path=/; max-age=31536000; SameSite=Lax`
   }
 }
 
@@ -27,6 +38,8 @@ export function markOnboardingComplete(): void {
 export function clearOnboardingStatus(): void {
   if (typeof window !== 'undefined') {
     localStorage.removeItem(ONBOARDING_STORAGE_KEY)
+    // Also clear the cookie
+    document.cookie = `${ONBOARDING_STORAGE_KEY}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`
   }
 }
 

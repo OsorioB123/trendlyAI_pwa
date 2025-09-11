@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { hasCompletedOnboardingFromCookies, ONBOARDING_STORAGE_KEY } from './lib/onboarding'
 
 export async function middleware(req: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -45,7 +46,7 @@ export async function middleware(req: NextRequest) {
   const protectedRoutes = ['/dashboard', '/tools', '/tracks', '/chat', '/profile', '/settings']
   const authRoutes = ['/login', '/register', '/forgot-password']
   const onboardingRoute = '/onboarding'
-  const publicRoutes = ['/', '/debug-auth', '/test-supabase', '/register']
+  const publicRoutes = ['/', '/debug-auth', '/test-supabase']
   
   const isProtectedRoute = protectedRoutes.some(route => 
     req.nextUrl.pathname.startsWith(route)
@@ -56,27 +57,43 @@ export async function middleware(req: NextRequest) {
   const isOnboardingRoute = req.nextUrl.pathname === onboardingRoute
   const isPublicRoute = publicRoutes.includes(req.nextUrl.pathname)
 
+  // Check onboarding status for authenticated users using server-safe method
+  const cookies = Object.fromEntries(req.cookies.getAll().map(cookie => [cookie.name, cookie.value]))
+  const hasOnboarded = user ? hasCompletedOnboardingFromCookies(cookies) : false
+
   // Debug logs
-  console.log(`Middleware: ${req.nextUrl.pathname} | User: ${user ? 'YES' : 'NO'} | Protected: ${isProtectedRoute} | Auth: ${isAuthRoute} | Public: ${isPublicRoute}`)
+  console.log(`Middleware: ${req.nextUrl.pathname} | User: ${user ? 'YES' : 'NO'} | Onboarded: ${hasOnboarded} | Protected: ${isProtectedRoute} | Auth: ${isAuthRoute} | Public: ${isPublicRoute}`)
 
-  // Redirect authenticated users away from auth pages to dashboard (but allow public routes)
-  if (user && isAuthRoute) {
-    console.log(`Redirecting logged user from ${req.nextUrl.pathname} to /dashboard`)
-    return NextResponse.redirect(new URL('/dashboard', req.url))
-  }
-
-  // Redirect unauthenticated users away from onboarding
-  if (!user && isOnboardingRoute) {
-    console.log(`Redirecting unauth user from onboarding to /login`)
-    return NextResponse.redirect(new URL('/login', req.url))
-  }
-
-  // Redirect unauthenticated users to login for protected routes (but allow public routes)
-  if (!user && isProtectedRoute && !isPublicRoute) {
+  // Redirect unauthenticated users away from onboarding and protected routes
+  if (!user && (isOnboardingRoute || isProtectedRoute)) {
     console.log(`Redirecting unauth user from ${req.nextUrl.pathname} to /login`)
     const redirectUrl = new URL('/login', req.url)
-    redirectUrl.searchParams.set('redirectTo', req.nextUrl.pathname)
+    if (isProtectedRoute) {
+      redirectUrl.searchParams.set('redirectTo', req.nextUrl.pathname)
+    }
     return NextResponse.redirect(redirectUrl)
+  }
+
+  // Handle authenticated users
+  if (user) {
+    // Redirect away from auth pages
+    if (isAuthRoute) {
+      const destination = hasOnboarded ? '/dashboard' : '/onboarding'
+      console.log(`Redirecting logged user from ${req.nextUrl.pathname} to ${destination}`)
+      return NextResponse.redirect(new URL(destination, req.url))
+    }
+
+    // Redirect to onboarding if not completed (except for onboarding route itself)
+    if (!hasOnboarded && !isOnboardingRoute && !isPublicRoute) {
+      console.log(`Redirecting user to onboarding from ${req.nextUrl.pathname}`)
+      return NextResponse.redirect(new URL('/onboarding', req.url))
+    }
+
+    // Redirect to dashboard if onboarding is completed but user tries to access onboarding
+    if (hasOnboarded && isOnboardingRoute) {
+      console.log(`Redirecting onboarded user from onboarding to /dashboard`)
+      return NextResponse.redirect(new URL('/dashboard', req.url))
+    }
   }
 
   console.log(`Allowing access to ${req.nextUrl.pathname}`)
@@ -86,7 +103,14 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    // Temporarily disable middleware by matching nothing
-    '/middleware-disabled-for-testing'
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - images (static images)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|images).*)',
   ],
 }

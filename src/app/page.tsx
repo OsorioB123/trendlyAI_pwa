@@ -7,14 +7,17 @@ import Link from 'next/link'
 import { Loader, Sparkles, TrendingUp, Users, Zap } from 'lucide-react'
 
 export default function Home() {
-  const { user, loading } = useAuth()
+  const { user, loading, needsOnboarding } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
     if (user && !loading) {
-      router.push('/dashboard')
+      // Redirect authenticated users to appropriate destination
+      const destination = needsOnboarding ? '/onboarding' : '/dashboard'
+      console.log(`Redirecting authenticated user to ${destination}`)
+      router.push(destination)
     }
-  }, [user, loading, router])
+  }, [user, loading, needsOnboarding, router])
 
   if (loading) {
     return (
@@ -22,6 +25,19 @@ export default function Home() {
         <div className="text-white text-center">
           <Loader className="w-8 h-8 animate-spin mx-auto mb-4" />
           <p>Carregando...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // If user is authenticated, let the useEffect handle redirection
+  // Show loading state while redirection happens to avoid flash
+  if (user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+        <div className="text-white text-center">
+          <Loader className="w-8 h-8 animate-spin mx-auto mb-4" />
+          <p>Redirecionando...</p>
         </div>
       </div>
     )
