@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Heart } from 'lucide-react'
 import { Track } from '../../types/track'
 
@@ -19,6 +20,7 @@ export default function TrackCard({
   onFavorite,
   isFavorited = false
 }: TrackCardProps) {
+  const router = useRouter()
   const [favoriteLoading, setFavoriteLoading] = useState(false)
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
@@ -34,6 +36,15 @@ export default function TrackCard({
       setFavoriteLoading(false)
     }
   }
+
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick(track)
+    } else {
+      router.push(`/tracks/${track.id}`)
+    }
+  }
+
   if (variant === 'compact') {
     return (
       <div className="min-w-[280px] p-2">
@@ -44,7 +55,7 @@ export default function TrackCard({
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}
-          onClick={() => onClick?.(track)}
+          onClick={handleCardClick}
         >
         {/* Favorite Button */}
         <button 
@@ -83,7 +94,7 @@ export default function TrackCard({
               className="w-full py-3 font-medium rounded-xl backdrop-blur-[20px] bg-white/10 border border-white/15 text-white hover:bg-white/15 transition-all duration-300"
               onClick={(e) => {
                 e.stopPropagation()
-                onClick?.(track)
+                handleCardClick()
               }}
             >
               {track.progress === 100 ? 'Finalizar Trilha' : 
@@ -102,7 +113,7 @@ export default function TrackCard({
     <div className="min-w-[280px] p-2">
       <div 
         className="rounded-2xl overflow-hidden relative h-64 cursor-pointer group hover:-translate-y-1 transition-all duration-200"
-        onClick={() => onClick?.(track)}
+        onClick={handleCardClick}
       >
         <img 
           src={track.backgroundImage} 
