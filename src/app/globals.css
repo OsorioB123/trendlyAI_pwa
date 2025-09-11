@@ -2,6 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Inline styles for Vercel debugging */
+body {
+  background: linear-gradient(135deg, #581c87, #1e3a8a, #312e81) !important;
+  color: white !important;
+  min-height: 100vh !important;
+}
+
+.min-h-screen {
+  min-height: 100vh !important;
+}
+
+.bg-gradient-to-br {
+  background: linear-gradient(135deg, #581c87, #1e3a8a, #312e81) !important;
+}
+
+.text-white {
+  color: white !important;
+}
+
+.text-5xl {
+  font-size: 3rem !important;
+  line-height: 1 !important;
+}
+
+.font-bold {
+  font-weight: 700 !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.px-8 {
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+}
+
+.py-4 {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+.bg-gradient-to-r {
+  background: linear-gradient(90deg, #9333ea, #2563eb) !important;
+}
+
+.rounded-xl {
+  border-radius: 0.75rem !important;
+}
+
+.hover\:from-purple-700:hover {
+  background: linear-gradient(90deg, #7e22ce, #1d4ed8) !important;
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
