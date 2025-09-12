@@ -1,7 +1,7 @@
+'use client'
+
 // Force dynamic rendering to avoid SSG issues with Supabase
 export const dynamic = 'force-dynamic'
-
-'use client'
 
 import dynamic from 'next/dynamic'
 import { useState, useEffect } from 'react'
