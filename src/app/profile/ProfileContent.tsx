@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Check, X, Loader } from 'lucide-react'
-// import { useProfile } from '../../hooks/useProfile'
+import { useProfile } from '../../hooks/useProfile'
 import { useAuth } from '../../contexts/AuthContext'
 import Header from '../../components/layout/Header'
 import { HeaderVariant } from '../../types/header'
@@ -22,20 +22,7 @@ export default function ProfileContent() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
   
-  // Mock profile data for now to avoid Supabase issues during build
-  const profile = {
-    profile: null,
-    metrics: null,
-    arsenal: null,
-    referralInfo: null,
-    nextAction: null,
-    isLoading: true,
-    isUpdating: false,
-    error: null,
-    clearError: () => {},
-    updateProfile: async () => ({ success: false, error: 'Profile functionality disabled for deployment' }),
-    updateAvatar: async () => ({ success: false, error: 'Avatar functionality disabled for deployment' })
-  }
+  const profile = useProfile()
 
   // UI state
   const [activeArsenalTab, setActiveArsenalTab] = useState<ArsenalTab>('trails')
