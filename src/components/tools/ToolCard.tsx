@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { motion, useMotionTemplate, useMotionValue, useSpring } from 'framer-motion'
 import { Heart, ArrowRight } from 'lucide-react'
 import { Tool } from '../../types/tool'
 
@@ -18,6 +19,28 @@ export default function ToolCard({
   isFavorited
 }: ToolCardProps) {
   const [favoriteLoading, setFavoriteLoading] = useState(false)
+  const cardRef = useRef<HTMLDivElement>(null)
+  const mouseX = useMotionValue(0)
+  const mouseY = useMotionValue(0)
+  const springX = useSpring(mouseX, { stiffness: 500, damping: 100 })
+  const springY = useSpring(mouseY, { stiffness: 500, damping: 100 })
+  
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return
+    const rect = cardRef.current.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    const rotateX = (event.clientY - centerY) / 10
+    const rotateY = (centerX - event.clientX) / 10
+    
+    mouseX.set(rotateY)
+    mouseY.set(rotateX)
+  }
+  
+  const handleMouseLeave = () => {
+    mouseX.set(0)
+    mouseY.set(0)
+  }
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -66,30 +89,56 @@ export default function ToolCard({
   }
 
   return (
-    <div 
+    <motion.div 
+      ref={cardRef}
       className="tool-card-grid-item cursor-pointer"
       data-id={tool.id}
       onClick={handleCardClick}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      whileHover={{ y: -8, scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      style={{
+        rotateX: springY,
+        rotateY: springX,
+        transformStyle: "preserve-3d",
+      }}
     >
-      <div className="prompt-card relative card-glow group rounded-2xl overflow-hidden h-72 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:translate-y-[-4px] hover:scale-[1.02] active:scale-[0.98]">
+      <motion.div 
+        className="prompt-card relative card-glow group rounded-2xl overflow-hidden h-72"
+        style={{
+          transform: "translateZ(20px)",
+        }}
+      >
         
-        {/* Background with subtle gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-white/[0.02] to-transparent backdrop-blur-[10px] border border-white/10" />
+        {/* Enhanced Background with dynamic gradient */}
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-br from-white/5 via-white/[0.02] to-transparent backdrop-blur-[10px] border border-white/10"
+          whileHover={{
+            background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 50%, rgba(239,209,53,0.1) 100%)",
+          }}
+          transition={{ duration: 0.3 }}
+        />
         
-        {/* Favorite Button */}
-        <button 
-          className={`absolute top-5 right-5 z-20 w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-[20px] bg-white/10 border border-white/15 transition-all duration-300 hover:bg-white/15 active:scale-90 ${favoriteLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isFavorited ? 'animate-[pop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)]' : ''}`}
+        {/* Favorite Button - 48px minimum touch target */}
+        <motion.button 
+          className={`absolute top-4 right-4 z-20 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-full backdrop-blur-[20px] bg-white/10 border border-white/15 transition-all duration-300 hover:bg-white/15 ${favoriteLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
           onClick={handleFavoriteClick}
           disabled={favoriteLoading}
           aria-label={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
           title={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          animate={isFavorited ? { scale: [1, 1.2, 1] } : {}}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
         >
           <Heart className={`w-5 h-5 transition-all duration-200 ${ 
             isFavorited 
               ? 'text-red-500 fill-red-500' 
               : 'text-white/80 hover:text-white'
           }`} />
-        </button>
+        </motion.button>
 
         {/* Category Tag - Top Left */}
         <div className="absolute top-5 left-5 z-10">
@@ -167,9 +216,13 @@ export default function ToolCard({
             {/* Footer Action */}
             <div className="flex items-center justify-between text-xs text-white/50 pt-3 border-t border-white/10 opacity-70 transition-opacity duration-300 group-hover:opacity-100">
               <span>Clique para abrir</span>
-              <div className="flex items-center gap-1 hover:text-white transition-colors">
+              <motion.div 
+                className="flex items-center gap-1 hover:text-white transition-colors"
+                whileHover={{ x: 4 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              >
                 <ArrowRight className="w-3 h-3" />
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
@@ -208,7 +261,7 @@ export default function ToolCard({
             100% { transform: scale(1); }
           }
         `}</style>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

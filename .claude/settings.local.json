@@ -37,7 +37,14 @@
       "WebFetch(domain:supabase.com)",
       "Bash(grep:*)",
       "Bash(sed:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "WebFetch(domain:lollypop.design)",
+      "WebFetch(domain:www.jasper.ai)",
+      "WebFetch(domain:userpilot.com)",
+      "WebFetch(domain:www.chargebee.com)",
+      "WebFetch(domain:chatgpt.com)",
+      "WebFetch(domain:www.saasui.design)",
+      "Bash(npm run lint)"
     ],
     "deny": [],
     "ask": []

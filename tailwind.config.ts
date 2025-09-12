@@ -19,6 +19,7 @@ const config: Config = {
       animation: {
         'fade-in-up': 'fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'spin': 'spin 4s linear infinite',
+        'shimmer': 'shimmer 1.8s ease-in-out infinite',
       },
       keyframes: {
         fadeInUp: {
@@ -29,6 +30,14 @@ const config: Config = {
           to: {
             opacity: '1',
             transform: 'translateY(0)',
+          },
+        },
+        shimmer: {
+          '0%': {
+            backgroundPosition: '-200% 0',
+          },
+          '100%': {
+            backgroundPosition: '200% 0',
           },
         },
       },
