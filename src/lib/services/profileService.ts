@@ -20,7 +20,13 @@ import { uploadImage, compressImage, deleteImage } from '../../../frontend/src/u
 
 class ProfileService {
   private getClient() {
-    return getSupabase()
+    try {
+      return getSupabase()
+    } catch (error) {
+      console.warn('Supabase client not available:', error)
+      // Return mock client for deployment
+      return null as any
+    }
   }
 
   // =====================================================

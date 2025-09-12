@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Check, X, Loader } from 'lucide-react'
-import { useProfile } from '../../hooks/useProfile'
+// import { useProfile } from '../../hooks/useProfile' // Temporarily disabled for deployment
 import { useAuth } from '../../contexts/AuthContext'
 import Header from '../../components/layout/Header'
 import { HeaderVariant } from '../../types/header'
@@ -22,7 +22,22 @@ export default function ProfileContent() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
   
-  const profile = useProfile()
+  // const profile = useProfile() // Temporarily disabled for deployment
+  
+  // Mock profile data until database tables are created
+  const profile = {
+    profile: { id: user?.id, name: user?.email, avatar_url: null },
+    metrics: { total_tracks: 0, completed_tracks: 0, tools_used: 0, streak: 0 },
+    arsenal: { trails: [], tools: [] },
+    referralInfo: { code: 'TEMP123', earnings: 0, referrals: 0 },
+    nextAction: null,
+    isLoading: false,
+    isUpdating: false,
+    error: null,
+    clearError: () => {},
+    updateProfile: async () => ({ success: false, error: 'Database tables need to be created' }),
+    updateAvatar: async () => ({ success: false, error: 'Database tables need to be created' })
+  }
 
   // UI state
   const [activeArsenalTab, setActiveArsenalTab] = useState<ArsenalTab>('trails')
