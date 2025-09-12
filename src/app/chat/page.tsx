@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '../../contexts/AuthContext'
 import Header from '../../components/layout/Header'
@@ -18,7 +18,7 @@ const CURRENT_BACKGROUND = {
   value: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80'
 }
 
-export default function ChatPage() {
+function ChatPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { user, loading: authLoading } = useAuth()
@@ -301,5 +301,13 @@ export default function ChatPage() {
         }
       `}</style>
     </div>
+  )
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader className="w-8 h-8 animate-spin text-white" /></div>}>
+      <ChatPageContent />
+    </Suspense>
   )
 }

@@ -3,7 +3,7 @@
 // Complete Supabase integration for profile management
 // =====================================================
 
-import { supabase } from '../supabase'
+import { getSupabase } from '../supabase'
 import type { 
   UserProfile,
   ProfileMetrics,
@@ -19,6 +19,9 @@ import type {
 import { uploadImage, compressImage, deleteImage } from '../../../frontend/src/utils/supabaseStorage'
 
 class ProfileService {
+  private getClient() {
+    return getSupabase()
+  }
 
   // =====================================================
   // PROFILE MANAGEMENT
@@ -30,7 +33,7 @@ class ProfileService {
   static async getUserProfile(userId: string): Promise<ServiceResponse<UserProfile>> {
     try {
 
-      const { data, error } = await supabase
+      const { data, error } = await this.getClient()
         .from('profiles')
         .select('*')
         .eq('user_id', userId)
@@ -76,7 +79,7 @@ class ProfileService {
         Object.entries(updates).filter(([_, value]) => value !== undefined && value !== null)
       )
 
-      const { data, error } = await supabase
+      const { data, error } = await this.getClient()
         .from('profiles')
         .update({
           ...cleanUpdates,
@@ -115,7 +118,7 @@ class ProfileService {
     try {
 
       // Get current profile to delete old avatar if exists
-      const { data: profile } = await supabase
+      const { data: profile } = await this.getClient()
         .from('profiles')
         .select('avatar_url')
         .eq('user_id', userId)
@@ -137,7 +140,7 @@ class ProfileService {
       }
 
       // Update profile with new avatar URL
-      const { data, error: updateError } = await supabase
+      const { data, error: updateError } = await this.getClient()
         .from('profiles')
         .update({
           avatar_url: avatarUrl,
@@ -186,30 +189,30 @@ class ProfileService {
         toolsResult
       ] = await Promise.all([
         // Total tracks user has access to
-        supabase
+        this.getClient()
           .from('user_track_progress')
           .select('id')
           .eq('user_id', userId),
 
         // Completed modules
-        supabase
+        this.getClient()
           .from('user_module_progress')
           .select('id')
           .eq('user_id', userId)
           .eq('status', 'completed'),
 
         // Calculate streak days (this would need a more complex query or RPC function)
-        supabase.rpc('calculate_user_streak', { user_id: userId }),
+        this.getClient().rpc('calculate_user_streak', { user_id: userId }),
 
         // Active tracks (in progress)
-        supabase
+        this.getClient()
           .from('user_track_progress')
           .select('id')
           .eq('user_id', userId)
           .eq('status', 'active'),
 
         // Favorite tools
-        supabase
+        this.getClient()
           .from('user_favorite_tools')
           .select('id')
           .eq('user_id', userId)
@@ -246,7 +249,7 @@ class ProfileService {
 
       const [tracksResult, toolsResult] = await Promise.all([
         // User saved tracks
-        supabase
+        this.getClient()
           .from('user_track_progress')
           .select(`
             *,
@@ -256,7 +259,7 @@ class ProfileService {
           .order('updated_at', { ascending: false }),
 
         // User favorite tools
-        supabase
+        this.getClient()
           .from('user_favorite_tools')
           .select(`
             *,
@@ -321,7 +324,7 @@ class ProfileService {
   static async getReferralInfo(userId: string): Promise<ServiceResponse<ReferralInfo>> {
     try {
 
-      const { data, error } = await supabase
+      const { data, error } = await this.getClient()
         .from('user_referrals')
         .select('*')
         .eq('user_id', userId)
@@ -379,7 +382,7 @@ class ProfileService {
     try {
 
       // Get user profile to generate code based on username or name
-      const { data: profile } = await supabase
+      const { data: profile } = await this.getClient()
         .from('profiles')
         .select('display_name, username')
         .eq('user_id', userId)
@@ -397,7 +400,7 @@ class ProfileService {
       // Check if code already exists, if so, generate another
       let attempts = 0
       while (attempts < 5) {
-        const { data: existing } = await supabase
+        const { data: existing } = await this.getClient()
           .from('user_referrals')
           .select('referral_code')
           .eq('referral_code', referralCode)
@@ -410,7 +413,7 @@ class ProfileService {
       }
 
       // Insert referral record
-      const { error } = await supabase
+      const { error } = await this.getClient()
         .from('user_referrals')
         .insert([{
           user_id: userId,
@@ -494,7 +497,7 @@ class ProfileService {
         ...initialData
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await this.getClient()
         .from('profiles')
         .insert([defaultProfile])
         .select()
@@ -565,7 +568,7 @@ class ProfileService {
     try {
 
       // Get profile to delete avatar
-      const { data: profile } = await supabase
+      const { data: profile } = await this.getClient()
         .from('profiles')
         .select('avatar_url')
         .eq('user_id', userId)
@@ -577,7 +580,7 @@ class ProfileService {
       }
 
       // Delete profile record
-      const { error } = await supabase
+      const { error } = await this.getClient()
         .from('profiles')
         .delete()
         .eq('user_id', userId)
