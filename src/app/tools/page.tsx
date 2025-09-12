@@ -250,6 +250,7 @@ export default function ToolsPage() {
   const [displayedCount, setDisplayedCount] = useState(TOOLS_PER_PAGE)
   const [favorites, setFavorites] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null)
@@ -262,6 +263,15 @@ export default function ToolsPage() {
     compatibility: [],
     activity: []
   })
+
+  // Initial loading simulation
+  useEffect(() => {
+    const loadingTimer = setTimeout(() => {
+      setIsInitialLoading(false)
+    }, 1200) // Simulate initial data fetch
+
+    return () => clearTimeout(loadingTimer)
+  }, [])
 
   // Debounce search input
   useEffect(() => {
@@ -451,26 +461,90 @@ export default function ToolsPage() {
           </p>
         </div>
 
-        {/* Control Panel - Based on HTML Reference */}
-        <div className="grid grid-cols-1 md:grid-cols-10 gap-3 backdrop-blur-[20px] bg-white/10 border border-white/15 rounded-xl p-3 mb-6">
-          {/* Search Bar */}
-          <div className="md:col-span-5 relative">
+        {/* Enhanced Control Panel with Advanced Liquid Glass - Tablet-Optimized */}
+        <div className="
+          grid grid-cols-1 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-3 p-3 mb-6 rounded-xl overflow-hidden
+          relative backdrop-blur-[36px] 
+          shadow-[0_8px_32px_rgba(0,0,0,0.25),0_2px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.05)]
+        ">
+          {/* Advanced Glass Background */}
+          <div className="absolute inset-0">
+            {/* Base frosted layer */}
+            <div 
+              className="absolute inset-0 backdrop-blur-[32px]"
+              style={{
+                background: `
+                  linear-gradient(135deg, 
+                    rgba(255,255,255,0.12) 0%,
+                    rgba(255,255,255,0.08) 35%,
+                    rgba(255,255,255,0.04) 100%
+                  ),
+                  radial-gradient(circle at 20% 20%, 
+                    rgba(255,255,255,0.08) 0%,
+                    transparent 50%
+                  ),
+                  radial-gradient(circle at 80% 80%, 
+                    rgba(255,255,255,0.06) 0%,
+                    transparent 50%
+                  )
+                `,
+              }}
+            />
+            
+            {/* Texture noise overlay */}
+            <div 
+              className="absolute inset-0 opacity-[0.02] mix-blend-overlay"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='1'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noiseFilter)' opacity='0.6'/%3E%3C/svg%3E")`,
+              }}
+            />
+            
+            {/* Border highlight */}
+            <div 
+              className="absolute inset-0 rounded-xl"
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05), rgba(255,255,255,0.1))',
+                mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                WebkitMaskComposite: 'xor',
+                maskComposite: 'exclude',
+                padding: '1px',
+              }}
+            />
+          </div>
+          
+          {/* Search Bar - Enhanced Glass - Responsive Span */}
+          <div className="md:col-span-4 lg:col-span-5 xl:col-span-6 relative z-10">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none z-10" />
             <input
               type="text"
               placeholder="Busque por objetivo, técnica ou ferramenta..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full h-12 bg-white/5 border border-white/10 rounded-xl py-2.5 pl-12 pr-4 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
+              className="
+                w-full h-12 py-2.5 pl-12 pr-4 text-white placeholder-white/50 rounded-xl
+                backdrop-blur-[20px] bg-gradient-to-br from-white/[0.08] to-white/[0.04]
+                border border-white/[0.12] transition-all duration-300
+                shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.08)]
+                focus:outline-none focus:from-white/[0.12] focus:to-white/[0.06] 
+                focus:border-white/[0.2] focus:shadow-[0_4px_16px_rgba(0,0,0,0.15),0_0_0_2px_rgba(255,255,255,0.1)]
+              "
             />
           </div>
           
-          {/* Category Dropdown */}
-          <div className="md:col-span-2 relative">
+          {/* Category Dropdown - Enhanced Glass - Responsive Span */}
+          <div className="md:col-span-2 lg:col-span-2 xl:col-span-3 relative z-10">
             <select
               value={filters.category}
               onChange={(e) => updateFilter('category', e.target.value as 'all' | ToolCategory)}
-              className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-white appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50"
+              className="
+                w-full h-12 px-4 text-white appearance-none cursor-pointer rounded-xl
+                backdrop-blur-[20px] bg-gradient-to-br from-white/[0.08] to-white/[0.04]
+                border border-white/[0.12] transition-all duration-300
+                shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.08)]
+                focus:outline-none focus:from-white/[0.12] focus:to-white/[0.06] 
+                focus:border-white/[0.2] focus:shadow-[0_4px_16px_rgba(0,0,0,0.15),0_0_0_2px_rgba(255,255,255,0.1)]
+              "
             >
               <option value="all" className="bg-gray-800">Todas as Categorias</option>
               {ALL_CATEGORIES.map(category => (
@@ -480,28 +554,48 @@ export default function ToolsPage() {
             <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
           </div>
           
-          {/* Filters Button */}
-          <div className="md:col-span-2 relative">
+          {/* Filters Button - Enhanced Glass - Responsive Span */}
+          <div className="md:col-span-2 lg:col-span-2 xl:col-span-2 relative z-10">
             <button
               onClick={() => setShowFiltersDrawer(true)}
-              className="w-full h-12 flex items-center justify-between bg-white/5 border border-white/10 rounded-xl px-4 text-white hover:bg-white/10 transition-all"
+              className="
+                w-full h-12 flex items-center justify-between px-4 text-white rounded-xl transition-all duration-300
+                backdrop-blur-[20px] bg-gradient-to-br from-white/[0.08] to-white/[0.04]
+                border border-white/[0.12] 
+                shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.08)]
+                hover:from-white/[0.12] hover:to-white/[0.06] hover:border-white/[0.15]
+                hover:shadow-[0_4px_16px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.12)]
+                focus:outline-none focus:shadow-[0_0_0_2px_rgba(255,255,255,0.1)]
+              "
             >
               <span className="truncate pr-2">Filtros</span>
               <SlidersHorizontal className="w-4 h-4 text-white/60" />
               {activeFiltersCount > 0 && (
-                <div className="absolute -top-2 -right-2 bg-white/90 text-gray-900 w-5 h-5 rounded-full text-xs font-semibold flex items-center justify-center">
+                <div className="
+                  absolute -top-2 -right-2 w-5 h-5 rounded-full text-xs font-semibold 
+                  flex items-center justify-center text-gray-900
+                  backdrop-blur-[16px] bg-gradient-to-br from-white/[0.9] to-white/[0.8]
+                  border border-white/[0.3] shadow-[0_2px_6px_rgba(0,0,0,0.15)]
+                ">
                   {activeFiltersCount}
                 </div>
               )}
             </button>
           </div>
           
-          {/* Sort Dropdown */}
-          <div className="md:col-span-1 relative">
+          {/* Sort Dropdown - Enhanced Glass - Responsive Span */}
+          <div className="md:col-span-0 md:hidden lg:block lg:col-span-1 xl:col-span-1 relative z-10">
             <select
               value={filters.sort}
               onChange={(e) => updateFilter('sort', e.target.value as 'relevance' | 'recent')}
-              className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-white appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50"
+              className="
+                w-full h-12 px-4 text-white appearance-none cursor-pointer rounded-xl
+                backdrop-blur-[20px] bg-gradient-to-br from-white/[0.08] to-white/[0.04]
+                border border-white/[0.12] transition-all duration-300
+                shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.08)]
+                focus:outline-none focus:from-white/[0.12] focus:to-white/[0.06] 
+                focus:border-white/[0.2] focus:shadow-[0_4px_16px_rgba(0,0,0,0.15),0_0_0_2px_rgba(255,255,255,0.1)]
+              "
             >
               <option value="relevance" className="bg-gray-800">Relevantes</option>
               <option value="recent" className="bg-gray-800">Recentes</option>
@@ -509,18 +603,43 @@ export default function ToolsPage() {
             <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
           </div>
         </div>
+        
+        {/* Mobile/Tablet Sort Dropdown - Shows when main sort is hidden */}
+        <div className="md:block lg:hidden mb-4">
+          <div className="relative">
+            <select
+              value={filters.sort}
+              onChange={(e) => updateFilter('sort', e.target.value as 'relevance' | 'recent')}
+              className="
+                w-full h-12 px-4 text-white appearance-none cursor-pointer rounded-xl
+                backdrop-blur-[20px] bg-gradient-to-br from-white/[0.08] to-white/[0.04]
+                border border-white/[0.12] transition-all duration-300
+                shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.08)]
+                focus:outline-none focus:from-white/[0.12] focus:to-white/[0.06] 
+                focus:border-white/[0.2] focus:shadow-[0_4px_16px_rgba(0,0,0,0.15),0_0_0_2px_rgba(255,255,255,0.1)]
+              "
+            >
+              <option value="relevance" className="bg-gray-800">🔥 Mais Relevantes</option>
+              <option value="recent" className="bg-gray-800">⏰ Mais Recentes</option>
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
+          </div>
+        </div>
 
-        {/* Quick Category Filters */}
+        {/* Enhanced Quick Category Filters */}
         <div className="flex flex-wrap gap-2 mb-6">
           {quickCategories.map((category, index) => (
             <button
               key={category}
               onClick={() => updateFilter('category', filters.category === category ? 'all' : category)}
               className={`
-                px-3 py-2 text-sm rounded-full backdrop-blur-[10px] border transition-all duration-200
+                px-3 py-2 text-sm rounded-full transition-all duration-300 backdrop-blur-[16px]
+                shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.1)]
+                hover:shadow-[0_4px_12px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.15)]
+                hover:-translate-y-0.5
                 ${filters.category === category
-                  ? 'bg-white/20 text-white border-white/40'
-                  : 'bg-white/5 text-white/80 border-white/10 hover:bg-white/10'
+                  ? 'bg-gradient-to-br from-white/[0.25] to-white/[0.15] text-white border border-white/[0.3]'
+                  : 'bg-gradient-to-br from-white/[0.08] to-white/[0.04] text-white/80 border border-white/[0.12] hover:from-white/[0.12] hover:to-white/[0.06]'
                 }
               `}
               style={{ 
@@ -534,14 +653,18 @@ export default function ToolsPage() {
 
         {/* Results Counter */}
         <div className="flex justify-between items-center mb-8">
-          <p className="text-white/80">
+          <p className="text-white/80 drop-shadow-sm">
             Exibindo {displayedTools.length} de {filteredTools.length} ferramentas
           </p>
           
           {(filters.search || filters.category !== 'all' || activeFiltersCount > 0) && (
             <button
               onClick={clearFilters}
-              className="text-white/80 hover:text-white text-sm underline"
+              className="
+                text-white/80 hover:text-white text-sm underline transition-colors duration-200
+                backdrop-blur-[8px] bg-white/[0.05] px-2 py-1 rounded-lg
+                hover:bg-white/[0.08]
+              "
             >
               Limpar filtros
             </button>
@@ -550,14 +673,104 @@ export default function ToolsPage() {
 
         {/* Error Toast */}
         {error && (
-          <div className="fixed top-24 right-4 z-50 p-4 rounded-lg bg-red-500/90 backdrop-blur-md text-white border border-red-400/50 shadow-lg animate-fade-in-up">
-            <p className="font-medium">{error}</p>
+          <div className="
+            fixed top-24 right-4 z-50 p-4 rounded-lg text-white border shadow-lg animate-fade-in-up
+            backdrop-blur-[24px] bg-gradient-to-br from-red-500/[0.9] to-red-600/[0.8]
+            border-red-400/[0.5] shadow-[0_8px_24px_rgba(220,38,38,0.25)]
+          ">
+            <p className="font-medium drop-shadow-sm">{error}</p>
           </div>
         )}
 
-        {/* Tools Grid */}
-        {displayedTools.length > 0 ? (
-          <div id="tools-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {/* Tools Grid - Enhanced Responsive Layout with Initial Loading */}
+        {isInitialLoading ? (
+          /* Initial Loading State */
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-8">
+            {Array.from({ length: TOOLS_PER_PAGE }).map((_, index) => (
+              <div
+                key={`initial-skeleton-${index}`}
+                className="glass-card h-72 relative overflow-hidden stagger-animation"
+                style={{ 
+                  animationDelay: `${index * 100}ms`,
+                  borderRadius: 'var(--radius-lg)',
+                }}
+              >
+                {/* Enhanced Skeleton Structure */}
+                <div className="p-6 h-full flex flex-col">
+                  {/* Category and Type Tags */}
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex flex-col gap-2">
+                      <div 
+                        className="loading-shimmer h-6 w-20"
+                        style={{ borderRadius: 'var(--radius-full)' }}
+                      />
+                      <div 
+                        className="loading-shimmer h-5 w-16"
+                        style={{ borderRadius: 'var(--radius-full)' }}
+                      />
+                    </div>
+                    <div 
+                      className="loading-shimmer w-12 h-12"
+                      style={{ borderRadius: 'var(--radius-full)' }}
+                    />
+                  </div>
+                  
+                  {/* Title */}
+                  <div className="mb-3">
+                    <div className="loading-shimmer h-6 w-full mb-2" />
+                    <div className="loading-shimmer h-6 w-3/4" />
+                  </div>
+                  
+                  {/* Description */}
+                  <div className="mb-4">
+                    <div className="loading-shimmer h-4 w-full mb-2" />
+                    <div className="loading-shimmer h-4 w-5/6" />
+                  </div>
+                  
+                  {/* Tags */}
+                  <div className="flex gap-2 mb-4">
+                    <div 
+                      className="loading-shimmer h-6 w-16"
+                      style={{ borderRadius: 'var(--radius-full)' }}
+                    />
+                    <div 
+                      className="loading-shimmer h-6 w-20"
+                      style={{ borderRadius: 'var(--radius-full)' }}
+                    />
+                    <div 
+                      className="loading-shimmer h-6 w-12"
+                      style={{ borderRadius: 'var(--radius-full)' }}
+                    />
+                  </div>
+                  
+                  {/* AI Compatibility */}
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="loading-shimmer h-4 w-24" />
+                    <div className="flex gap-1">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <div 
+                          key={i}
+                          className="loading-shimmer w-8 h-8"
+                          style={{ borderRadius: 'var(--radius-full)' }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Footer */}
+                  <div 
+                    className="mt-auto pt-3 flex justify-between items-center"
+                    style={{ borderTop: '1px solid var(--glass-border-subtle)' }}
+                  >
+                    <div className="loading-shimmer h-3 w-20" />
+                    <div className="loading-shimmer h-3 w-4" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : displayedTools.length > 0 ? (
+          <div id="tools-grid" className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-8">
             {displayedTools.map((tool, index) => (
               <div
                 key={tool.id}
@@ -577,60 +790,172 @@ export default function ToolsPage() {
             ))}
           </div>
         ) : (
-          /* Empty State */
+          /* Enhanced Empty State */
           <div className="text-center py-16">
-            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-white/10 flex items-center justify-center">
+            <div className="
+              w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center
+              backdrop-blur-[20px] bg-gradient-to-br from-white/[0.15] to-white/[0.08]
+              border border-white/[0.2] shadow-[0_8px_24px_rgba(0,0,0,0.15)]
+            ">
               <ArchiveX className="w-10 h-10 text-white/60" />
             </div>
-            <h3 className="text-2xl font-semibold text-white mb-2">
+            <h3 className="text-2xl font-semibold text-white mb-2 drop-shadow-sm">
               Nenhuma ferramenta encontrada
             </h3>
-            <p className="text-white/70 mb-6">
+            <p className="text-white/70 mb-6 drop-shadow-sm">
               Tente ajustar seus filtros ou fazer uma nova busca
             </p>
             <button
               onClick={clearFilters}
-              className="px-6 py-3 rounded-xl bg-white/20 text-white hover:bg-white/25 transition-all"
+              className="
+                px-6 py-3 rounded-xl text-white transition-all duration-300
+                backdrop-blur-[20px] bg-gradient-to-br from-white/[0.2] to-white/[0.1]
+                border border-white/[0.25] shadow-[0_4px_16px_rgba(0,0,0,0.15)]
+                hover:from-white/[0.25] hover:to-white/[0.15] hover:-translate-y-0.5
+                hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)]
+              "
             >
               Limpar todos os filtros
             </button>
           </div>
         )}
 
-        {/* Load More Button */}
+        {/* Enhanced Load More Button */}
         {hasMore && (
           <div className="text-center mb-12">
             <button
               onClick={handleLoadMore}
               disabled={isLoading}
-              className="px-8 py-4 rounded-xl backdrop-blur-[20px] bg-white/10 border border-white/15 text-white hover:bg-white/15 transition-all flex items-center gap-2 mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
+              className="
+                px-8 py-4 text-white transition-all flex items-center gap-2 mx-auto 
+                disabled:opacity-50 disabled:cursor-not-allowed focus-visible:focus-visible
+              "
+              style={{
+                borderRadius: 'var(--radius-xl)',
+                backdropFilter: 'blur(var(--glass-blur-intense))',
+                background: 'linear-gradient(135deg, var(--glass-bg-strong) 0%, var(--glass-bg-medium) 100%)',
+                border: '1px solid var(--glass-border-strong)',
+                boxShadow: 'var(--shadow-lg)',
+                transition: 'all var(--duration-fast) var(--ease-primary)',
+              }}
+              onMouseEnter={(e) => {
+                if (!isLoading) {
+                  e.currentTarget.style.transform = 'translateY(-2px)'
+                  e.currentTarget.style.boxShadow = 'var(--shadow-xl)'
+                  e.currentTarget.style.background = 'linear-gradient(135deg, var(--glass-bg-intense) 0%, var(--glass-bg-strong) 100%)'
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
+                e.currentTarget.style.background = 'linear-gradient(135deg, var(--glass-bg-strong) 0%, var(--glass-bg-medium) 100%)'
+              }}
             >
               {isLoading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Carregando...
+                  <div 
+                    className="w-5 h-5 border-2 rounded-full animate-spin"
+                    style={{
+                      borderColor: 'var(--text-muted)',
+                      borderTopColor: 'var(--text-primary)',
+                    }}
+                  />
+                  <span style={{ color: 'var(--text-primary)' }}>Carregando...</span>
                 </>
               ) : (
                 <>
-                  <Plus className="w-5 h-5" />
-                  Carregar mais ferramentas
+                  <Plus className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
+                  <span style={{ color: 'var(--text-primary)' }}>Carregar mais ferramentas</span>
                 </>
               )}
             </button>
           </div>
         )}
 
-        {/* Loading Skeleton for new content */}
+        {/* Enhanced Loading Skeleton for new content - Responsive */}
         {isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-8">
             {Array.from({ length: Math.min(TOOLS_PER_PAGE, filteredTools.length - displayedTools.length) }).map((_, index) => (
               <div
                 key={`skeleton-${index}`}
-                className="h-64 rounded-2xl animate-pulse bg-white/10"
+                className="glass-card h-72 relative overflow-hidden"
                 style={{ 
                   animationDelay: `${index * 100}ms`,
+                  borderRadius: 'var(--radius-lg)',
                 }}
-              />
+              >
+                {/* Enhanced Skeleton Structure */}
+                <div className="p-6 h-full flex flex-col">
+                  {/* Category and Type Tags */}
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex flex-col gap-2">
+                      <div 
+                        className="loading-shimmer h-6 w-20"
+                        style={{ borderRadius: 'var(--radius-full)' }}
+                      />
+                      <div 
+                        className="loading-shimmer h-5 w-16"
+                        style={{ borderRadius: 'var(--radius-full)' }}
+                      />
+                    </div>
+                    <div 
+                      className="loading-shimmer w-12 h-12"
+                      style={{ borderRadius: 'var(--radius-full)' }}
+                    />
+                  </div>
+                  
+                  {/* Title */}
+                  <div className="mb-3">
+                    <div className="loading-shimmer h-6 w-full mb-2" />
+                    <div className="loading-shimmer h-6 w-3/4" />
+                  </div>
+                  
+                  {/* Description */}
+                  <div className="mb-4">
+                    <div className="loading-shimmer h-4 w-full mb-2" />
+                    <div className="loading-shimmer h-4 w-5/6" />
+                  </div>
+                  
+                  {/* Tags */}
+                  <div className="flex gap-2 mb-4">
+                    <div 
+                      className="loading-shimmer h-6 w-16"
+                      style={{ borderRadius: 'var(--radius-full)' }}
+                    />
+                    <div 
+                      className="loading-shimmer h-6 w-20"
+                      style={{ borderRadius: 'var(--radius-full)' }}
+                    />
+                    <div 
+                      className="loading-shimmer h-6 w-12"
+                      style={{ borderRadius: 'var(--radius-full)' }}
+                    />
+                  </div>
+                  
+                  {/* AI Compatibility */}
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="loading-shimmer h-4 w-24" />
+                    <div className="flex gap-1">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <div 
+                          key={i}
+                          className="loading-shimmer w-8 h-8"
+                          style={{ borderRadius: 'var(--radius-full)' }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Footer */}
+                  <div 
+                    className="mt-auto pt-3 flex justify-between items-center"
+                    style={{ borderTop: '1px solid var(--glass-border-subtle)' }}
+                  >
+                    <div className="loading-shimmer h-3 w-20" />
+                    <div className="loading-shimmer h-3 w-4" />
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         )}

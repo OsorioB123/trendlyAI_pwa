@@ -9,6 +9,7 @@ interface FiltersDrawerProps {
   onClose: () => void
   filters: TracksFilters
   onFiltersChange: (filters: Partial<TracksFilters>) => void
+  availableCategories?: string[]
 }
 
 const LEVELS = ['Iniciante', 'Intermediário', 'Avançado']
@@ -24,7 +25,7 @@ const ALL_CATEGORIES = [
   'Estratégia', 'Engajamento', 'Métricas', 'Copywriting', 'Persuasão'
 ]
 
-export default function FiltersDrawer({ isOpen, onClose, filters, onFiltersChange }: FiltersDrawerProps) {
+export default function FiltersDrawer({ isOpen, onClose, filters, onFiltersChange, availableCategories = ALL_CATEGORIES }: FiltersDrawerProps) {
   const [tempFilters, setTempFilters] = useState<TracksFilters>(filters)
 
   // Update temp filters when props change
@@ -208,7 +209,7 @@ export default function FiltersDrawer({ isOpen, onClose, filters, onFiltersChang
           <div className="mb-8">
             <h3 className="text-lg font-medium text-white mb-4">CATEGORIAS</h3>
             <div className="grid grid-cols-2 gap-2">
-              {ALL_CATEGORIES.map(category => (
+              {availableCategories.map(category => (
                 <button
                   key={category}
                   onClick={() => handleToggleArrayFilter('categories', category)}
