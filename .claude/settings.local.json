@@ -44,7 +44,8 @@
       "WebFetch(domain:www.chargebee.com)",
       "WebFetch(domain:chatgpt.com)",
       "WebFetch(domain:www.saasui.design)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,240 @@
+/* TrendlyAI Tools Page - Responsive Design Fixes */
+
+/* 1. CONTROL PANEL IMPROVEMENTS */
+.control-panel-enhanced {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+/* Mobile First - Stack all controls */
+@media (min-width: 640px) {
+  .control-panel-enhanced {
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+  }
+}
+
+/* Tablet - Better distribution */
+@media (min-width: 768px) {
+  .control-panel-enhanced {
+    grid-template-columns: 2fr 1fr 1fr 120px;
+    gap: 0.75rem;
+  }
+}
+
+/* Desktop - Optimized spacing */
+@media (min-width: 1024px) {
+  .control-panel-enhanced {
+    grid-template-columns: 3fr 1.5fr 1fr 140px;
+    gap: 0.75rem;
+  }
+}
+
+/* 2. TOOLS GRID IMPROVEMENTS */
+.tools-grid-enhanced {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .tools-grid-enhanced {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .tools-grid-enhanced {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .tools-grid-enhanced {
+    grid-template-columns: repeat(4, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+/* 3. TOUCH TARGET IMPROVEMENTS */
+.touch-optimized {
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+}
+
+/* Quick category buttons */
+.category-filter-button {
+  min-height: 48px;
+  padding: 0.75rem 1rem;
+  touch-action: manipulation;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .category-filter-button {
+    min-height: 40px;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* 4. RESPONSIVE CARD IMPROVEMENTS */
+.tool-card-responsive {
+  height: auto;
+  min-height: 280px;
+}
+
+@media (min-width: 768px) {
+  .tool-card-responsive {
+    min-height: 320px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .tool-card-responsive {
+    min-height: 288px; /* h-72 equivalent */
+  }
+}
+
+/* 5. RESPONSIVE TYPOGRAPHY SCALE */
+.text-responsive-4xl {
+  font-size: 2rem;
+  line-height: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .text-responsive-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .text-responsive-4xl {
+    font-size: 2.5rem;
+    line-height: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-responsive-4xl {
+    font-size: 3rem;
+    line-height: 3.5rem;
+  }
+}
+
+.text-responsive-xl {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+@media (min-width: 640px) {
+  .text-responsive-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .text-responsive-xl {
+    font-size: 1.375rem;
+    line-height: 2rem;
+  }
+}
+
+/* 6. IMPROVED SPACING SYSTEM */
+.spacing-responsive-mb-6 {
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+  .spacing-responsive-mb-6 {
+    margin-bottom: 1.25rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .spacing-responsive-mb-6 {
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .spacing-responsive-mb-6 {
+    margin-bottom: 2rem;
+  }
+}
+
+/* 7. CONTAINER IMPROVEMENTS */
+.container-responsive {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-responsive {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .container-responsive {
+    padding: 0 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-responsive {
+    max-width: 1200px;
+    padding: 0 2rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .container-responsive {
+    max-width: 1400px;
+    padding: 0 2.5rem;
+  }
+}
+
+/* 8. ACCESSIBILITY IMPROVEMENTS */
+@media (prefers-reduced-motion: reduce) {
+  .tool-card-responsive {
+    transition: none;
+    animation: none;
+  }
+  
+  .stagger-animation {
+    animation: none;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 9. FOCUS IMPROVEMENTS FOR KEYBOARD NAVIGATION */
+.focus-enhanced:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+/* 10. PRINT STYLES */
+@media print {
+  .tools-grid-enhanced {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .tool-card-responsive {
+    break-inside: avoid;
+    height: auto;
+    min-height: auto;
+  }
+}

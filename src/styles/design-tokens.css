@@ -1,0 +1,291 @@
+/* TrendlyAI Design System Tokens - v1.0 */
+
+:root {
+  /* === SPACING SCALE === */
+  --space-0: 0;
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-7: 1.75rem;   /* 28px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+
+  /* === RADIUS SCALE === */
+  --radius-none: 0;
+  --radius-xs: 0.25rem; /* 4px - Small elements, inner tags */
+  --radius-sm: 0.5rem;  /* 8px - Buttons, small inputs */
+  --radius-md: 0.75rem; /* 12px - Standard inputs, small cards */
+  --radius-lg: 1rem;    /* 16px - Cards, panels, modals */
+  --radius-xl: 1.5rem;  /* 24px - Large cards */
+  --radius-full: 9999px; /* Pills, avatars */
+
+  /* === SHADOW SCALE === */
+  --shadow-none: 0 0 #0000;
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.35);
+  --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.45);
+  
+  /* Colored shadows for interactive states */
+  --shadow-glow-white: 0 0 20px rgba(255, 255, 255, 0.15);
+  --shadow-glow-brand: 0 0 20px rgba(239, 209, 53, 0.3);
+
+  /* === GLASS MORPHISM SYSTEM === */
+  --glass-blur-subtle: blur(8px);
+  --glass-blur-medium: blur(12px);
+  --glass-blur-strong: blur(16px);
+  --glass-blur-intense: blur(20px);
+  --glass-blur-maximum: blur(24px);
+
+  --glass-bg-subtle: rgba(255, 255, 255, 0.03);
+  --glass-bg-light: rgba(255, 255, 255, 0.05);
+  --glass-bg-medium: rgba(255, 255, 255, 0.08);
+  --glass-bg-strong: rgba(255, 255, 255, 0.12);
+  --glass-bg-intense: rgba(255, 255, 255, 0.16);
+
+  --glass-border-subtle: rgba(255, 255, 255, 0.08);
+  --glass-border-light: rgba(255, 255, 255, 0.10);
+  --glass-border-medium: rgba(255, 255, 255, 0.12);
+  --glass-border-strong: rgba(255, 255, 255, 0.16);
+  --glass-border-intense: rgba(255, 255, 255, 0.20);
+
+  /* Opaque glass for dropdown panels */
+  --glass-opaque-bg: rgba(30, 30, 40, 0.85);
+  --glass-opaque-border: rgba(255, 255, 255, 0.14);
+
+  /* === TYPOGRAPHY SCALE === */
+  --text-xs: 0.75rem;   /* 12px */
+  --text-sm: 0.875rem;  /* 14px */
+  --text-base: 1rem;    /* 16px */
+  --text-lg: 1.125rem;  /* 18px */
+  --text-xl: 1.25rem;   /* 20px */
+  --text-2xl: 1.5rem;   /* 24px */
+  --text-3xl: 1.875rem; /* 30px */
+  --text-4xl: 2.25rem;  /* 36px */
+  --text-5xl: 3rem;     /* 48px */
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* === COLOR OPACITY SCALE === */
+  --opacity-5: 0.05;
+  --opacity-10: 0.10;
+  --opacity-15: 0.15;
+  --opacity-20: 0.20;
+  --opacity-30: 0.30;
+  --opacity-40: 0.40;
+  --opacity-50: 0.50;
+  --opacity-60: 0.60;
+  --opacity-70: 0.70;
+  --opacity-80: 0.80;
+  --opacity-90: 0.90;
+
+  /* === CATEGORY COLORS === */
+  --category-copywriting: #3b82f6;    /* Blue 500 */
+  --category-seo: #10b981;            /* Green 500 */
+  --category-image: #8b5cf6;          /* Purple 500 */
+  --category-analysis: #f59e0b;       /* Orange 500 */
+  --category-business: #ef4444;       /* Red 500 */
+  --category-marketing: #ec4899;      /* Pink 500 */
+  --category-design: #14b8a6;         /* Teal 500 */
+
+  /* === ANIMATION TIMING === */
+  --duration-fast: 0.15s;
+  --duration-normal: 0.2s;
+  --duration-slow: 0.3s;
+  --duration-slower: 0.5s;
+
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* === Z-INDEX SCALE === */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-tooltip: 1060;
+}
+
+/* === UTILITY CLASSES === */
+
+/* Glass Effects */
+.glass-subtle {
+  backdrop-filter: var(--glass-blur-subtle);
+  background: var(--glass-bg-subtle);
+  border: 1px solid var(--glass-border-subtle);
+}
+
+.glass-medium {
+  backdrop-filter: var(--glass-blur-medium);
+  background: var(--glass-bg-medium);
+  border: 1px solid var(--glass-border-medium);
+}
+
+.glass-strong {
+  backdrop-filter: var(--glass-blur-strong);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border-strong);
+}
+
+.glass-opaque {
+  backdrop-filter: var(--glass-blur-maximum);
+  background: var(--glass-opaque-bg);
+  border: 1px solid var(--glass-opaque-border);
+}
+
+/* Shadow Utilities */
+.shadow-card {
+  box-shadow: var(--shadow-md);
+}
+
+.shadow-card-hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.shadow-card-active {
+  box-shadow: var(--shadow-sm);
+}
+
+.shadow-glow {
+  box-shadow: var(--shadow-glow-white);
+}
+
+/* Interactive States */
+.interactive {
+  transition: all var(--duration-normal) var(--ease-spring);
+}
+
+.interactive:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.interactive:active {
+  transform: translateY(-1px) scale(1.01);
+  transition-duration: var(--duration-fast);
+}
+
+/* Touch Targets */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.touch-target-large {
+  min-width: 48px;
+  min-height: 48px;
+}
+
+/* Category Color Utilities */
+.category-copywriting {
+  --category-color: var(--category-copywriting);
+  background: color-mix(in srgb, var(--category-color) 20%, transparent);
+  color: color-mix(in srgb, var(--category-color) 80%, white);
+  border-color: color-mix(in srgb, var(--category-color) 30%, transparent);
+}
+
+.category-seo {
+  --category-color: var(--category-seo);
+  background: color-mix(in srgb, var(--category-color) 20%, transparent);
+  color: color-mix(in srgb, var(--category-color) 80%, white);
+  border-color: color-mix(in srgb, var(--category-color) 30%, transparent);
+}
+
+.category-image {
+  --category-color: var(--category-image);
+  background: color-mix(in srgb, var(--category-color) 20%, transparent);
+  color: color-mix(in srgb, var(--category-color) 80%, white);
+  border-color: color-mix(in srgb, var(--category-color) 30%, transparent);
+}
+
+.category-analysis {
+  --category-color: var(--category-analysis);
+  background: color-mix(in srgb, var(--category-color) 20%, transparent);
+  color: color-mix(in srgb, var(--category-color) 80%, white);
+  border-color: color-mix(in srgb, var(--category-color) 30%, transparent);
+}
+
+.category-business {
+  --category-color: var(--category-business);
+  background: color-mix(in srgb, var(--category-color) 20%, transparent);
+  color: color-mix(in srgb, var(--category-color) 80%, white);
+  border-color: color-mix(in srgb, var(--category-color) 30%, transparent);
+}
+
+.category-marketing {
+  --category-color: var(--category-marketing);
+  background: color-mix(in srgb, var(--category-color) 20%, transparent);
+  color: color-mix(in srgb, var(--category-color) 80%, white);
+  border-color: color-mix(in srgb, var(--category-color) 30%, transparent);
+}
+
+.category-design {
+  --category-color: var(--category-design);
+  background: color-mix(in srgb, var(--category-color) 20%, transparent);
+  color: color-mix(in srgb, var(--category-color) 80%, white);
+  border-color: color-mix(in srgb, var(--category-color) 30%, transparent);
+}
+
+/* Responsive Design Tokens */
+@media (min-width: 768px) {
+  :root {
+    --space-card-padding: var(--space-6); /* 24px */
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --space-card-padding: var(--space-8); /* 32px */
+  }
+}
+
+/* Focus States for Accessibility */
+.focus-ring {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  :root {
+    --glass-bg-medium: rgba(255, 255, 255, 0.15);
+    --glass-border-medium: rgba(255, 255, 255, 0.25);
+    --glass-bg-strong: rgba(255, 255, 255, 0.20);
+    --glass-border-strong: rgba(255, 255, 255, 0.30);
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .interactive {
+    transition: none;
+  }
+  
+  .interactive:hover {
+    transform: none;
+  }
+  
+  .interactive:active {
+    transform: none;
+  }
+}

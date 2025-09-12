@@ -16,10 +16,11 @@ import type {
   ProfileUpdateData,
   AvatarUploadResult
 } from '../../types/profile'
-import { uploadImage, compressImage, deleteImage } from '../../../frontend/src/utils/supabaseStorage'
+// Avatar upload functionality will be handled by the auth context for now
+// import { uploadImage, compressImage, deleteImage } from '../../../frontend/src/utils/supabaseStorage'
 
 class ProfileService {
-  private getClient() {
+  private static getClient() {
     try {
       return getSupabase()
     } catch (error) {
@@ -42,7 +43,7 @@ class ProfileService {
       const { data, error } = await this.getClient()
         .from('profiles')
         .select('*')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .single()
 
       if (error) {
@@ -91,7 +92,7 @@ class ProfileService {
           ...cleanUpdates,
           updated_at: new Date().toISOString()
         })
-        .eq('user_id', userId)
+        .eq('id', userId)
         .select()
         .single()
 
@@ -119,40 +120,46 @@ class ProfileService {
 
   /**
    * Upload and update user avatar
+   * Note: This method uses Supabase Storage directly
    */
   static async uploadAvatar(userId: string, file: File): Promise<ServiceResponse<string>> {
     try {
-
+      const supabase = this.getClient()
+      
       // Get current profile to delete old avatar if exists
-      const { data: profile } = await this.getClient()
+      const { data: profile } = await supabase
         .from('profiles')
         .select('avatar_url')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .single()
 
-      // Compress image before upload
-      const compressedFile = await compressImage(file, 400, 0.8)
+      // Create file path
+      const fileExt = file.name.split('.').pop()
+      const filePath = `${userId}/avatar.${fileExt}`
       
       // Upload to Supabase Storage
-      const { data: avatarUrl, error: uploadError } = await uploadImage(
-        compressedFile, 
-        'avatars', 
-        userId
-      )
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true })
 
       if (uploadError) {
         console.error('Avatar upload error:', uploadError)
         return { success: false, error: uploadError.message }
       }
 
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath)
+
       // Update profile with new avatar URL
-      const { data, error: updateError } = await this.getClient()
+      const { data, error: updateError } = await supabase
         .from('profiles')
         .update({
-          avatar_url: avatarUrl,
+          avatar_url: publicUrl,
           updated_at: new Date().toISOString()
         })
-        .eq('user_id', userId)
+        .eq('id', userId)
         .select('avatar_url')
         .single()
 
@@ -161,12 +168,7 @@ class ProfileService {
         return { success: false, error: updateError.message }
       }
 
-      // Delete old avatar if it exists and is different
-      if (profile?.avatar_url && profile.avatar_url !== avatarUrl) {
-        await deleteImage(profile.avatar_url, 'avatars')
-      }
-
-      return { success: true, data: avatarUrl }
+      return { success: true, data: publicUrl }
 
     } catch (error) {
       console.error('Avatar upload service error:', error)
@@ -196,7 +198,7 @@ class ProfileService {
       ] = await Promise.all([
         // Total tracks user has access to
         this.getClient()
-          .from('user_track_progress')
+          .from('user_tracks')
           .select('id')
           .eq('user_id', userId),
 
@@ -205,29 +207,35 @@ class ProfileService {
           .from('user_module_progress')
           .select('id')
           .eq('user_id', userId)
-          .eq('status', 'completed'),
+          .eq('is_completed', true),
 
-        // Calculate streak days (this would need a more complex query or RPC function)
-        this.getClient().rpc('calculate_user_streak', { user_id: userId }),
+        // Calculate streak days (using profiles table streak_days field)
+        this.getClient()
+          .from('profiles')
+          .select('streak_days')
+          .eq('id', userId)
+          .single(),
 
         // Active tracks (in progress)
         this.getClient()
-          .from('user_track_progress')
+          .from('user_tracks')
           .select('id')
           .eq('user_id', userId)
-          .eq('status', 'active'),
+          .gt('progress', 0)
+          .lt('progress', 100),
 
         // Favorite tools
         this.getClient()
-          .from('user_favorite_tools')
+          .from('user_tools')
           .select('id')
           .eq('user_id', userId)
+          .eq('is_favorite', true)
       ])
 
       const metrics: ProfileMetrics = {
         total_tracks: tracksResult.data?.length || 0,
         completed_modules: modulesResult.data?.length || 0,
-        streak_days: streakResult.data || 0,
+        streak_days: streakResult.data?.streak_days || 0,
         active_tracks: activeTracksResult.data?.length || 0,
         favorite_tools: toolsResult.data?.length || 0
       }
@@ -256,22 +264,23 @@ class ProfileService {
       const [tracksResult, toolsResult] = await Promise.all([
         // User saved tracks
         this.getClient()
-          .from('user_track_progress')
+          .from('user_tracks')
           .select(`
             *,
-            track:tracks(*)
+            tracks!inner(*)
           `)
           .eq('user_id', userId)
           .order('updated_at', { ascending: false }),
 
         // User favorite tools
         this.getClient()
-          .from('user_favorite_tools')
+          .from('user_tools')
           .select(`
             *,
-            tool:tools(*)
+            tools!inner(*)
           `)
           .eq('user_id', userId)
+          .eq('is_favorite', true)
           .order('created_at', { ascending: false })
       ])
 
@@ -286,25 +295,25 @@ class ProfileService {
       }
 
       const tracks: Track[] = tracksResult.data?.map(item => ({
-        id: item.track.id,
-        title: item.track.title,
-        description: item.track.description,
-        category: item.track.category,
-        progress: item.progress_percentage || 0,
-        backgroundImage: item.track.cover_image || 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
-        created_at: new Date(item.track.created_at),
-        updated_at: new Date(item.track.updated_at)
+        id: item.tracks.id,
+        title: item.tracks.title,
+        description: item.tracks.description,
+        category: item.tracks.category,
+        progress: item.progress || 0,
+        backgroundImage: item.tracks.cover_image || 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
+        created_at: new Date(item.tracks.created_at),
+        updated_at: new Date(item.tracks.updated_at)
       })) || []
 
       const tools: Tool[] = toolsResult.data?.map(item => ({
-        id: item.tool.id,
-        name: item.tool.name,
-        description: item.tool.description,
-        category: item.tool.category,
-        icon: item.tool.icon,
+        id: item.tools.id,
+        name: item.tools.title,
+        description: item.tools.description,
+        category: item.tools.category,
+        icon: item.tools.icon,
         is_favorite: true,
         usage_count: item.usage_count || 0,
-        created_at: new Date(item.tool.created_at)
+        created_at: new Date(item.tools.created_at)
       })) || []
 
       const arsenalData: ArsenalData = { tracks, tools }
@@ -391,7 +400,7 @@ class ProfileService {
       const { data: profile } = await this.getClient()
         .from('profiles')
         .select('display_name, username')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .single()
 
       // Generate referral code
@@ -492,7 +501,7 @@ class ProfileService {
     try {
 
       const defaultProfile = {
-        user_id: userId,
+        id: userId,
         display_name: '',
         bio: '',
         level: 'Explorador' as const,
@@ -577,19 +586,30 @@ class ProfileService {
       const { data: profile } = await this.getClient()
         .from('profiles')
         .select('avatar_url')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .single()
 
       // Delete avatar from storage
       if (profile?.avatar_url) {
-        await deleteImage(profile.avatar_url, 'avatars')
+        try {
+          const supabase = this.getClient()
+          const avatarPath = profile.avatar_url.split('/').pop()
+          if (avatarPath) {
+            await supabase.storage
+              .from('avatars')
+              .remove([`${userId}/${avatarPath}`])
+          }
+        } catch (error) {
+          console.error('Error deleting avatar:', error)
+          // Don't fail the profile deletion if avatar deletion fails
+        }
       }
 
       // Delete profile record
       const { error } = await this.getClient()
         .from('profiles')
         .delete()
-        .eq('user_id', userId)
+        .eq('id', userId)
 
       if (error) {
         console.error('Error deleting profile:', error)

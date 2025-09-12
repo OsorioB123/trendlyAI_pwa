@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Check, X, Loader } from 'lucide-react'
-// import { useProfile } from '../../hooks/useProfile' // Temporarily disabled for deployment
+import { useProfile } from '../../hooks/useProfile'
 import { useAuth } from '../../contexts/AuthContext'
 import Header from '../../components/layout/Header'
 import { HeaderVariant } from '../../types/header'
@@ -21,23 +21,7 @@ const CURRENT_BACKGROUND = {
 export default function ProfileContent() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
-  
-  // const profile = useProfile() // Temporarily disabled for deployment
-  
-  // Mock profile data until database tables are created
-  const profile = {
-    profile: { id: user?.id, name: user?.email, avatar_url: null },
-    metrics: { total_tracks: 0, completed_tracks: 0, tools_used: 0, streak: 0 },
-    arsenal: { trails: [], tools: [] },
-    referralInfo: { code: 'TEMP123', earnings: 0, referrals: 0 },
-    nextAction: null,
-    isLoading: false,
-    isUpdating: false,
-    error: null,
-    clearError: () => {},
-    updateProfile: async () => ({ success: false, error: 'Database tables need to be created' }),
-    updateAvatar: async () => ({ success: false, error: 'Database tables need to be created' })
-  }
+  const profileData = useProfile()
 
   // UI state
   const [activeArsenalTab, setActiveArsenalTab] = useState<ArsenalTab>('trails')
@@ -54,17 +38,17 @@ export default function ProfileContent() {
 
   // Handle profile hook errors
   useEffect(() => {
-    if (profile.error) {
-      setErrorMessage(profile.error)
+    if (profileData.error) {
+      setErrorMessage(profileData.error)
       setTimeout(() => {
         setErrorMessage('')
-        profile.clearError()
+        profileData.clearError()
       }, 5000)
     }
-  }, [profile.error, profile.clearError])
+  }, [profileData.error, profileData.clearError])
 
   // Show loading state
-  if (authLoading || profile.isLoading || !user || !profile.profile) {
+  if (authLoading || profileData.isLoading || !user || !profileData.profile) {
     return (
       <div 
         className="min-h-screen flex items-center justify-center"
@@ -87,12 +71,12 @@ export default function ProfileContent() {
 
   const handleProfileUpdate = async (data: any) => {
     try {
-      const result = await profile.updateProfile(data)
-      if (result.success) {
+      const result = await profileData.updateProfile(data)
+      if (result) {
         setSuccessMessage('Perfil atualizado com sucesso!')
         setTimeout(() => setSuccessMessage(''), 3000)
       } else {
-        setErrorMessage(result.error || 'Erro ao atualizar perfil')
+        setErrorMessage('Erro ao atualizar perfil')
         setTimeout(() => setErrorMessage(''), 5000)
       }
     } catch (error) {
@@ -103,12 +87,12 @@ export default function ProfileContent() {
 
   const handleAvatarUpdate = async (file: File) => {
     try {
-      const result = await profile.updateAvatar(file)
-      if (result.success) {
+      const result = await profileData.uploadAvatar(file)
+      if (result) {
         setSuccessMessage('Avatar atualizado com sucesso!')
         setTimeout(() => setSuccessMessage(''), 3000)
       } else {
-        setErrorMessage(result.error || 'Erro ao atualizar avatar')
+        setErrorMessage('Erro ao atualizar avatar')
         setTimeout(() => setErrorMessage(''), 5000)
       }
     } catch (error) {
@@ -159,17 +143,17 @@ export default function ProfileContent() {
           {/* Profile Header */}
           <ProfileHeader 
             user={user}
-            profile={profile.profile}
-            metrics={profile.metrics}
+            profile={profileData.profile}
+            metrics={profileData.metrics}
             onProfileUpdate={handleProfileUpdate}
             onAvatarUpdate={handleAvatarUpdate}
-            isUpdating={profile.isUpdating}
+            isUpdating={profileData.isUploading || profileData.isSaving}
           />
 
           {/* Next Action Card */}
-          {profile.nextAction && (
+          {profileData.nextAction && (
             <NextActionCard 
-              recommendation={profile.nextAction}
+              recommendation={profileData.nextAction}
               onActionTaken={(actionType) => {
                 console.log('Action taken:', actionType)
                 // Could trigger analytics or profile update here
@@ -182,15 +166,15 @@ export default function ProfileContent() {
             
             {/* Arsenal Section */}
             <ArsenalSection
-              arsenal={profile.arsenal}
+              arsenal={profileData.arsenalData}
               activeTab={activeArsenalTab}
               onTabChange={setActiveArsenalTab}
-              isLoading={profile.isLoading}
+              isLoading={profileData.isLoading}
             />
 
             {/* Referral Section */}
             <ReferralSection
-              referralInfo={profile.referralInfo}
+              referralInfo={profileData.referralInfo}
               activeTab={activeReferralTab}
               onTabChange={setActiveReferralTab}
               onReferralCodeCopy={() => {
