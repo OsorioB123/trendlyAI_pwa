@@ -99,10 +99,10 @@ const getToastStyles = (type: Toast['type']) => {
     case 'error':
       return 'border-red-500/30 bg-red-500/10 text-red-300'
     case 'warning':
-      return 'border-yellow-500/30 bg-yellow-500/10 text-yellow-300'
+      return 'border-white/30 bg-white/10 text-white'
     case 'info':
     default:
-      return 'border-blue-500/30 bg-blue-500/10 text-blue-300'
+      return 'border-white/20 bg-white/5 text-white/90'
   }
 }
 

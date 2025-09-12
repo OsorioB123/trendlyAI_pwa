@@ -197,7 +197,7 @@ export default function RegisterPage() {
   // Show loading spinner while checking authentication state
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-900">
         <div className="text-center text-white">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p className="text-white/70">Carregando...</p>
@@ -209,7 +209,7 @@ export default function RegisterPage() {
   // Success state - email confirmation required
   if (success) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center font-sans text-white p-4 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      <div className="min-h-screen flex flex-col items-center justify-center font-sans text-white p-4 bg-gradient-to-br from-gray-900 via-black to-gray-900">
         <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
 
         <main className="w-full max-w-md flex flex-col items-center">
@@ -258,7 +258,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center font-sans text-white p-4 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen flex flex-col items-center justify-center font-sans text-white p-4 bg-gradient-to-br from-gray-900 via-black to-gray-900">
       {/* Background overlay */}
       <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
 

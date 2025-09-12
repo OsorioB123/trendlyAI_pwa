@@ -140,10 +140,7 @@ body {
 .placeholder-white\/50::placeholder { color: rgba(255, 255, 255, 0.5); }
 
 /* Animation */
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-.animate-spin { animation: spin 1s linear infinite; }
+/* Removed duplicate spin keyframes - using Tailwind's built-in animate-spin */
 
 /* Responsive */
 @media (min-width: 768px) {
@@ -207,20 +204,9 @@ body {
 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* Animations - exact from HTML reference */
-.fade-in-up, .animate-entry {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-.animate-entry.delay-1 { animation-delay: 0.15s; }
-.animate-entry.delay-2 { animation-delay: 0.3s; }
+/* Removed fade-in-up and animate-entry classes - migrated to Framer Motion */
 
-@keyframes fadeInUp { 
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  } 
-}
+/* Removed fadeInUp keyframe - migrated to Framer Motion */
 
 /* Slide system */
 .slide {
@@ -456,17 +442,9 @@ body {
   transform: scale(1); 
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* Removed second duplicate spin keyframe */
 
-.animate-fade-in-up {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
+/* Removed animate-fade-in-up - using Framer Motion */
 
 /* Background gradients */
 .bg-gradient-radial {

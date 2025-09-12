@@ -150,7 +150,7 @@ export default function DashboardPage() {
   const handleTrackClick = (track: Track) => {
     console.log('Track clicked:', track)
     // Navegar para página da trilha específica
-    router.push(`/track/${track.id}`)
+    router.push(`/tracks/${track.id}`)
   }
 
   const handleToolClick = (tool: Tool) => {
