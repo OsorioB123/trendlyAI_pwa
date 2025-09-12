@@ -617,6 +617,232 @@ INSERT INTO public.subscription_plans (name, description, price_brl, price_usd, 
  '{"unlimited_insights": true, "priority_support": true, "advanced_analytics": true, "custom_templates": true, "annual_discount": true}');
 
 -- =====================================================
+-- HELP CENTER TABLES
+-- =====================================================
+
+-- FAQ Categories (tabs in help center)
+CREATE TABLE public.faq_categories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL,
+  description TEXT,
+  icon TEXT,
+  sort_order INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- FAQ Items (questions and answers)
+CREATE TABLE public.faq_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  category_id UUID REFERENCES public.faq_categories(id) ON DELETE CASCADE,
+  question TEXT NOT NULL,
+  answer TEXT NOT NULL,
+  sort_order INTEGER DEFAULT 0,
+  is_featured BOOLEAN DEFAULT false,
+  is_active BOOLEAN DEFAULT true,
+  tags TEXT[] DEFAULT '{}',
+  view_count INTEGER DEFAULT 0,
+  helpful_count INTEGER DEFAULT 0,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Support Tickets (for future chat functionality)
+CREATE TABLE public.support_tickets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  subject TEXT NOT NULL,
+  description TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'waiting_user', 'resolved', 'closed')),
+  priority TEXT NOT NULL DEFAULT 'normal' CHECK (priority IN ('low', 'normal', 'high', 'urgent')),
+  category TEXT,
+  assigned_to UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  resolution TEXT,
+  first_response_at TIMESTAMPTZ,
+  resolved_at TIMESTAMPTZ,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Support Messages (for ticket conversation thread)
+CREATE TABLE public.support_messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  ticket_id UUID REFERENCES public.support_tickets(id) ON DELETE CASCADE,
+  sender_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  message TEXT NOT NULL,
+  is_internal BOOLEAN DEFAULT false,
+  attachments JSONB DEFAULT '[]',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS for help center tables
+ALTER TABLE public.faq_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.faq_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.support_tickets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.support_messages ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for FAQ (public read access)
+CREATE POLICY "Anyone can view active FAQ categories" 
+ON public.faq_categories FOR SELECT 
+TO authenticated 
+USING (is_active = true);
+
+CREATE POLICY "Anyone can view active FAQ items" 
+ON public.faq_items FOR SELECT 
+TO authenticated 
+USING (is_active = true);
+
+-- RLS Policies for support tickets (users can only see their own)
+CREATE POLICY "Users can view their own support tickets" 
+ON public.support_tickets FOR SELECT 
+TO authenticated 
+USING (user_id = auth.uid());
+
+CREATE POLICY "Users can create support tickets" 
+ON public.support_tickets FOR INSERT 
+TO authenticated 
+WITH CHECK (user_id = auth.uid());
+
+CREATE POLICY "Users can update their own support tickets" 
+ON public.support_tickets FOR UPDATE 
+TO authenticated 
+USING (user_id = auth.uid());
+
+-- RLS Policies for support messages
+CREATE POLICY "Users can view messages for their own tickets" 
+ON public.support_messages FOR SELECT 
+TO authenticated 
+USING (
+  EXISTS (
+    SELECT 1 FROM public.support_tickets st 
+    WHERE st.id = support_messages.ticket_id AND st.user_id = auth.uid()
+  )
+  AND is_internal = false
+);
+
+CREATE POLICY "Users can create messages for their own tickets" 
+ON public.support_messages FOR INSERT 
+TO authenticated 
+WITH CHECK (
+  sender_id = auth.uid() AND
+  EXISTS (
+    SELECT 1 FROM public.support_tickets st 
+    WHERE st.id = support_messages.ticket_id AND st.user_id = auth.uid()
+  )
+  AND is_internal = false
+);
+
+-- Indexes for performance
+CREATE INDEX idx_faq_categories_active_order ON public.faq_categories(is_active, sort_order);
+CREATE INDEX idx_faq_items_category_active_order ON public.faq_items(category_id, is_active, sort_order);
+CREATE INDEX idx_faq_items_tags ON public.faq_items USING GIN(tags);
+CREATE INDEX idx_faq_items_featured ON public.faq_items(is_featured, is_active);
+CREATE INDEX idx_support_tickets_user_status ON public.support_tickets(user_id, status);
+CREATE INDEX idx_support_tickets_status_priority ON public.support_tickets(status, priority);
+CREATE INDEX idx_support_tickets_created ON public.support_tickets(created_at DESC);
+CREATE INDEX idx_support_messages_ticket ON public.support_messages(ticket_id, created_at);
+
+-- Triggers for updating updated_at
+CREATE TRIGGER update_faq_categories_updated_at 
+  BEFORE UPDATE ON public.faq_categories 
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_faq_items_updated_at 
+  BEFORE UPDATE ON public.faq_items 
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_support_tickets_updated_at 
+  BEFORE UPDATE ON public.support_tickets 
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Function to increment view count for FAQ items
+CREATE OR REPLACE FUNCTION increment_faq_view_count(item_id UUID)
+RETURNS VOID AS $$
+BEGIN
+  UPDATE public.faq_items 
+  SET view_count = view_count + 1 
+  WHERE id = item_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Sample FAQ categories data
+INSERT INTO public.faq_categories (slug, name, description, icon, sort_order) VALUES
+('primeiros-passos', 'Primeiros Passos', 'Como começar a usar a TrendlyAI', 'Rocket', 1),
+('assinatura', 'Assinatura', 'Dúvidas sobre planos e pagamentos', 'Gem', 2),
+('ferramentas', 'Ferramentas', 'Como usar as ferramentas de IA', 'Zap', 3),
+('tecnico', 'Questões Técnicas', 'Problemas técnicos e suporte', 'HardDrive', 4);
+
+-- Sample FAQ items data
+INSERT INTO public.faq_items (category_id, question, answer, sort_order, is_featured) VALUES
+-- Primeiros Passos
+((SELECT id FROM public.faq_categories WHERE slug = 'primeiros-passos'), 
+ 'O que é a TrendlyAI?', 
+ 'TrendlyAI é sua orquestra de inteligência artificial para criação de conteúdo. Combinamos ferramentas de IA, trilhas de aprendizado e a assistente Salina para ajudar você a criar conteúdo de alta performance de forma mais rápida e estratégica.', 
+ 1, true),
+
+((SELECT id FROM public.faq_categories WHERE slug = 'primeiros-passos'), 
+ 'Como começo a usar as ferramentas?', 
+ 'A melhor forma de começar é pela Home. Você pode conversar diretamente com a Salina sobre o que deseja criar ou explorar as "Ferramentas recomendadas". Cada ferramenta possui um prompt pronto para uso que você pode abrir, editar e copiar com um clique.', 
+ 2, false),
+
+((SELECT id FROM public.faq_categories WHERE slug = 'primeiros-passos'), 
+ 'O que são as Trilhas?', 
+ 'As Trilhas são jornadas de aprendizado guiadas que combinam teoria e prática. Elas ensinam conceitos de marketing e criação de conteúdo, e integram as ferramentas da TrendlyAI para você aplicar o conhecimento imediatamente.', 
+ 3, false),
+
+-- Assinatura
+((SELECT id FROM public.faq_categories WHERE slug = 'assinatura'), 
+ 'Como funciona o cancelamento?', 
+ 'Você pode cancelar sua assinatura a qualquer momento através do seu painel de "Gerenciar Assinatura" no menu do seu perfil. O acesso permanecerá ativo até o final do período já pago.', 
+ 1, true),
+
+((SELECT id FROM public.faq_categories WHERE slug = 'assinatura'), 
+ 'Quais são as formas de pagamento?', 
+ 'Aceitamos os principais cartões de crédito (Visa, MasterCard, American Express) e PIX para planos anuais. Todo o processamento é feito de forma segura por nosso parceiro de pagamentos.', 
+ 2, false),
+
+((SELECT id FROM public.faq_categories WHERE slug = 'assinatura'), 
+ 'Posso trocar de plano depois?', 
+ 'Sim! Você pode fazer upgrade ou downgrade do seu plano a qualquer momento. As alterações são aplicadas no próximo ciclo de cobrança, exceto para upgrades que são aplicados imediatamente.', 
+ 3, false),
+
+-- Ferramentas
+((SELECT id FROM public.faq_categories WHERE slug = 'ferramentas'), 
+ 'Como uso os prompts das ferramentas?', 
+ 'Cada ferramenta tem um prompt otimizado que você pode visualizar, editar e copiar. Clique em "Abrir ferramenta", personalize os campos necessários e depois copie o prompt para usar no ChatGPT, Claude ou qualquer IA de sua preferência.', 
+ 1, true),
+
+((SELECT id FROM public.faq_categories WHERE slug = 'ferramentas'), 
+ 'Posso salvar meus trabalhos?', 
+ 'Sim! Você pode salvar seus prompts personalizados e resultados na sua biblioteca pessoal. Isso permite reutilizar estratégias que funcionaram bem e manter um histórico dos seus melhores conteúdos.', 
+ 2, false),
+
+((SELECT id FROM public.faq_categories WHERE slug = 'ferramentas'), 
+ 'Quantas ferramentas estão disponíveis?', 
+ 'Temos mais de 50 ferramentas organizadas por categorias como redes sociais, e-mail marketing, copywriting, storytelling e análise de tendências. Adicionamos novas ferramentas regularmente baseadas no feedback dos usuários.', 
+ 3, false),
+
+-- Técnico
+((SELECT id FROM public.faq_categories WHERE slug = 'tecnico'), 
+ 'A plataforma funciona no celular?', 
+ 'Sim! A TrendlyAI é totalmente responsiva e funciona perfeitamente em todos os dispositivos. Você pode acessar ferramentas, trilhas e conversar com a Salina tanto no computador quanto no smartphone.', 
+ 1, true),
+
+((SELECT id FROM public.faq_categories WHERE slug = 'tecnico'), 
+ 'Meus dados estão seguros?', 
+ 'Absolutamente. Usamos criptografia de ponta a ponta e seguimos as melhores práticas de segurança da indústria. Seus dados nunca são compartilhados com terceiros e você pode deletar sua conta a qualquer momento.', 
+ 2, false),
+
+((SELECT id FROM public.faq_categories WHERE slug = 'tecnico'), 
+ 'Posso usar offline?', 
+ 'A TrendlyAI requer conexão com a internet para funcionar, pois depende de IA em tempo real. Porém, você pode copiar e salvar localmente os prompts e resultados para usar offline posteriormente.', 
+ 3, false);
+
+-- =====================================================
 -- ENABLE REALTIME (Run in Supabase dashboard)
 -- =====================================================
 -- ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
@@ -624,3 +850,6 @@ INSERT INTO public.subscription_plans (name, description, price_brl, price_usd, 
 -- ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;
 -- ALTER PUBLICATION supabase_realtime ADD TABLE public.subscriptions;
 -- ALTER PUBLICATION supabase_realtime ADD TABLE public.billing_history;
+-- ALTER PUBLICATION supabase_realtime ADD TABLE public.faq_categories;
+-- ALTER PUBLICATION supabase_realtime ADD TABLE public.faq_items;
+-- ALTER PUBLICATION supabase_realtime ADD TABLE public.support_tickets;
