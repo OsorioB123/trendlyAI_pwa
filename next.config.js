@@ -2,12 +2,13 @@
 const nextConfig = {
   reactStrictMode: true,
   serverExternalPackages: ['@supabase/supabase-js'],
+  // Disable static optimization completely for problem pages
   experimental: {
-    // Disable static generation for pages that use Supabase
-    missingSuspenseWithCSRBailout: false,
+    outputFileTracingRoot: process.cwd(),
   },
-  // Force dynamic rendering for pages that need runtime environment variables
-  generateStaticParams: false,
+  async generateBuildId() {
+    return 'build-' + Date.now()
+  },
   images: {
     remotePatterns: [
       {
