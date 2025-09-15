@@ -3,7 +3,8 @@
  * Manages user onboarding status and flow
  */
 
-export const ONBOARDING_STORAGE_KEY = 'trendly-onboarding-completed'
+// Unified key across app, middleware and auth flows
+export const ONBOARDING_STORAGE_KEY = 'trendlyai-onboarding-completed'
 
 /**
  * Check if user has completed onboarding
@@ -26,7 +27,11 @@ export function markOnboardingComplete(): void {
   if (typeof window === 'undefined') return
   
   try {
+    // Persist in localStorage for client logic
     localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true')
+    // Also set a cookie so middleware/SSR can read it
+    const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:'
+    document.cookie = `${ONBOARDING_STORAGE_KEY}=true; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax${isSecure ? '; Secure' : ''}`
   } catch (error) {
     console.error('Error marking onboarding complete:', error)
   }
@@ -40,6 +45,9 @@ export function clearOnboardingStatus(): void {
   
   try {
     localStorage.removeItem(ONBOARDING_STORAGE_KEY)
+    // Clear cookie by setting Max-Age=0
+    const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:'
+    document.cookie = `${ONBOARDING_STORAGE_KEY}=; Path=/; Max-Age=0; SameSite=Lax${isSecure ? '; Secure' : ''}`
   } catch (error) {
     console.error('Error clearing onboarding status:', error)
   }

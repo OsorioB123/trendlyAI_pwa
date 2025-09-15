@@ -7,6 +7,7 @@ import { MOTION_CONSTANTS, respectReducedMotion } from '../../lib/motion'
 import { ArrowRight, Check } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useBackground } from '../../contexts/BackgroundContext'
+import { markOnboardingComplete } from '../../lib/onboarding'
 
 interface Theme {
   id: string
@@ -242,7 +243,10 @@ export default function OnboardingPage() {
       // Complete onboarding
       console.log(`Onboarding concluído! Tema selecionado: ${selectedThemeId}`)
       
-      // Save selected theme
+      // Persist completion flag (localStorage + cookie for middleware)
+      markOnboardingComplete()
+      
+      // Save selected theme preference
       await changeBackground(selectedThemeId)
       
       // Navigate to dashboard
@@ -253,6 +257,8 @@ export default function OnboardingPage() {
   // Handle skip
   const handleSkip = useCallback(() => {
     console.log("Navegar para a próxima página (pulou)")
+    // Mark onboarding as complete when skipping as well
+    markOnboardingComplete()
     router.push('/dashboard')
   }, [router])
 
