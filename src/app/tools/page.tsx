@@ -11,9 +11,9 @@ import {
   ArchiveX
 } from 'lucide-react'
 import Header from '../../components/layout/Header'
-import ToolCard from '../../components/tools/ToolCard'
+import ToolCard from '../../components/cards/ToolCard'
 import ToolsFiltersDrawer from '../../components/tools/ToolsFiltersDrawer'
-import ToolModal from '../../components/tools/ToolModal'
+import ToolModal from '../../components/modals/ToolModal'
 import { HeaderVariant } from '../../types/header'
 import { Tool, ToolsFilters, ToolCategory, ToolType, AICompatibility } from '../../types/tool'
 import { useBackground } from '../../contexts/BackgroundContext'
@@ -438,15 +438,7 @@ export default function ToolsPage() {
   }, [filters])
 
   return (
-    <div 
-      className="min-h-screen pt-24 px-4"
-      style={{
-        backgroundImage: `url('${currentBackground.value}')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
-      }}
-    >
+    <div className="min-h-screen bg-black text-white pt-24 px-4">
       <Header variant={HeaderVariant.SECONDARY} />
       
       {/* Main Content */}
@@ -461,14 +453,10 @@ export default function ToolsPage() {
           </p>
         </div>
 
-        {/* Enhanced Control Panel with Advanced Liquid Glass - Tablet-Optimized */}
-        <div className="
-          grid grid-cols-1 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-3 p-3 mb-6 rounded-xl overflow-hidden
-          relative backdrop-blur-[36px] 
-          shadow-[0_8px_32px_rgba(0,0,0,0.25),0_2px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.05)]
-        ">
+        {/* Filtros: preto e branco, sem degradês */}
+        <div className="grid grid-cols-1 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-3 p-3 mb-6 rounded-xl border border-white/15 bg-black">
           {/* Advanced Glass Background */}
-          <div className="absolute inset-0">
+          <div className="hidden">
             {/* Base frosted layer */}
             <div 
               className="absolute inset-0 backdrop-blur-[32px]"
@@ -514,69 +502,42 @@ export default function ToolsPage() {
           </div>
           
           {/* Search Bar - Enhanced Glass - Responsive Span */}
-          <div className="md:col-span-4 lg:col-span-5 xl:col-span-6 relative z-10">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none z-10" />
+          <div className="md:col-span-4 lg:col-span-5 xl:col-span-6 relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none" />
             <input
               type="text"
               placeholder="Busque por objetivo, técnica ou ferramenta..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="
-                w-full h-12 py-2.5 pl-12 pr-4 text-white placeholder-white/50 rounded-xl
-                backdrop-blur-[20px] bg-gradient-to-br from-white/[0.08] to-white/[0.04]
-                border border-white/[0.12] transition-all duration-300
-                shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.08)]
-                focus:outline-none focus:from-white/[0.12] focus:to-white/[0.06] 
-                focus:border-white/[0.2] focus:shadow-[0_4px_16px_rgba(0,0,0,0.15),0_0_0_2px_rgba(255,255,255,0.1)]
-              "
+              className="w-full h-12 py-2.5 pl-12 pr-4 text-white placeholder-white/50 rounded-xl bg-black border border-white/20 focus:outline-none focus:border-white/40"
             />
           </div>
           
           {/* Category Dropdown - Enhanced Glass - Responsive Span */}
-          <div className="md:col-span-2 lg:col-span-2 xl:col-span-3 relative z-10">
+          <div className="md:col-span-2 lg:col-span-2 xl:col-span-3 relative">
             <select
               value={filters.category}
               onChange={(e) => updateFilter('category', e.target.value as 'all' | ToolCategory)}
-              className="
-                w-full h-12 px-4 text-white appearance-none cursor-pointer rounded-xl
-                backdrop-blur-[20px] bg-gradient-to-br from-white/[0.08] to-white/[0.04]
-                border border-white/[0.12] transition-all duration-300
-                shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.08)]
-                focus:outline-none focus:from-white/[0.12] focus:to-white/[0.06] 
-                focus:border-white/[0.2] focus:shadow-[0_4px_16px_rgba(0,0,0,0.15),0_0_0_2px_rgba(255,255,255,0.1)]
-              "
+              className="w-full h-12 px-4 text-white bg-black border border-white/20 rounded-xl appearance-none focus:outline-none focus:border-white/40"
             >
-              <option value="all" className="bg-gray-800">Todas as Categorias</option>
+              <option value="all" className="bg-black">Todas as Categorias</option>
               {ALL_CATEGORIES.map(category => (
-                <option key={category} value={category} className="bg-gray-800">{category}</option>
+                <option key={category} value={category} className="bg-black">{category}</option>
               ))}
             </select>
-            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
           </div>
           
           {/* Filters Button - Enhanced Glass - Responsive Span */}
-          <div className="md:col-span-2 lg:col-span-2 xl:col-span-2 relative z-10">
+          <div className="md:col-span-2 lg:col-span-2 xl:col-span-2">
             <button
               onClick={() => setShowFiltersDrawer(true)}
-              className="
-                w-full h-12 flex items-center justify-between px-4 text-white rounded-xl transition-all duration-300
-                backdrop-blur-[20px] bg-gradient-to-br from-white/[0.08] to-white/[0.04]
-                border border-white/[0.12] 
-                shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.08)]
-                hover:from-white/[0.12] hover:to-white/[0.06] hover:border-white/[0.15]
-                hover:shadow-[0_4px_16px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.12)]
-                focus:outline-none focus:shadow-[0_0_0_2px_rgba(255,255,255,0.1)]
-              "
+              className="w-full h-12 flex items-center justify-between px-4 text-white rounded-xl bg-black border border-white/20 hover:border-white/40"
             >
               <span className="truncate pr-2">Filtros</span>
               <SlidersHorizontal className="w-4 h-4 text-white/60" />
               {activeFiltersCount > 0 && (
-                <div className="
-                  absolute -top-2 -right-2 w-5 h-5 rounded-full text-xs font-semibold 
-                  flex items-center justify-center text-gray-900
-                  backdrop-blur-[16px] bg-gradient-to-br from-white/[0.9] to-white/[0.8]
-                  border border-white/[0.3] shadow-[0_2px_6px_rgba(0,0,0,0.15)]
-                ">
+                <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full text-xs font-semibold flex items-center justify-center text-black bg-white border border-white/60">
                   {activeFiltersCount}
                 </div>
               )}
@@ -584,23 +545,16 @@ export default function ToolsPage() {
           </div>
           
           {/* Sort Dropdown - Enhanced Glass - Responsive Span */}
-          <div className="md:col-span-0 md:hidden lg:block lg:col-span-1 xl:col-span-1 relative z-10">
+          <div className="md:col-span-0 md:hidden lg:block lg:col-span-1 xl:col-span-1 relative">
             <select
               value={filters.sort}
               onChange={(e) => updateFilter('sort', e.target.value as 'relevance' | 'recent')}
-              className="
-                w-full h-12 px-4 text-white appearance-none cursor-pointer rounded-xl
-                backdrop-blur-[20px] bg-gradient-to-br from-white/[0.08] to-white/[0.04]
-                border border-white/[0.12] transition-all duration-300
-                shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.08)]
-                focus:outline-none focus:from-white/[0.12] focus:to-white/[0.06] 
-                focus:border-white/[0.2] focus:shadow-[0_4px_16px_rgba(0,0,0,0.15),0_0_0_2px_rgba(255,255,255,0.1)]
-              "
+              className="w-full h-12 px-4 text-white bg-black border border-white/20 rounded-xl appearance-none focus:outline-none focus:border-white/40"
             >
-              <option value="relevance" className="bg-gray-800">Relevantes</option>
-              <option value="recent" className="bg-gray-800">Recentes</option>
+              <option value="relevance" className="bg-black">Relevantes</option>
+              <option value="recent" className="bg-black">Recentes</option>
             </select>
-            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
           </div>
         </div>
         
@@ -610,41 +564,26 @@ export default function ToolsPage() {
             <select
               value={filters.sort}
               onChange={(e) => updateFilter('sort', e.target.value as 'relevance' | 'recent')}
-              className="
-                w-full h-12 px-4 text-white appearance-none cursor-pointer rounded-xl
-                backdrop-blur-[20px] bg-gradient-to-br from-white/[0.08] to-white/[0.04]
-                border border-white/[0.12] transition-all duration-300
-                shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.08)]
-                focus:outline-none focus:from-white/[0.12] focus:to-white/[0.06] 
-                focus:border-white/[0.2] focus:shadow-[0_4px_16px_rgba(0,0,0,0.15),0_0_0_2px_rgba(255,255,255,0.1)]
-              "
+              className="w-full h-12 px-4 text-white bg-black border border-white/20 rounded-xl appearance-none focus:outline-none focus:border-white/40"
             >
-              <option value="relevance" className="bg-gray-800">🔥 Mais Relevantes</option>
-              <option value="recent" className="bg-gray-800">⏰ Mais Recentes</option>
+              <option value="relevance" className="bg-black">🔥 Mais Relevantes</option>
+              <option value="recent" className="bg-black">⏰ Mais Recentes</option>
             </select>
-            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
           </div>
         </div>
 
-        {/* Enhanced Quick Category Filters */}
+        {/* Filtros rápidos: preto e branco */}
         <div className="flex flex-wrap gap-2 mb-6">
           {quickCategories.map((category, index) => (
             <button
               key={category}
               onClick={() => updateFilter('category', filters.category === category ? 'all' : category)}
-              className={`
-                px-3 py-2 text-sm rounded-full transition-all duration-300 backdrop-blur-[16px]
-                shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.1)]
-                hover:shadow-[0_4px_12px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.15)]
-                hover:-translate-y-0.5
-                ${filters.category === category
-                  ? 'bg-gradient-to-br from-white/[0.25] to-white/[0.15] text-white border border-white/[0.3]'
-                  : 'bg-gradient-to-br from-white/[0.08] to-white/[0.04] text-white/80 border border-white/[0.12] hover:from-white/[0.12] hover:to-white/[0.06]'
-                }
-              `}
-              style={{ 
-                animationDelay: `${index * 50}ms`,
-              }}
+              className={`px-3 py-2 text-sm rounded-full transition-colors border ${
+                filters.category === category
+                  ? 'text-white border-white/40 bg-black'
+                  : 'text-white/80 border-white/20 bg-black hover:text-white hover:border-white/40'
+              }`}
             >
               {category}
             </button>
@@ -673,11 +612,7 @@ export default function ToolsPage() {
 
         {/* Error Toast */}
         {error && (
-          <div className="
-            fixed top-24 right-4 z-50 p-4 rounded-lg text-white border shadow-lg
-            backdrop-blur-[24px] bg-gradient-to-br from-red-500/[0.9] to-red-600/[0.8]
-            border-red-400/[0.5] shadow-[0_8px_24px_rgba(220,38,38,0.25)]
-          ">
+          <div className="fixed top-24 right-4 z-50 p-4 rounded-lg text-white border border-white/20 bg-black shadow-lg">
             <p className="font-medium drop-shadow-sm">{error}</p>
           </div>
         )}
@@ -790,7 +725,7 @@ export default function ToolsPage() {
             ))}
           </div>
         ) : (
-          /* Enhanced Empty State */
+          /* Empty State */
           <div className="text-center py-16">
             <div className="
               w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center
@@ -969,21 +904,11 @@ export default function ToolsPage() {
         onFiltersChange={updateFilters}
       />
 
-      {/* Tool Modal */}
+      {/* Tool Modal (mesmo da Dashboard) */}
       <ToolModal
         tool={selectedTool}
         isOpen={selectedTool !== null}
         onClose={() => setSelectedTool(null)}
-        onCopy={(content) => {
-          navigator.clipboard.writeText(content)
-          // Show toast notification (can be enhanced later)
-          console.log('Prompt copiado!')
-        }}
-        onSave={(toolId, content) => {
-          // Handle save logic here
-          console.log('Tool saved:', toolId, content)
-          return Promise.resolve()
-        }}
       />
     </div>
   )
