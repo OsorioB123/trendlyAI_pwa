@@ -12,16 +12,15 @@ import NextActionCard from '../../components/profile/NextActionCard'
 import ArsenalSection from '../../components/profile/ArsenalSection'
 import ReferralSection from '../../components/profile/ReferralSection'
 import type { ArsenalTab, ReferralTab } from '../../types/profile'
+import { useBackground } from '../../contexts/BackgroundContext'
 
-// Mock background for now - in production this would come from user settings
-const CURRENT_BACKGROUND = {
-  value: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80'
-}
+// Background comes from user preferences via BackgroundContext
 
 export default function ProfileContent() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
   const profileData = useProfile()
+  const { currentBackground } = useBackground()
 
   // UI state
   const [activeArsenalTab, setActiveArsenalTab] = useState<ArsenalTab>('trails')
@@ -53,7 +52,7 @@ export default function ProfileContent() {
       <div 
         className="min-h-screen flex items-center justify-center"
         style={{
-          backgroundImage: `url("${CURRENT_BACKGROUND.value}?w=800&q=80")`,
+          backgroundImage: `url("${currentBackground.value}?w=800&q=80")`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -105,7 +104,7 @@ export default function ProfileContent() {
     <div 
       className="min-h-screen relative"
       style={{
-        backgroundImage: `url("${CURRENT_BACKGROUND.value}?w=1920&q=80")`,
+        backgroundImage: `url("${currentBackground.value}?w=1920&q=80")`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
@@ -113,7 +112,7 @@ export default function ProfileContent() {
       }}
     >
       {/* Background overlay */}
-      <div className="fixed inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent -z-10" />
+      <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
 
       {/* Header */}
       <Header 

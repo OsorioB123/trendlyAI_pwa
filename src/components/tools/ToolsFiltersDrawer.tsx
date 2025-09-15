@@ -2,42 +2,27 @@
 
 import React, { useCallback, useEffect, useState, useRef } from 'react'
 import { X } from 'lucide-react'
-import { ToolsFilters, ToolType, AICompatibility } from '../../types/tool'
+import { ToolsFilters, ToolCategory } from '../../types/tool'
 
 interface ToolsFiltersDrawerProps {
   isOpen: boolean
   onClose: () => void
   filters: ToolsFilters
   onFiltersChange: (filters: Partial<ToolsFilters>) => void
+  categories?: ToolCategory[]
 }
 
-// Filter options based on HTML reference and UX research
-const TOOL_TYPES: { value: ToolType; label: string }[] = [
-  { value: 'text-generation', label: 'Geração de Texto' },
-  { value: 'image-generation', label: 'Geração de Imagem' },
-  { value: 'data-analysis', label: 'Análise de Dados' },
-  { value: 'research', label: 'Pesquisa' }
-]
-
-const AI_COMPATIBILITY: { value: AICompatibility; label: string }[] = [
-  { value: 'ChatGPT', label: 'Otimizado para ChatGPT' },
-  { value: 'Claude', label: 'Otimizado para Claude' },
-  { value: 'Gemini', label: 'Otimizado para Gemini' },
-  { value: 'Midjourney', label: 'Otimizado para Midjourney' },
-  { value: 'DALL-E', label: 'Otimizado para DALL-E' },
-  { value: 'Stable Diffusion', label: 'Otimizado para Stable Diffusion' }
-]
-
+// Somente filtros compatíveis: favoritos e ordenação
 const ACTIVITY_OPTIONS = [
-  { value: 'isFavorite' as const, label: 'Meus Favoritos' },
-  { value: 'isEdited' as const, label: 'Editados por mim' }
+  { value: 'isFavorite' as const, label: 'Meus Favoritos' }
 ]
 
 export default function ToolsFiltersDrawer({ 
   isOpen, 
   onClose, 
   filters, 
-  onFiltersChange 
+  onFiltersChange,
+  categories = []
 }: ToolsFiltersDrawerProps) {
   const [tempFilters, setTempFilters] = useState<ToolsFilters>(filters)
   const drawerRef = useRef<HTMLDivElement>(null)
@@ -106,7 +91,7 @@ export default function ToolsFiltersDrawer({
     }
   }, [isOpen, onClose])
 
-  const handleToggleArrayFilter = useCallback(<K extends keyof Pick<ToolsFilters, 'type' | 'compatibility' | 'activity'>>(
+  const handleToggleArrayFilter = useCallback(<K extends keyof Pick<ToolsFilters, 'activity'>>(
     key: K,
     value: string
   ) => {
@@ -120,12 +105,12 @@ export default function ToolsFiltersDrawer({
 
   const handleClearFilters = useCallback(() => {
     const clearedFilters: ToolsFilters = {
-      search: filters.search, // Keep search
-      category: 'all', // Reset category
-      sort: filters.sort, // Keep sort
-      type: [],
-      compatibility: [],
-      activity: []
+      search: filters.search, // mantém busca
+      category: filters.category, // não altera categoria aqui
+      sort: filters.sort, // mantém ordenação
+      type: [], // removido do UI
+      compatibility: [], // removido do UI
+      activity: [] // limpa atividade
     }
     setTempFilters(clearedFilters)
   }, [filters.search, filters.sort])
@@ -142,7 +127,7 @@ export default function ToolsFiltersDrawer({
   }, [onClose])
 
   // Count active filters
-  const activeFiltersCount = tempFilters.type.length + tempFilters.compatibility.length + tempFilters.activity.length
+  const activeFiltersCount = (tempFilters.category !== 'all' ? 1 : 0) + tempFilters.activity.length
 
   if (!isOpen) return null
 
@@ -150,7 +135,7 @@ export default function ToolsFiltersDrawer({
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300"
+        className="fixed inset-0 bg-black/70 z-40 transition-opacity duration-300"
         onClick={handleBackdropClick}
         style={{ opacity: isOpen ? 1 : 0 }}
         aria-hidden="true"
@@ -163,8 +148,8 @@ export default function ToolsFiltersDrawer({
           fixed z-50 
           lg:top-0 lg:right-0 lg:h-full lg:w-full lg:max-w-md 
           bottom-0 left-0 right-0 max-h-[85vh]
-          bg-gray-900/95 backdrop-blur-[20px] border-white/15 overflow-y-auto
-          lg:border-l border-t lg:border-t-0
+          bg-black overflow-y-auto
+          border border-white/20 lg:border-l lg:border-t-0
           transform transition-transform duration-300 ease-out
           ${isOpen 
             ? 'translate-y-0 lg:translate-x-0' 
@@ -190,84 +175,46 @@ export default function ToolsFiltersDrawer({
             <button
               ref={firstFocusableRef}
               onClick={onClose}
-              className="min-w-[44px] min-h-[44px] rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-transparent"
+              className="min-w-[44px] min-h-[44px] rounded-full bg-black border border-white/20 flex items-center justify-center text-white hover:border-white/40 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30"
               aria-label="Fechar painel de filtros"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Tool Type Section */}
+          {/* Categoria */}
           <fieldset className="mb-8">
-            <legend className="text-lg font-medium text-white mb-4">TIPO DE FERRAMENTA</legend>
-            <div className="space-y-3" role="group" aria-labelledby="tool-type-legend">
-              {TOOL_TYPES.map(type => (
-                <label key={type.value} className="flex items-center cursor-pointer group min-h-[44px]">
-                  <div className="relative flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={tempFilters.type.includes(type.value)}
-                      onChange={() => handleToggleArrayFilter('type', type.value)}
-                      className="sr-only"
-                    />
-                    <div className={`
-                      w-6 h-6 rounded border-2 transition-all duration-200 flex items-center justify-center
-                      ${tempFilters.type.includes(type.value)
-                        ? 'bg-white border-white'
-                        : 'border-white/40 hover:border-white/60 group-focus-within:border-white'
-                      }
-                    `}>
-                      {tempFilters.type.includes(type.value) && (
-                        <svg className="w-4 h-4 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                    </div>
-                  </div>
-                  <span className="ml-3 text-white group-hover:text-white/80 transition-colors duration-200 flex-1 py-2">
-                    {type.label}
-                  </span>
-                </label>
-              ))}
+            <legend className="text-lg font-medium text-white mb-4">CATEGORIA</legend>
+            <div className="space-y-3">
+              <select
+                value={tempFilters.category}
+                onChange={(e) => setTempFilters(prev => ({ ...prev, category: e.target.value as any }))}
+                className="w-full h-12 px-4 text-white bg-black border border-white/20 rounded-xl appearance-none focus:outline-none focus:border-white/40"
+              >
+                <option value="all" className="bg-black">Todas as Categorias</option>
+                {categories.map(cat => (
+                  <option key={cat} value={cat} className="bg-black">{cat}</option>
+                ))}
+              </select>
             </div>
           </fieldset>
 
-          {/* AI Compatibility Section */}
+          {/* Ordenação */}
           <fieldset className="mb-8">
-            <legend className="text-lg font-medium text-white mb-4">COMPATIBILIDADE</legend>
-            <div className="space-y-3" role="group" aria-labelledby="compatibility-legend">
-              {AI_COMPATIBILITY.map(ai => (
-                <label key={ai.value} className="flex items-center cursor-pointer group min-h-[44px]">
-                  <div className="relative flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={tempFilters.compatibility.includes(ai.value)}
-                      onChange={() => handleToggleArrayFilter('compatibility', ai.value)}
-                      className="sr-only"
-                    />
-                    <div className={`
-                      w-6 h-6 rounded border-2 transition-all duration-200 flex items-center justify-center
-                      ${tempFilters.compatibility.includes(ai.value)
-                        ? 'bg-white border-white'
-                        : 'border-white/40 hover:border-white/60 group-focus-within:border-white'
-                      }
-                    `}>
-                      {tempFilters.compatibility.includes(ai.value) && (
-                        <svg className="w-4 h-4 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                    </div>
-                  </div>
-                  <span className="ml-3 text-white group-hover:text-white/80 transition-colors duration-200 flex-1 py-2">
-                    {ai.label}
-                  </span>
-                </label>
-              ))}
+            <legend className="text-lg font-medium text-white mb-4">ORDENAR POR</legend>
+            <div className="space-y-3" role="group" aria-labelledby="sort-legend">
+              <select
+                value={tempFilters.sort}
+                onChange={(e) => setTempFilters(prev => ({ ...prev, sort: e.target.value as any }))}
+                className="w-full h-12 px-4 text-white bg-black border border-white/20 rounded-xl appearance-none focus:outline-none focus:border-white/40"
+              >
+                <option value="relevance" className="bg-black">Mais Relevantes</option>
+                <option value="recent" className="bg-black">Mais Recentes</option>
+              </select>
             </div>
           </fieldset>
 
-          {/* Activity Section */}
+          {/* Minha Atividade */}
           <fieldset className="mb-8">
             <legend className="text-lg font-medium text-white mb-4">MINHA ATIVIDADE</legend>
             <div className="space-y-3" role="group" aria-labelledby="activity-legend">
@@ -303,10 +250,10 @@ export default function ToolsFiltersDrawer({
           </fieldset>
 
           {/* Actions Footer */}
-          <div className="flex gap-3 sticky bottom-0 bg-gray-900/95 pt-4 -mx-6 px-6 pb-6 border-t border-white/10">
+          <div className="flex gap-3 sticky bottom-0 bg-black pt-4 -mx-6 px-6 pb-6 border-t border-white/20">
             <button
               onClick={handleClearFilters}
-              className="flex-1 min-h-[48px] px-4 py-3 rounded-xl bg-white/5 text-white/80 border border-white/10 hover:bg-white/10 transition-all duration-200 font-medium focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-transparent"
+              className="flex-1 min-h-[48px] px-4 py-3 rounded-xl bg-black text-white/80 border border-white/20 hover:border-white/40 transition-all duration-200 font-medium focus:outline-none focus:ring-2 focus:ring-white/20"
             >
               Limpar
             </button>
@@ -314,10 +261,10 @@ export default function ToolsFiltersDrawer({
               ref={lastFocusableRef}
               onClick={handleApplyFilters}
               className={`
-                flex-1 min-h-[48px] px-4 py-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-transparent
+                flex-1 min-h-[48px] px-4 py-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/20
                 ${activeFiltersCount > 0 
-                  ? 'bg-white/20 text-white hover:bg-white/25'
-                  : 'bg-white/10 text-white/80 hover:bg-white/15'
+                  ? 'bg-black text-white border border-white/40 hover:border-white/60'
+                  : 'bg-black text-white/80 border border-white/20 hover:border-white/30'
                 }
               `}
               aria-describedby="apply-button-description"

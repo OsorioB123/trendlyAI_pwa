@@ -15,237 +15,20 @@ import ToolCard from '../../components/cards/ToolCard'
 import ToolsFiltersDrawer from '../../components/tools/ToolsFiltersDrawer'
 import ToolModal from '../../components/modals/ToolModal'
 import { HeaderVariant } from '../../types/header'
-import { Tool, ToolsFilters, ToolCategory, ToolType, AICompatibility } from '../../types/tool'
+import { Tool, ToolsFilters, ToolCategory } from '../../types/tool'
 import { useBackground } from '../../contexts/BackgroundContext'
+import { supabase } from '../../lib/supabase'
+import type { Database } from '@/types/database'
 
-// Mock data baseado no HTML de referência e UX research
-const MOCK_TOOLS: Tool[] = [
-  {
-    id: "p01",
-    title: "Roteiro Viral em 30 Segundos",
-    description: "Transforme qualquer ideia em uma estrutura de roteiro de 3 atos para engajamento máximo.",
-    category: "Copywriting",
-    type: "text-generation",
-    compatibility: ["ChatGPT", "Claude", "Gemini"],
-    tags: ["roteiro", "storytelling", "reels"],
-    content: `Você é um roteirista viral especializado em conteúdo de redes sociais...
-
-[INSTRUÇÕES]
-Crie um roteiro viral de 30 segundos seguindo a estrutura:
-
-1. GANCHO (0-3s): Uma frase ou pergunta que prende a atenção imediatamente
-2. DESENVOLVIMENTO (3-25s): Conte a história ou apresente o conteúdo principal
-3. CALL TO ACTION (25-30s): Termine com um convite claro para engajamento
-
-[TÓPICO]
-{seu_topico_aqui}
-
-[OUTPUT]
-Formate como roteiro com timing e direções visuais.`,
-    isFavorite: false,
-    isEdited: true
-  },
-  {
-    id: "p02",
-    title: "Títulos Otimizados para SEO",
-    description: "Gere títulos magnéticos e otimizados para os mecanismos de busca que aumentam o CTR.",
-    category: "SEO",
-    type: "text-generation",
-    compatibility: ["ChatGPT", "Claude"],
-    tags: ["seo", "títulos", "blog"],
-    content: `Crie 5 títulos SEO-otimizados para o seguinte conteúdo...
-
-[DIRETRIZES]
-- Máximo 60 caracteres
-- Inclua a palavra-chave principal no início
-- Use power words (como 'definitivo', 'completo', 'secreto')
-- Crie urgência ou curiosidade
-- Seja específico com números quando possível
-
-[CONTEÚDO]
-{seu_conteudo_aqui}
-
-[PALAVRA-CHAVE]
-{palavra_chave_principal}
-
-[OUTPUT]
-Retorne 5 opções numeradas com explicação do por que cada uma funciona.`,
-    isFavorite: false,
-    isEdited: false
-  },
-  {
-    id: "p03",
-    title: "Cenário 3D Fotorrealista",
-    description: "Crie um prompt detalhado para gerar uma cena de floresta mística ao amanhecer.",
-    category: "Imagem",
-    type: "image-generation",
-    compatibility: ["Midjourney", "DALL-E", "Stable Diffusion"],
-    tags: ["3d", "cenário", "iluminação"],
-    content: "/imagine prompt: mystical forest at golden hour, ancient towering trees with twisted branches, soft volumetric light rays piercing through morning mist, moss-covered fallen logs, delicate wildflowers scattered on forest floor, ethereal atmosphere, photorealistic 3D render, octane render, ultra detailed, 8k resolution, cinematic lighting, depth of field, fantasy environment --ar 16:9 --v 6 --style raw",
-    isFavorite: false,
-    isEdited: false
-  },
-  {
-    id: "p04",
-    title: "Análise de Sentimento de Comentários",
-    description: "Analise um bloco de texto e classifique o sentimento predominante (positivo, negativo, neutro).",
-    category: "Análise",
-    type: "data-analysis",
-    compatibility: ["ChatGPT", "Claude", "Gemini"],
-    tags: ["dados", "sentimento", "feedback"],
-    content: `Analise os seguintes comentários e classifique o sentimento de cada um...
-
-[INSTRUÇÕES]
-- Classifique cada comentário como: POSITIVO, NEGATIVO ou NEUTRO
-- Forneça um score de 1-10 para intensidade do sentimento
-- Identifique as palavras-chave que determinaram a classificação
-- Resuma o sentimento geral no final
-
-[COMENTÁRIOS]
-{cole_os_comentarios_aqui}
-
-[OUTPUT]
-Formato:
-Comentário 1: [SENTIMENTO] - Score: X/10
-Palavras-chave: [palavras]
-
-Resumo geral: [análise_completa]`,
-    isFavorite: true,
-    isEdited: false
-  },
-  {
-    id: "p05",
-    title: "Pesquisa de Mercado Profunda",
-    description: "Execute uma pesquisa aprofundada sobre um nicho de mercado, identificando concorrentes e oportunidades.",
-    category: "Negócios",
-    type: "research",
-    compatibility: ["ChatGPT", "Claude"],
-    tags: ["pesquisa", "mercado", "estratégia"],
-    content: `Conduza uma análise completa do mercado para o seguinte nicho...
-
-[ESTRUTURA DA ANÁLISE]
-1. Visão geral do mercado (tamanho, crescimento, tendências)
-2. Análise de concorrentes (top 5 players principais)
-3. Público-alvo (demographics, comportamento, dores)
-4. Oportunidades de mercado (gaps não atendidos)
-5. Ameaças e desafios
-6. Recomendações estratégicas
-
-[NICHO]
-{seu_nicho_aqui}
-
-[OUTPUT]
-Formate como relatório executivo com dados específicos e insights acionáveis.`,
-    isFavorite: false,
-    isEdited: true
-  },
-  {
-    id: "p06",
-    title: "Gerador de Persona Detalhada",
-    description: "Construa uma persona de cliente completa com dores, desejos, demografia e comportamento.",
-    category: "Marketing",
-    type: "text-generation",
-    compatibility: ["ChatGPT", "Claude", "Gemini"],
-    tags: ["persona", "público-alvo"],
-    content: `Crie uma persona detalhada para o seguinte produto/serviço...
-
-[ESTRUTURA DA PERSONA]
-📊 DEMOGRAFIA
-- Nome e idade
-- Localização e renda
-- Profissão e educação
-- Estado civil e família
-
-🎯 PSICOGRAFIA
-- Personalidade e valores
-- Interesses e hobbies
-- Estilo de vida
-
-😰 DORES E DESAFIOS
-- Principais problemas
-- Frustrações diárias
-- Medos e objeções
-
-💫 OBJETIVOS E DESEJOS
-- Aspirações de vida
-- Metas profissionais
-- Desejos secretos
-
-📱 COMPORTAMENTO DIGITAL
-- Redes sociais preferidas
-- Hábitos de consumo de conteúdo
-- Jornada de compra
-
-[PRODUTO/SERVIÇO]
-{seu_produto_servico_aqui}`,
-    isFavorite: false,
-    isEdited: false
-  },
-  {
-    id: "p07",
-    title: "Copy de Vendas (AIDA)",
-    description: "Crie textos persuasivos que convertem usando o framework AIDA (Atenção, Interesse, Desejo, Ação).",
-    category: "Copywriting",
-    type: "text-generation",
-    compatibility: ["ChatGPT", "Claude"],
-    tags: ["copywriting", "vendas", "aida"],
-    content: `Escreva uma copy de vendas persuasiva usando o framework AIDA...
-
-[ESTRUTURA AIDA]
-🎯 ATENÇÃO
-- Headline impactante
-- Estatística ou pergunta provocativa
-- Promessa específica
-
-🔥 INTERESSE
-- Desenvolva o problema
-- Conte uma história relacionável
-- Apresente credibilidade
-
-💎 DESEJO
-- Benefícios transformadores
-- Prova social (depoimentos)
-- Urgência/escassez
-
-⚡ AÇÃO
-- Call-to-action claro
-- Garantia/redução de risco
-- Instruções específicas
-
-[PRODUTO/SERVIÇO]
-{seu_produto_aqui}
-
-[PÚBLICO-ALVO]
-{sua_persona_aqui}
-
-[OUTPUT]
-Copy completa otimizada para conversão.`,
-    isFavorite: true,
-    isEdited: false
-  },
-  {
-    id: "p08",
-    title: "Ícone de App Estilo 'Liquid Glass'",
-    description: "Gere um ícone de aplicativo moderno com efeito de vidro líquido e gradientes suaves.",
-    category: "Design",
-    type: "image-generation",
-    compatibility: ["Midjourney", "DALL-E"],
-    tags: ["ícone", "ui", "design"],
-    content: "/imagine prompt: app icon design, liquid glass effect, translucent material with soft gradients from blue to purple, subtle reflections and refractions, minimal geometric shape, glossy surface, depth and dimension, modern clean aesthetic, rounded square format, high quality 3D render, professional app store style, octane render, 1024x1024 resolution --ar 1:1 --v 6 --style raw",
-    isFavorite: false,
-    isEdited: false
-  }
-]
-
-const ALL_CATEGORIES: ToolCategory[] = ['Copywriting', 'SEO', 'Imagem', 'Análise', 'Negócios', 'Marketing', 'Design']
-const TOOL_TYPES: ToolType[] = ['text-generation', 'image-generation', 'data-analysis', 'research']
-const AI_COMPATIBILITY: AICompatibility[] = ['ChatGPT', 'Claude', 'Gemini', 'Midjourney', 'DALL-E', 'Stable Diffusion']
+// Categorias serão derivadas dos dados do Supabase
 
 const TOOLS_PER_PAGE = 6
 
 export default function ToolsPage() {
   const router = useRouter()
   const { currentBackground } = useBackground()
+  const [tools, setTools] = useState<Tool[]>([])
+  const [categories, setCategories] = useState<ToolCategory[]>([] as any)
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false)
   const [displayedCount, setDisplayedCount] = useState(TOOLS_PER_PAGE)
   const [favorites, setFavorites] = useState<string[]>([])
@@ -264,13 +47,61 @@ export default function ToolsPage() {
     activity: []
   })
 
-  // Initial loading simulation
+  // Carregar ferramentas do Supabase
   useEffect(() => {
-    const loadingTimer = setTimeout(() => {
-      setIsInitialLoading(false)
-    }, 1200) // Simulate initial data fetch
+    const load = async () => {
+      try {
+        setIsInitialLoading(true)
+        // Fetch tools
+        const { data: toolsData, error } = await supabase
+          .from('tools')
+          .select('*')
+          .eq('is_active', true)
+        if (error) throw error
 
-    return () => clearTimeout(loadingTimer)
+        const mapped: Tool[] = (toolsData as Database['public']['Tables']['tools']['Row'][]).map(t => ({
+          id: t.id,
+          title: t.title,
+          description: t.description || '',
+          category: (t.category as ToolCategory) || 'Marketing',
+          // Campos não presentes no schema atual: default simples
+          type: 'text-generation',
+          compatibility: [],
+          tags: t.tags || [],
+          content: t.content || '',
+          how_to_use: undefined,
+          isFavorite: false,
+          isEdited: false,
+          createdAt: t.created_at ? new Date(t.created_at) : undefined,
+          updatedAt: t.updated_at ? new Date(t.updated_at) : undefined,
+        }))
+        setTools(mapped)
+
+        // Build unique categories from data
+        const uniqueCats = Array.from(new Set(mapped.map(m => m.category).filter(Boolean))) as ToolCategory[]
+        setCategories(uniqueCats)
+
+        // Fetch favorites for current user
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const { data: favs, error: favErr } = await supabase
+            .from('user_tools')
+            .select('tool_id, is_favorite')
+            .eq('user_id', user.id)
+            .eq('is_favorite', true)
+          if (favErr) throw favErr
+          setFavorites((favs || []).map((f: any) => f.tool_id))
+        } else {
+          setFavorites([])
+        }
+      } catch (e) {
+        console.error('Erro carregando ferramentas:', e)
+        setError('Não foi possível carregar as ferramentas agora.')
+      } finally {
+        setIsInitialLoading(false)
+      }
+    }
+    load()
   }, [])
 
   // Debounce search input
@@ -295,9 +126,18 @@ export default function ToolsPage() {
     )
 
     try {
-      // Mock API call delay
-      await new Promise(resolve => setTimeout(resolve, 200))
-      // Here you would make the actual API call
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Usuário não autenticado')
+      const willFavorite = !favorites.includes(toolId)
+      const { error } = await (supabase
+        .from('user_tools') as any)
+        .upsert({
+          user_id: user.id,
+          tool_id: toolId,
+          is_favorite: willFavorite,
+          last_used: new Date().toISOString()
+        })
+      if (error) throw error
     } catch (error) {
       // Revert optimistic update on error
       setFavorites(prev => 
@@ -312,7 +152,7 @@ export default function ToolsPage() {
 
   // Filter and sort tools
   const filteredTools = useMemo(() => {
-    let result = [...MOCK_TOOLS]
+    let result = [...tools]
 
     // Search filter
     if (filters.search) {
@@ -365,7 +205,7 @@ export default function ToolsPage() {
     }
 
     return result
-  }, [filters, favorites])
+  }, [filters, favorites, tools])
 
   const displayedTools = useMemo(() => 
     filteredTools.slice(0, displayedCount), 
@@ -427,7 +267,7 @@ export default function ToolsPage() {
   }, [])
 
   // Quick category filters (based on most popular from HTML reference)
-  const quickCategories: ToolCategory[] = ['Copywriting', 'SEO', 'Marketing', 'Design', 'Análise']
+  // Quick category buttons removidos (duplicado visual)
 
   // Active filters count
   const activeFiltersCount = useMemo(() => {
@@ -438,7 +278,16 @@ export default function ToolsPage() {
   }, [filters])
 
   return (
-    <div className="min-h-screen bg-black text-white pt-24 px-4">
+    <div 
+      className="min-h-screen bg-black text-white pt-24 px-4"
+      style={{
+        backgroundImage: `url("${currentBackground.value}?w=1600&q=80")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       <Header variant={HeaderVariant.SECONDARY} />
       
       {/* Main Content */}
@@ -453,8 +302,8 @@ export default function ToolsPage() {
           </p>
         </div>
 
-        {/* Filtros: preto e branco, sem degradês */}
-        <div className="grid grid-cols-1 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-3 p-3 mb-6 rounded-xl border border-white/15 bg-black">
+        {/* Filtros: apenas uma seleção de categoria + busca + ordenação */}
+        <div className="grid grid-cols-1 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-3 p-3 mb-6 rounded-xl border border-white/15 bg-black/70">
           {/* Advanced Glass Background */}
           <div className="hidden">
             {/* Base frosted layer */}
@@ -513,20 +362,8 @@ export default function ToolsPage() {
             />
           </div>
           
-          {/* Category Dropdown - Enhanced Glass - Responsive Span */}
-          <div className="md:col-span-2 lg:col-span-2 xl:col-span-3 relative">
-            <select
-              value={filters.category}
-              onChange={(e) => updateFilter('category', e.target.value as 'all' | ToolCategory)}
-              className="w-full h-12 px-4 text-white bg-black border border-white/20 rounded-xl appearance-none focus:outline-none focus:border-white/40"
-            >
-              <option value="all" className="bg-black">Todas as Categorias</option>
-              {ALL_CATEGORIES.map(category => (
-                <option key={category} value={category} className="bg-black">{category}</option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
-          </div>
+          {/* Categoria removida do painel principal: utilizar Drawer */}
+          <div className="hidden" />
           
           {/* Filters Button - Enhanced Glass - Responsive Span */}
           <div className="md:col-span-2 lg:col-span-2 xl:col-span-2">
@@ -544,51 +381,14 @@ export default function ToolsPage() {
             </button>
           </div>
           
-          {/* Sort Dropdown - Enhanced Glass - Responsive Span */}
-          <div className="md:col-span-0 md:hidden lg:block lg:col-span-1 xl:col-span-1 relative">
-            <select
-              value={filters.sort}
-              onChange={(e) => updateFilter('sort', e.target.value as 'relevance' | 'recent')}
-              className="w-full h-12 px-4 text-white bg-black border border-white/20 rounded-xl appearance-none focus:outline-none focus:border-white/40"
-            >
-              <option value="relevance" className="bg-black">Relevantes</option>
-              <option value="recent" className="bg-black">Recentes</option>
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
-          </div>
+          {/* Ordenação fora do Drawer removida para evitar duplicidade */}
+          <div className="hidden" />
         </div>
         
-        {/* Mobile/Tablet Sort Dropdown - Shows when main sort is hidden */}
-        <div className="md:block lg:hidden mb-4">
-          <div className="relative">
-            <select
-              value={filters.sort}
-              onChange={(e) => updateFilter('sort', e.target.value as 'relevance' | 'recent')}
-              className="w-full h-12 px-4 text-white bg-black border border-white/20 rounded-xl appearance-none focus:outline-none focus:border-white/40"
-            >
-              <option value="relevance" className="bg-black">🔥 Mais Relevantes</option>
-              <option value="recent" className="bg-black">⏰ Mais Recentes</option>
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
-          </div>
-        </div>
+        {/* Ordenação mobile removida: usar Drawer */}
+        <div className="hidden" />
 
-        {/* Filtros rápidos: preto e branco */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          {quickCategories.map((category, index) => (
-            <button
-              key={category}
-              onClick={() => updateFilter('category', filters.category === category ? 'all' : category)}
-              className={`px-3 py-2 text-sm rounded-full transition-colors border ${
-                filters.category === category
-                  ? 'text-white border-white/40 bg-black'
-                  : 'text-white/80 border-white/20 bg-black hover:text-white hover:border-white/40'
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
+        {/* Removido: botões de categorias duplicados */}
 
         {/* Results Counter */}
         <div className="flex justify-between items-center mb-8">
@@ -902,7 +702,11 @@ export default function ToolsPage() {
         onClose={() => setShowFiltersDrawer(false)}
         filters={filters}
         onFiltersChange={updateFilters}
+        categories={categories}
       />
+
+      {/* Overlay para garantir cobertura do background */}
+      <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
 
       {/* Tool Modal (mesmo da Dashboard) */}
       <ToolModal

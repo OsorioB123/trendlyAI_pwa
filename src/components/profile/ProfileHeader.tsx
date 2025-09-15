@@ -109,8 +109,9 @@ export default function ProfileHeader({
     }
   }
 
-  // Get level info
-  const levelInfo = PROFILE_LEVELS[profile.level]
+  // Get level info with safe fallback
+  const levelKey = (profile.level as keyof typeof PROFILE_LEVELS) || 'Explorador'
+  const levelInfo = PROFILE_LEVELS[levelKey]
 
   return (
     <section className={`flex flex-col md:flex-row gap-8 items-center text-center md:text-left mb-16 animate-entry ${className}`}>

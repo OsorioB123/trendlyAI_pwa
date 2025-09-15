@@ -60,9 +60,15 @@ class ProfileService {
 
       const profile: UserProfile = {
         ...data,
-        created_at: new Date(data.created_at),
-        updated_at: new Date(data.updated_at)
-      }
+        // Ensure required fields with safe defaults
+        level: (data as any).level || 'Explorador',
+        total_tracks: (data as any).total_tracks || 0,
+        completed_modules: (data as any).completed_modules || 0,
+        streak_days: (data as any).streak_days || 0,
+        referral_credits: (data as any).referral_credits || 0,
+        created_at: new Date((data as any).created_at),
+        updated_at: new Date((data as any).updated_at)
+      } as any
 
       return { success: true, data: profile }
 
@@ -103,9 +109,14 @@ class ProfileService {
 
       const profile: UserProfile = {
         ...data,
-        created_at: new Date(data.created_at),
-        updated_at: new Date(data.updated_at)
-      }
+        level: (data as any).level || 'Explorador',
+        total_tracks: (data as any).total_tracks || 0,
+        completed_modules: (data as any).completed_modules || 0,
+        streak_days: (data as any).streak_days || 0,
+        referral_credits: (data as any).referral_credits || 0,
+        created_at: new Date((data as any).created_at),
+        updated_at: new Date((data as any).updated_at)
+      } as any
 
       return { success: true, data: profile }
 
@@ -221,8 +232,8 @@ class ProfileService {
           .from('user_tracks')
           .select('id')
           .eq('user_id', userId)
-          .gt('progress', 0)
-          .lt('progress', 100),
+          .gt('progress_percentage', 0)
+          .lt('progress_percentage', 100),
 
         // Favorite tools
         this.getClient()
@@ -270,7 +281,7 @@ class ProfileService {
             tracks!inner(*)
           `)
           .eq('user_id', userId)
-          .order('updated_at', { ascending: false }),
+          .order('created_at', { ascending: false }),
 
         // User favorite tools
         this.getClient()
@@ -299,7 +310,7 @@ class ProfileService {
         title: item.tracks.title,
         description: item.tracks.description,
         category: item.tracks.category,
-        progress: item.progress || 0,
+        progress: item.progress_percentage || 0,
         backgroundImage: item.tracks.cover_image || 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
         created_at: new Date(item.tracks.created_at),
         updated_at: new Date(item.tracks.updated_at)
