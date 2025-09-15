@@ -104,6 +104,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(session)
         setUser(session?.user ?? null)
 
+        // Sync auth state to server-side cookies for middleware/SSR
+        // This lets the middleware recognize authenticated users in Vercel
+        try {
+          await fetch('/api/auth/callback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ event, session }),
+          })
+        } catch (e) {
+          console.warn('Auth cookie sync failed:', e)
+        }
+
         if (session?.user) {
           console.log('👤 User session found, loading profile...')
           try {
@@ -313,6 +325,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         clearOnboardingStatus()
         if (typeof window !== 'undefined') {
           localStorage.removeItem('trendlyai-user-authenticated')
+        }
+
+        // Also notify server to clear auth cookies
+        try {
+          await fetch('/api/auth/callback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ event: 'SIGNED_OUT', session: null }),
+          })
+        } catch (e) {
+          console.warn('Auth cookie clear failed:', e)
         }
       }
       

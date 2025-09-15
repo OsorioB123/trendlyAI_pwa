@@ -54,7 +54,7 @@ export function useSettings(): UseSettingsReturn {
         const { data: { session } } = await supabase.auth.getSession()
         
         if (!session?.user) {
-          router.push('/auth/login')
+          router.push('/login')
           return
         }
         
@@ -84,7 +84,7 @@ export function useSettings(): UseSettingsReturn {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
-        router.push('/auth/login')
+        router.push('/login')
       } else if (event === 'SIGNED_IN' && session?.user) {
         setUser(session.user)
         initializeData()

@@ -85,7 +85,7 @@ export default function TrackPage() {
 
   const handleStartTrack = async () => {
     if (!user) {
-      router.push('/auth/login')
+      router.push('/login')
       return
     }
 
@@ -103,7 +103,7 @@ export default function TrackPage() {
 
   const handleModuleClick = async (module: TrackModule) => {
     if (!user) {
-      router.push('/auth/login')
+      router.push('/login')
       return
     }
 
@@ -135,7 +135,7 @@ export default function TrackPage() {
 
   const handleToggleFavorite = async () => {
     if (!user) {
-      router.push('/auth/login')
+      router.push('/login')
       return
     }
 

@@ -28,7 +28,7 @@ const ProtectedRoute = ({ children, requireEmailConfirmed = false }: ProtectedRo
 
   // Redirect to login if not authenticated
   if (!user) {
-    router.push('/auth/login')
+    router.push('/login')
     return null
   }
 
@@ -48,7 +48,7 @@ const ProtectedRoute = ({ children, requireEmailConfirmed = false }: ProtectedRo
             Verifique sua caixa de entrada.
           </p>
           <button
-            onClick={() => router.push('/auth/login')}
+            onClick={() => router.push('/login')}
             className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/15 transition-colors"
           >
             Voltar ao Login
