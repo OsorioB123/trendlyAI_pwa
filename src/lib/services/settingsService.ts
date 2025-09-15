@@ -1,4 +1,5 @@
 import { supabase, STORAGE_BUCKETS } from '../supabase'
+import type { Database } from '@/types/database'
 import {
   UserProfile,
   ProfileFormData,
@@ -32,15 +33,16 @@ export class SettingsService {
       if (error) throw error
       if (!data) return null
 
+      const row = data as Database['public']['Tables']['profiles']['Row']
       return {
-        id: data.id,
-        full_name: data.full_name || '',
-        username: data.username || `user${data.id.slice(0, 8)}`,
-        bio: data.bio || '',
-        avatar_url: data.avatar_url,
-        studio_theme: data.preferences?.studio_theme || 'default',
-        created_at: new Date(data.created_at),
-        updated_at: new Date(data.updated_at)
+        id: row.id,
+        full_name: row.full_name || '',
+        username: row.username || `user${row.id.slice(0, 8)}`,
+        bio: row.bio || '',
+        avatar_url: row.avatar_url || undefined,
+        studio_theme: (row.preferences as any)?.studio_theme || 'default',
+        created_at: new Date(row.created_at),
+        updated_at: new Date(row.updated_at)
       }
     } catch (error) {
       console.error('Error fetching user profile:', error)
@@ -114,8 +116,8 @@ export class SettingsService {
 
       updates.updated_at = new Date().toISOString()
 
-      const { data, error } = await supabase
-        .from('profiles')
+      const { data, error } = await (supabase
+        .from('profiles') as any)
         .update(updates)
         .eq('id', userId)
         .select()
@@ -165,8 +167,8 @@ export class SettingsService {
 
       const avatarUrl = urlData.publicUrl
 
-      const { error: updateError } = await supabase
-        .from('profiles')
+      const { error: updateError } = await (supabase
+        .from('profiles') as any)
         .update({ 
           avatar_url: avatarUrl,
           updated_at: new Date().toISOString()
@@ -198,19 +200,19 @@ export class SettingsService {
         }
       }
 
-      const { data: currentProfile } = await supabase
-        .from('profiles')
+      const { data: currentProfile } = await (supabase
+        .from('profiles') as any)
         .select('preferences')
         .eq('id', userId)
         .single()
 
       const preferences = {
-        ...(currentProfile?.preferences || {}),
+        ...((currentProfile as Database['public']['Tables']['profiles']['Row'])?.preferences as any || {}),
         studio_theme: themeId
       }
 
-      const { error } = await supabase
-        .from('profiles')
+      const { error } = await (supabase
+        .from('profiles') as any)
         .update({ 
           preferences,
           updated_at: new Date().toISOString()
@@ -239,21 +241,22 @@ export class SettingsService {
       const { data: user } = await supabase.auth.getUser()
       if (!user.user) return null
 
-      const { data: profile } = await supabase
-        .from('profiles')
+      const { data: profile } = await (supabase
+        .from('profiles') as any)
         .select('preferences')
         .eq('id', userId)
         .single()
 
+      const pref = ((profile as any)?.preferences) as any
       return {
         email: user.user.email!,
-        has_password: !!user.user.encrypted_password,
-        two_factor_enabled: profile?.preferences?.two_factor_enabled || false,
-        last_password_change: profile?.preferences?.last_password_change 
-          ? new Date(profile.preferences.last_password_change)
+        has_password: !!(user.user as any).encrypted_password,
+        two_factor_enabled: pref?.two_factor_enabled || false,
+        last_password_change: pref?.last_password_change 
+          ? new Date(pref.last_password_change)
           : undefined,
-        last_email_change: profile?.preferences?.last_email_change
-          ? new Date(profile.preferences.last_email_change)
+        last_email_change: pref?.last_email_change
+          ? new Date(pref.last_email_change)
           : undefined
       }
     } catch (error) {
@@ -401,8 +404,8 @@ export class SettingsService {
       const deletionDate = new Date()
       deletionDate.setHours(deletionDate.getHours() + gracePeriodHours)
 
-      await supabase
-        .from('profiles')
+      await (supabase
+        .from('profiles') as any)
         .update({
           preferences: {
             account_deletion_scheduled: deletionDate.toISOString(),
@@ -429,13 +432,14 @@ export class SettingsService {
   // Notification preferences
   static async getNotificationPreferences(userId: string): Promise<NotificationPreferences> {
     try {
-      const { data } = await supabase
-        .from('profiles')
+      const { data } = await (supabase
+        .from('profiles') as any)
         .select('preferences')
         .eq('id', userId)
         .single()
 
-      const prefs = data?.preferences?.notifications || {}
+      const row: any = (data as any) || {}
+      const prefs = row?.preferences?.notifications || {}
       
       return {
         ...DEFAULT_NOTIFICATION_PREFERENCES,
@@ -452,22 +456,23 @@ export class SettingsService {
     preferences: Partial<NotificationPreferences>
   ): Promise<SettingsResponse<NotificationPreferences>> {
     try {
-      const { data: currentProfile } = await supabase
-        .from('profiles')
+      const { data: currentProfile } = await (supabase
+        .from('profiles') as any)
         .select('preferences')
         .eq('id', userId)
         .single()
 
-      const currentPrefs = currentProfile?.preferences?.notifications || DEFAULT_NOTIFICATION_PREFERENCES
+      const currentRow: any = (currentProfile as any) || {}
+      const currentPrefs = currentRow?.preferences?.notifications || DEFAULT_NOTIFICATION_PREFERENCES
       const updatedPrefs = { ...currentPrefs, ...preferences }
 
       const newPreferences = {
-        ...(currentProfile?.preferences || {}),
+        ...((currentProfile as Database['public']['Tables']['profiles']['Row'])?.preferences as any || {}),
         notifications: updatedPrefs
       }
 
-      const { error } = await supabase
-        .from('profiles')
+      const { error } = await (supabase
+        .from('profiles') as any)
         .update({ 
           preferences: newPreferences,
           updated_at: new Date().toISOString()
@@ -492,19 +497,19 @@ export class SettingsService {
 
   // Helper methods
   private static async updateSecurityMetadata(userId: string, metadata: Record<string, any>) {
-    const { data: currentProfile } = await supabase
-      .from('profiles')
+      const { data: currentProfile } = await (supabase
+      .from('profiles') as any)
       .select('preferences')
       .eq('id', userId)
       .single()
 
     const preferences = {
-      ...(currentProfile?.preferences || {}),
+      ...(((currentProfile as any)?.preferences) || {}),
       ...metadata
     }
 
-    await supabase
-      .from('profiles')
+    await (supabase
+      .from('profiles') as any)
       .update({ 
         preferences,
         updated_at: new Date().toISOString()

@@ -1,4 +1,5 @@
 import { supabase } from '../supabase'
+import type { Database } from '@/types/database'
 import { 
   Track, 
   TrackWithModules, 
@@ -39,35 +40,39 @@ export class TrackService {
       if (trackError) throw trackError
       if (!trackData) return null
 
-      const modules: TrackModule[] = trackData.track_modules
-        ?.sort((a: any, b: any) => a.order_index - b.order_index)
-        .map((module: any) => ({
+      const trow = (trackData as Database['public']['Tables']['tracks']['Row'] & {
+        track_modules: Database['public']['Tables']['track_modules']['Row'][]
+      })
+
+      const modules: TrackModule[] = trow.track_modules
+        ?.sort((a, b) => a.order_index - b.order_index)
+        .map((module) => ({
           id: module.id,
           trackId: trackId,
           title: module.title,
-          content: module.content,
+          content: module.content as any,
           orderIndex: module.order_index,
-          videoUrl: module.video_url,
-          tools: module.tools || [],
+          videoUrl: module.video_url || undefined,
+          tools: (module.tools as any) || [],
           createdAt: module.created_at ? new Date(module.created_at) : undefined,
           updatedAt: module.updated_at ? new Date(module.updated_at) : undefined
         })) || []
 
       const track: Track = {
-        id: trackData.id,
-        title: trackData.title,
-        subtitle: trackData.subtitle,
-        description: trackData.description,
-        categories: trackData.category ? [trackData.category] : [],
-        category: trackData.category,
-        level: trackData.difficulty_level,
-        estimatedDuration: trackData.estimated_duration,
-        thumbnailUrl: trackData.thumbnail_url,
-        isPremium: trackData.is_premium,
-        totalModules: trackData.total_modules,
-        isPublished: trackData.is_published,
-        createdAt: trackData.created_at ? new Date(trackData.created_at) : undefined,
-        updatedAt: trackData.updated_at ? new Date(trackData.updated_at) : undefined
+        id: trow.id,
+        title: trow.title,
+        subtitle: trow.subtitle || undefined,
+        description: trow.description || undefined,
+        categories: trow.category ? [trow.category] : [],
+        category: trow.category || undefined,
+        level: (trow.difficulty_level as any) || 'Iniciante',
+        estimatedDuration: trow.estimated_duration || undefined,
+        thumbnailUrl: trow.thumbnail_url || undefined,
+        isPremium: trow.is_premium,
+        totalModules: trow.total_modules,
+        isPublished: trow.is_published,
+        createdAt: trow.created_at ? new Date(trow.created_at) : undefined,
+        updatedAt: trow.updated_at ? new Date(trow.updated_at) : undefined
       }
 
       let userProgress: UserTrackProgress | undefined
@@ -75,11 +80,14 @@ export class TrackService {
       let userReview: TrackReview | undefined
 
       if (userId) {
-        [userProgress, moduleProgress, userReview] = await Promise.all([
+        const [p, mp, ur] = await Promise.all([
           this.getUserTrackProgress(userId, trackId),
           this.getUserModuleProgress(userId, trackId),
           this.getUserTrackReview(userId, trackId)
         ])
+        userProgress = (p || undefined) as any
+        moduleProgress = mp
+        userReview = (ur || undefined) as any
       }
 
       const { data: reviewStats } = await supabase
@@ -87,18 +95,19 @@ export class TrackService {
         .select('rating')
         .eq('track_id', trackId)
 
-      const averageRating = reviewStats?.length 
-        ? reviewStats.reduce((sum, review) => sum + review.rating, 0) / reviewStats.length
+      const ratings = (reviewStats as Array<{ rating: number }>) || []
+      const averageRating: number | undefined = ratings.length 
+        ? ratings.reduce((sum, review) => sum + review.rating, 0) / ratings.length
         : undefined
 
       return {
         ...track,
         modules,
-        userProgress,
+        userProgress: userProgress || undefined,
         moduleProgress,
         averageRating,
-        totalReviews: reviewStats?.length || 0,
-        userReview
+        totalReviews: ratings.length || 0,
+        userReview: userReview || undefined
       }
     } catch (error) {
       console.error('Error fetching track with modules:', error)
@@ -115,18 +124,19 @@ export class TrackService {
         .eq('track_id', trackId)
         .single()
 
-      if (error && error.code !== 'PGRST116') throw error
+      if (error && (error as any).code !== 'PGRST116') throw error
       if (!data) return null
 
+      const row = data as Database['public']['Tables']['user_tracks']['Row']
       return {
-        id: data.id,
-        userId: data.user_id,
-        trackId: data.track_id,
-        startedAt: new Date(data.started_at),
-        completedAt: data.completed_at ? new Date(data.completed_at) : undefined,
-        progressPercentage: data.progress_percentage,
-        currentModuleId: data.current_module_id,
-        isFavorite: data.is_favorite
+        id: row.id,
+        userId: row.user_id,
+        trackId: row.track_id,
+        startedAt: row.started_at ? new Date(row.started_at) : new Date(),
+        completedAt: row.completed_at ? new Date(row.completed_at) : undefined,
+        progressPercentage: row.progress_percentage,
+        currentModuleId: row.current_module_id || undefined,
+        isFavorite: row.is_favorite
       }
     } catch (error) {
       console.error('Error fetching user track progress:', error)
@@ -145,7 +155,8 @@ export class TrackService {
       if (error) throw error
       if (!data) return []
 
-      return data.map(progress => ({
+      const rows = data as Database['public']['Tables']['user_module_progress']['Row'][]
+      return rows.map(progress => ({
         id: progress.id,
         userId: progress.user_id,
         trackId: progress.track_id,
@@ -169,17 +180,18 @@ export class TrackService {
         .eq('track_id', trackId)
         .single()
 
-      if (error && error.code !== 'PGRST116') throw error
+      if (error && (error as any).code !== 'PGRST116') throw error
       if (!data) return null
 
+      const row = data as Database['public']['Tables']['track_reviews']['Row']
       return {
-        id: data.id,
-        userId: data.user_id,
-        trackId: data.track_id,
-        rating: data.rating,
-        comment: data.comment,
-        createdAt: new Date(data.created_at),
-        updatedAt: data.updated_at ? new Date(data.updated_at) : undefined
+        id: row.id,
+        userId: row.user_id,
+        trackId: row.track_id,
+        rating: (row.rating as 1 | 2 | 3 | 4 | 5),
+        comment: row.comment || undefined,
+        createdAt: new Date(row.created_at),
+        updatedAt: row.updated_at ? new Date(row.updated_at) : undefined
       }
     } catch (error) {
       console.error('Error fetching user track review:', error)
@@ -189,8 +201,8 @@ export class TrackService {
 
   static async startTrack(userId: string, trackId: string): Promise<UserTrackProgress | null> {
     try {
-      const { data, error } = await supabase
-        .from('user_tracks')
+      const { data, error } = await (supabase
+        .from('user_tracks') as any)
         .upsert({
           user_id: userId,
           track_id: trackId,
@@ -202,15 +214,16 @@ export class TrackService {
 
       if (error) throw error
 
+      const row = data as Database['public']['Tables']['user_tracks']['Row']
       return {
-        id: data.id,
-        userId: data.user_id,
-        trackId: data.track_id,
-        startedAt: new Date(data.started_at),
-        completedAt: data.completed_at ? new Date(data.completed_at) : undefined,
-        progressPercentage: data.progress_percentage,
-        currentModuleId: data.current_module_id,
-        isFavorite: data.is_favorite
+        id: row.id,
+        userId: row.user_id,
+        trackId: row.track_id,
+        startedAt: row.started_at ? new Date(row.started_at) : new Date(),
+        completedAt: row.completed_at ? new Date(row.completed_at) : undefined,
+        progressPercentage: row.progress_percentage,
+        currentModuleId: row.current_module_id || undefined,
+        isFavorite: row.is_favorite
       }
     } catch (error) {
       console.error('Error starting track:', error)
@@ -220,8 +233,8 @@ export class TrackService {
 
   static async completeModule(userId: string, trackId: string, moduleId: string): Promise<boolean> {
     try {
-      const { error: moduleError } = await supabase
-        .from('user_module_progress')
+      const { error: moduleError } = await (supabase
+        .from('user_module_progress') as any)
         .upsert({
           user_id: userId,
           track_id: trackId,
@@ -234,8 +247,8 @@ export class TrackService {
 
       const progressPercentage = await this.calculateTrackProgress(userId, trackId)
 
-      const { error: trackError } = await supabase
-        .from('user_tracks')
+      const { error: trackError } = await (supabase
+        .from('user_tracks') as any)
         .update({ 
           progress_percentage: progressPercentage,
           completed_at: progressPercentage === 100 ? new Date().toISOString() : null
@@ -284,10 +297,10 @@ export class TrackService {
         .eq('track_id', trackId)
         .single()
 
-      const newFavoriteStatus = !current?.is_favorite
+      const newFavoriteStatus = !(current as any)?.is_favorite
 
-      const { error } = await supabase
-        .from('user_tracks')
+      const { error } = await (supabase
+        .from('user_tracks') as any)
         .upsert({
           user_id: userId,
           track_id: trackId,
@@ -311,8 +324,8 @@ export class TrackService {
     comment?: string
   ): Promise<TrackReview | null> {
     try {
-      const { data, error } = await supabase
-        .from('track_reviews')
+      const { data, error } = await (supabase
+        .from('track_reviews') as any)
         .upsert({
           user_id: userId,
           track_id: trackId,
@@ -325,14 +338,15 @@ export class TrackService {
 
       if (error) throw error
 
+      const row2 = data as Database['public']['Tables']['track_reviews']['Row']
       return {
-        id: data.id,
-        userId: data.user_id,
-        trackId: data.track_id,
-        rating: data.rating,
-        comment: data.comment,
-        createdAt: new Date(data.created_at),
-        updatedAt: data.updated_at ? new Date(data.updated_at) : undefined
+        id: row2.id,
+        userId: row2.user_id,
+        trackId: row2.track_id,
+        rating: (row2.rating as 1 | 2 | 3 | 4 | 5),
+        comment: row2.comment || undefined,
+        createdAt: new Date(row2.created_at),
+        updatedAt: row2.updated_at ? new Date(row2.updated_at) : undefined
       }
     } catch (error) {
       console.error('Error submitting track review:', error)
@@ -352,13 +366,13 @@ export class TrackService {
       }
 
       if (track.isPremium) {
-        const { data: profile } = await supabase
+        const { data: profile } = await (supabase as any)
           .from('profiles')
           .select('is_premium')
           .eq('id', userId)
           .single()
 
-        if (!profile?.is_premium) {
+        if (!(profile as any)?.is_premium) {
           return {
             moduleId,
             hasAccess: false,
@@ -416,16 +430,17 @@ export class TrackService {
       if (error) throw error
       if (!data) return []
 
-      return data.map(track => ({
+      const rows = data as Database['public']['Tables']['tracks']['Row'][]
+      return rows.map(track => ({
         id: track.id,
         title: track.title,
-        subtitle: track.subtitle,
-        description: track.description,
+        subtitle: track.subtitle || undefined,
+        description: track.description || undefined,
         categories: track.category ? [track.category] : [],
-        category: track.category,
-        level: track.difficulty_level,
-        estimatedDuration: track.estimated_duration,
-        thumbnailUrl: track.thumbnail_url,
+        category: track.category || undefined,
+        level: (track.difficulty_level as any) || 'Iniciante',
+        estimatedDuration: track.estimated_duration || undefined,
+        thumbnailUrl: track.thumbnail_url || undefined,
         isPremium: track.is_premium,
         totalModules: track.total_modules,
         isPublished: track.is_published,

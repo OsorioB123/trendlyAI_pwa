@@ -1,9 +1,10 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/database'
 
-let supabaseAdminInstance: ReturnType<typeof createClient> | null = null
+let supabaseAdminInstance: SupabaseClient<Database> | null = null
 
 // Admin client with service role key for server-side operations
-export const getSupabaseAdmin = () => {
+export const getSupabaseAdmin = (): SupabaseClient<Database> => {
   if (supabaseAdminInstance) {
     return supabaseAdminInstance
   }
@@ -15,7 +16,7 @@ export const getSupabaseAdmin = () => {
     throw new Error('Missing Supabase configuration for admin client')
   }
   
-  supabaseAdminInstance = createClient(url, serviceKey, {
+  supabaseAdminInstance = createClient<Database>(url, serviceKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false
@@ -26,8 +27,8 @@ export const getSupabaseAdmin = () => {
 }
 
 // For backward compatibility - lazy initialization
-let _supabaseAdmin: ReturnType<typeof createClient> | null = null
-export const supabaseAdmin = new Proxy({} as ReturnType<typeof createClient>, {
+let _supabaseAdmin: SupabaseClient<Database> | null = null
+export const supabaseAdmin = new Proxy({} as SupabaseClient<Database>, {
   get(target, prop) {
     if (!_supabaseAdmin) {
       _supabaseAdmin = getSupabaseAdmin()

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import Image from 'next/image'
 import { 
   Camera, 
   Edit2, 
@@ -119,11 +120,14 @@ export default function ProfileHeader({
         onClick={handleAvatarClick}
         disabled={isUploading}
       >
-        <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-white/10">
-          <img 
-            src={profile.avatar_url || 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=300&q=80'} 
-            alt="Avatar do usuário" 
-            className="w-full h-full object-cover"
+        <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-white/10 relative">
+          <Image
+            src={profile.avatar_url || 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=300&q=80'}
+            alt="Avatar do usuário"
+            fill
+            sizes="128px"
+            className="object-cover"
+            priority
           />
         </div>
         

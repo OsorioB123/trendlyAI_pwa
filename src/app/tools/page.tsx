@@ -674,7 +674,7 @@ export default function ToolsPage() {
         {/* Error Toast */}
         {error && (
           <div className="
-            fixed top-24 right-4 z-50 p-4 rounded-lg text-white border shadow-lg animate-fade-in-up
+            fixed top-24 right-4 z-50 p-4 rounded-lg text-white border shadow-lg
             backdrop-blur-[24px] bg-gradient-to-br from-red-500/[0.9] to-red-600/[0.8]
             border-red-400/[0.5] shadow-[0_8px_24px_rgba(220,38,38,0.25)]
           ">

@@ -278,6 +278,18 @@ body {
 .hover\:to-blue-700:hover { background: linear-gradient(90deg, #9333ea, #1d4ed8); }
 .hover\:scale-105:hover { transform: scale(1.05); }
 
+/* Focus ring utility for icon buttons and interactive elements */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
+}
+
+/* Background attachment fixed only on desktop */
+.bg-fixed-desktop { background-attachment: fixed; }
+@media (max-width: 640px) {
+  .bg-fixed-desktop { background-attachment: scroll; }
+}
+
 /* Form Elements */
 .appearance-none { appearance: none; }
 .outline-none { outline: 2px solid transparent; outline-offset: 2px; }
@@ -297,6 +309,13 @@ body {
   .sm\:flex-row { flex-direction: row; }
   .sm\:px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
   .lg\:px-8 { padding-left: 2rem; padding-right: 2rem; }
+}
+
+/* Mobile performance: slightly reduce heavy blurs on small screens */
+@media (max-width: 640px) {
+  .liquid-glass { backdrop-filter: blur(12px); }
+  .glass-medium { backdrop-filter: blur(18px); }
+  .glass-heavy { backdrop-filter: blur(20px); }
 }
 
 :root {

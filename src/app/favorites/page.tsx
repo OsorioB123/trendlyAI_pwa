@@ -46,14 +46,18 @@ const MOCK_FAVORITE_TRACKS: Track[] = [
     title: 'Marketing Digital para Iniciantes',
     progress: 70,
     backgroundImage: 'https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=800&q=80',
-    tags: ['Marketing', 'Iniciante']
+    tags: ['Marketing', 'Iniciante'],
+    categories: ['Marketing'],
+    level: 'Iniciante'
   },
   {
     id: 2,
     title: 'Gestão de Redes Sociais',
     progress: 55,
     backgroundImage: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&q=80',
-    tags: ['Social Media', 'Intermediário']
+    tags: ['Social Media', 'Intermediário'],
+    categories: ['Social Media'],
+    level: 'Intermediário'
   }
 ]
 
@@ -210,7 +214,7 @@ export default function FavoritesPage() {
                         onClick={() => handleTrackClick(track)}
                         onFavorite={() => handleTrackFavorite(track)}
                         isFavorited={true}
-                        variant="default"
+                        variant="full"
                       />
                     ))}
                   </div>

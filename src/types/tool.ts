@@ -37,6 +37,7 @@ export interface Tool {
   compatibility: AICompatibility[]
   tags: string[]
   content: string
+  how_to_use?: string
   isFavorite: boolean
   isEdited: boolean
   usageCount?: number

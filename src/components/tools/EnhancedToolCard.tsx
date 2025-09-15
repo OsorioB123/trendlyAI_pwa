@@ -121,7 +121,7 @@ export default function EnhancedToolCard({
       rotate: [0, 15, 0],
       transition: {
         duration: 0.6,
-        ease: "backOut"
+        ease: "easeOut"
       }
     },
     loading: {
@@ -152,7 +152,7 @@ export default function EnhancedToolCard({
       rotate: [-5, 5, 0],
       transition: {
         duration: 0.3,
-        ease: EASING.bouncy
+        ease: EASING.quick
       }
     },
     favorited: {
@@ -162,7 +162,7 @@ export default function EnhancedToolCard({
       color: "#ef4444",
       transition: {
         duration: 0.6,
-        ease: "backOut"
+        ease: "easeOut"
       }
     }
   }
@@ -304,7 +304,7 @@ export default function EnhancedToolCard({
       ref={cardRef}
       className="tool-card-grid-item cursor-pointer"
       data-id={tool.id}
-      variants={cardVariants}
+      variants={cardVariants as any}
       initial="initial"
       animate="animate"
       whileHover="hover"
@@ -332,7 +332,7 @@ export default function EnhancedToolCard({
         {/* Enhanced Background with dynamic gradient */}
         <motion.div 
           className="absolute inset-0 backdrop-blur-[10px] border border-white/10"
-          variants={backgroundVariants}
+          variants={backgroundVariants as any}
           animate={isHovered ? "hover" : "idle"}
           style={{
             borderRadius: 16,
@@ -342,7 +342,7 @@ export default function EnhancedToolCard({
         {/* Enhanced Favorite Button */}
         <motion.button 
           className="absolute top-4 right-4 z-20 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-full backdrop-blur-[20px] border border-white/15"
-          variants={favoriteVariants}
+          variants={favoriteVariants as any}
           animate={favoriteLoading ? "loading" : isHovered ? "hover" : "idle"}
           whileTap="tap"
           onClick={handleFavoriteClick}
@@ -353,7 +353,7 @@ export default function EnhancedToolCard({
           }}
         >
           <motion.div
-            variants={heartVariants}
+            variants={heartVariants as any}
             animate={isFavorited ? "favorited" : "idle"}
             whileHover="hover"
           >

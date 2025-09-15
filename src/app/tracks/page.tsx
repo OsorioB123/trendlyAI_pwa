@@ -286,7 +286,7 @@ export default function TracksPage() {
 
         {/* Error Toast */}
         {error && (
-          <div className="fixed top-24 right-4 z-50 p-4 rounded-lg bg-red-500/90 backdrop-blur-md text-white border border-red-400/50 shadow-lg animate-fade-in-up">
+          <div className="fixed top-24 right-4 z-50 p-4 rounded-lg bg-red-500/90 backdrop-blur-md text-white border border-red-400/50 shadow-lg">
             <p className="font-medium">{error}</p>
           </div>
         )}
@@ -337,12 +337,20 @@ export default function TracksPage() {
             <p className="text-white/70 mb-6">
               Tente ajustar seus filtros ou fazer uma nova busca
             </p>
-            <button
-              onClick={clearFilters}
-              className="px-6 py-3 rounded-xl bg-white/20 text-white hover:bg-white/25 transition-all"
-            >
-              Limpar filtros
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={clearFilters}
+                className="px-6 py-3 rounded-xl bg-white/20 text-white hover:bg-white/25 transition-all"
+              >
+                Limpar filtros
+              </button>
+              <a
+                href="/help"
+                className="px-6 py-3 rounded-xl text-white transition-all bg-white/10 border border-white/20 hover:bg-white/15"
+              >
+                Ver dicas na Central de Ajuda
+              </a>
+            </div>
           </div>
         )}
 

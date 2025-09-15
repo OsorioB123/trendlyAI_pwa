@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import { AuthProvider } from "../contexts/AuthContext";
 import { BackgroundProvider } from "../contexts/BackgroundContext";
+import { ToastProvider } from "../components/ui/Toast";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -21,17 +23,26 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const inter = Inter({ subsets: ["latin"], display: "swap" });
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" className={inter.className}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
         <link href="https://unpkg.com/@geist-ui/fonts/geist-sans.css" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+        <style>{`
+          .skip-link { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+          .skip-link:focus { position: fixed; left: 16px; top: 16px; width: auto; height: auto; padding: 10px 14px; background: #fff; color: #000; border-radius: 8px; z-index: 1000; }
+        `}</style>
       </head>
-      <body style={{ fontFamily: 'Inter, sans-serif', WebkitTapHighlightColor: 'transparent', color: 'white' }}>
+      <body style={{ WebkitTapHighlightColor: 'transparent', color: 'white' }}>
+        <a href="#main-content" className="skip-link">Pular para conteúdo principal</a>
         <AuthProvider>
           <BackgroundProvider>
-            {children}
+            <ToastProvider>
+              <div id="main-content" role="main" tabIndex={-1}>
+                {children}
+              </div>
+            </ToastProvider>
           </BackgroundProvider>
         </AuthProvider>
       </body>

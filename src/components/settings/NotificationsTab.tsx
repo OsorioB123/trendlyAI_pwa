@@ -5,10 +5,11 @@ import { NotificationsTabProps } from '../../types/settings'
 import { IconToggleSwitch } from './ToggleSwitch'
 
 export default function NotificationsTab({ 
-  notifications, 
-  onUpdateNotifications, 
+  preferences, 
+  onUpdatePreferences, 
   isLoading 
 }: NotificationsTabProps) {
+  const notifications = preferences
   if (!notifications) {
     return (
       <div className="liquid-glass p-8 md:p-10 rounded-2xl">
@@ -27,7 +28,7 @@ export default function NotificationsTab({
 
   const handleToggleChange = async (key: keyof typeof notifications, value: boolean) => {
     try {
-      await onUpdateNotifications({ [key]: value })
+      await onUpdatePreferences({ [key]: value })
     } catch (error) {
       console.error(`Error updating ${key}:`, error)
     }
@@ -83,8 +84,8 @@ export default function NotificationsTab({
             icon={<Megaphone size={18} />}
             label="Comunicações de Marketing"
             description="Novidades, promoções e conteúdo educativo"
-            checked={notifications.marketing_communications}
-            onChange={(checked) => handleToggleChange('marketing_communications', checked)}
+            checked={!!notifications.marketing_communications}
+            onChange={(checked) => handleToggleChange('marketing_communications' as any, checked)}
             disabled={isLoading}
             color="orange"
           />
@@ -117,8 +118,8 @@ export default function NotificationsTab({
             icon={<Zap size={18} />}
             label="Atualizações de Recursos"
             description="Seja o primeiro a saber sobre novos recursos"
-            checked={notifications.feature_updates}
-            onChange={(checked) => handleToggleChange('feature_updates', checked)}
+            checked={!!notifications.feature_updates}
+            onChange={(checked) => handleToggleChange('feature_updates' as any, checked)}
             disabled={isLoading}
             color="blue"
           />
@@ -128,8 +129,8 @@ export default function NotificationsTab({
             icon={<Users size={18} />}
             label="Atividade da Comunidade"
             description="Interações, comentários e menções da comunidade"
-            checked={notifications.community_activity}
-            onChange={(checked) => handleToggleChange('community_activity', checked)}
+            checked={!!notifications.community_activity}
+            onChange={(checked) => handleToggleChange('community_activity' as any, checked)}
             disabled={isLoading}
             color="green"
           />
@@ -139,8 +140,8 @@ export default function NotificationsTab({
             icon={<Calendar size={18} />}
             label="Manutenções Programadas"
             description="Avisos sobre manutenções e atualizações do sistema"
-            checked={notifications.system_maintenance}
-            onChange={(checked) => handleToggleChange('system_maintenance', checked)}
+            checked={!!notifications.system_maintenance}
+            onChange={(checked) => handleToggleChange('system_maintenance' as any, checked)}
             disabled={isLoading}
             color="purple"
           />

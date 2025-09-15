@@ -202,8 +202,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                      'Usuário',
       }
 
-      const { data, error } = await supabase
-        .from('profiles')
+      const { data, error } = await (supabase
+        .from('profiles') as any)
         .insert([profileData])
         .select()
         .single()
@@ -340,8 +340,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (!user) return { data: null, error: new Error('No user logged in') }
 
     try {
-      const { data, error } = await supabase
-        .from('profiles')
+      const { data, error } = await (supabase
+        .from('profiles') as any)
         .update({
           ...updates,
           updated_at: new Date().toISOString()
@@ -367,8 +367,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (!user) return { data: null, error: new Error('No user logged in') }
 
     try {
-      const { data, error } = await supabase
-        .from('profiles')
+      const { data, error } = await (supabase
+        .from('profiles') as any)
         .update({ 
           avatar_url: avatarUrl,
           updated_at: new Date().toISOString()

@@ -40,7 +40,7 @@ export function EnhancedSkeletonCard({ index = 0 }: { index?: number }) {
   return (
     <motion.div
       className="h-72 rounded-2xl overflow-hidden relative"
-      variants={skeletonVariants}
+      variants={skeletonVariants as any}
       animate="loading"
       initial={{ opacity: 0, y: 20 }}
       style={{
@@ -52,7 +52,7 @@ export function EnhancedSkeletonCard({ index = 0 }: { index?: number }) {
       {/* Shimmer effect */}
       <motion.div
         className="absolute inset-0 -skew-x-12"
-        variants={shimmerVariants}
+        variants={shimmerVariants as any}
         animate="loading"
         style={{
           background: "linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent)",
@@ -171,7 +171,7 @@ export function EnhancedLoadingButton({
   return (
     <motion.button
       className={`px-8 py-4 rounded-xl backdrop-blur-[20px] border border-white/15 text-white font-medium flex items-center gap-3 relative overflow-hidden ${className}`}
-      variants={buttonVariants}
+      variants={buttonVariants as any}
       animate={disabled ? "disabled" : isLoading ? "loading" : "idle"}
       whileHover={!disabled && !isLoading ? "hover" : undefined}
       whileTap={!disabled && !isLoading ? { scale: 0.95, transition: { duration: 0.1 } } : undefined}
@@ -181,10 +181,10 @@ export function EnhancedLoadingButton({
       {/* Loading spinner */}
       <motion.div
         className="flex items-center gap-2 absolute inset-0 justify-center"
-        variants={loadingTextVariants}
+        variants={loadingTextVariants as any}
         animate={isLoading ? "loading" : "idle"}
       >
-        <motion.div variants={iconVariants} animate={isLoading ? "loading" : undefined}>
+        <motion.div variants={iconVariants as any} animate={isLoading ? "loading" : undefined}>
           <Loader2 className="w-5 h-5" />
         </motion.div>
         <span>Carregando...</span>
@@ -193,7 +193,7 @@ export function EnhancedLoadingButton({
       {/* Normal content */}
       <motion.div
         className="flex items-center gap-2"
-        variants={textVariants}
+        variants={textVariants as any}
         animate={isLoading ? "loading" : "idle"}
       >
         {children}
@@ -238,7 +238,7 @@ export function PulseLoader({ size = "sm", className = "" }: { size?: "sm" | "md
   return (
     <motion.div
       className={`${sizeClasses[size]} rounded-full bg-white/20 ${className}`}
-      variants={pulseVariants}
+      variants={pulseVariants as any}
       animate="loading"
     />
   )
@@ -271,7 +271,7 @@ export function SkeletonGrid({ count = 6, columns = 3 }: SkeletonGridProps) {
   return (
     <motion.div
       className={`grid ${gridClasses[columns]} gap-6 mb-8`}
-      variants={containerVariants}
+      variants={containerVariants as any}
       initial="hidden"
       animate="visible"
     >
@@ -317,7 +317,7 @@ export function BreathingDots({ className = "" }: { className?: string }) {
         <motion.div
           key={index}
           className="w-2 h-2 rounded-full bg-white/60"
-          variants={dotVariants}
+          variants={dotVariants as any}
           animate="loading"
           custom={index}
         />
@@ -383,7 +383,7 @@ export function SuccessCheckmark({ size = "md", className = "" }: { size?: "sm" 
           stroke="currentColor"
           strokeWidth="2"
           fill="rgba(34, 197, 94, 0.1)"
-          variants={circleVariants}
+          variants={circleVariants as any}
           className="text-green-500"
         />
         <motion.path
@@ -392,7 +392,7 @@ export function SuccessCheckmark({ size = "md", className = "" }: { size?: "sm" 
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          variants={checkVariants}
+          variants={checkVariants as any}
           className="text-green-500"
         />
       </svg>

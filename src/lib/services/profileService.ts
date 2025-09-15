@@ -294,7 +294,7 @@ class ProfileService {
         return { success: false, error: toolsResult.error.message }
       }
 
-      const tracks: Track[] = tracksResult.data?.map(item => ({
+      const tracks: Track[] = tracksResult.data?.map((item: any) => ({
         id: item.tracks.id,
         title: item.tracks.title,
         description: item.tracks.description,
@@ -305,7 +305,7 @@ class ProfileService {
         updated_at: new Date(item.tracks.updated_at)
       })) || []
 
-      const tools: Tool[] = toolsResult.data?.map(item => ({
+      const tools: Tool[] = toolsResult.data?.map((item: any) => ({
         id: item.tools.id,
         name: item.tools.title,
         description: item.tools.description,

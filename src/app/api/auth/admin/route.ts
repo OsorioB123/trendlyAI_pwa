@@ -18,7 +18,26 @@ const getSupabaseAdmin = () => {
   })
 }
 
+// Simple server-only authorization using a static admin token
+function isAuthorized(req: NextRequest): boolean {
+  const header = req.headers.get('authorization') || ''
+  const token = header.toLowerCase().startsWith('bearer ')
+    ? header.slice(7)
+    : null
+
+  const expected = process.env.ADMIN_API_TOKEN
+  if (!expected) {
+    // If no token is configured, deny in production by default
+    // and allow in development only.
+    return process.env.NODE_ENV !== 'production'
+  }
+  return token === expected
+}
+
 export async function POST(request: NextRequest) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
   try {
     const { action, ...params } = await request.json()
     const supabaseAdmin = getSupabaseAdmin()
@@ -78,6 +97,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json({ 
     message: 'Admin API endpoint',
-    available_actions: ['listUsers', 'getUserById', 'testConfig']
+    available_actions: ['listUsers', 'getUserById', 'testConfig'],
+    requires: 'Authorization: Bearer <ADMIN_API_TOKEN>'
   })
 }

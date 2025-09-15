@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { 
   Bell, 
@@ -127,9 +128,11 @@ export default function Header({
       case HeaderVariant.PRIMARY:
         return (
           <button onClick={handleLogoClick} className="flex items-center hover:opacity-80 transition-opacity">
-            <img 
-              src="https://i.ibb.co/6JghTg2R/Sem-nome-Apresenta-o-43-64-x-40-px-cone-para-You-Tube.png" 
-              alt="TrendlyAI Logo" 
+            <Image 
+              src="https://i.ibb.co/6JghTg2R/Sem-nome-Apresenta-o-43-64-x-40-px-cone-para-You-Tube.png"
+              alt="TrendlyAI Logo"
+              width={160}
+              height={40}
               className="h-8 w-auto object-cover"
             />
           </button>
@@ -140,14 +143,17 @@ export default function Header({
           <div className="flex items-center gap-4">
             <button 
               onClick={handleBack}
-              className="nav-button w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95"
+              className="nav-button w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95 focus-ring"
+              aria-label="Voltar"
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
             <button onClick={handleLogoClick} className="flex items-center hover:opacity-80 transition-opacity">
-              <img 
-                src="https://i.ibb.co/6JghTg2R/Sem-nome-Apresenta-o-43-64-x-40-px-cone-para-You-Tube.png" 
-                alt="TrendlyAI Logo" 
+              <Image 
+                src="https://i.ibb.co/6JghTg2R/Sem-nome-Apresenta-o-43-64-x-40-px-cone-para-You-Tube.png"
+                alt="TrendlyAI Logo"
+                width={160}
+                height={40}
                 className="h-8 w-auto object-cover"
               />
             </button>
@@ -159,16 +165,19 @@ export default function Header({
           <div className="flex items-center gap-4">
             <button 
               onClick={onMenuToggle || handleBack}
-              className="nav-button w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95"
+              className="nav-button w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95 focus-ring"
+              aria-label={onMenuToggle ? 'Abrir menu' : 'Voltar'}
             >
               <Menu className="w-5 h-5 md:hidden" />
               <ChevronLeft className="w-6 h-6 hidden md:block" />
             </button>
             
             <button onClick={handleLogoClick} className="flex items-center hover:opacity-80 transition-opacity">
-              <img 
-                src="https://i.ibb.co/6JghTg2R/Sem-nome-Apresenta-o-43-64-x-40-px-cone-para-You-Tube.png" 
-                alt="TrendlyAI Logo" 
+              <Image 
+                src="https://i.ibb.co/6JghTg2R/Sem-nome-Apresenta-o-43-64-x-40-px-cone-para-You-Tube.png"
+                alt="TrendlyAI Logo"
+                width={160}
+                height={40}
                 className="h-8 w-auto object-cover"
               />
             </button>
@@ -198,7 +207,8 @@ export default function Header({
                   closeAllMenus()
                   setShowNotifications(!showNotifications)
                 }}
-                className="relative w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95"
+                className="relative w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95 focus-ring"
+                aria-label={showNotifications ? 'Fechar notificações' : 'Abrir notificações'}
               >
                 <Bell className="w-5 h-5" />
                 <span className="absolute top-2 right-2 flex h-2 w-2">
@@ -246,13 +256,16 @@ export default function Header({
                   showProfile 
                     ? 'bg-white/20 ring-white/40 scale-105 shadow-[0_8px_24px_rgba(0,0,0,0.3)]' 
                     : 'bg-white/10 hover:bg-white/15 hover:ring-white/30 hover:scale-105 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)]'
-                }`}
+                } focus-ring`}
+                aria-label={showProfile ? 'Fechar menu do perfil' : 'Abrir menu do perfil'}
               >
-                <div className="w-9 h-9 rounded-full overflow-hidden">
-                  <img 
+                <div className="w-9 h-9 rounded-full overflow-hidden relative">
+                  <Image 
                     src={profile?.avatar_url || mockUser.avatar} 
                     alt="Avatar" 
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="36px"
+                    className="object-cover"
                   />
                 </div>
               </button>
@@ -261,11 +274,13 @@ export default function Header({
                 <div className={`dropdown-menu absolute top-full right-0 mt-2 p-4 w-64 md:w-72 z-50 backdrop-blur-[24px] bg-[rgba(30,30,40,0.85)] border border-white/14 shadow-[0_8px_24px_rgba(0,0,0,0.3)] rounded-2xl transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[top_right] ${showProfile ? 'show' : ''}`}>
                   {/* Profile Header */}
                   <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                      <img 
+                    <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 relative">
+                      <Image 
                         src={profile?.avatar_url || mockUser.avatar} 
                         alt="Avatar" 
-                        className="w-full h-full object-cover"
+                        fill
+                        sizes="48px"
+                        className="object-cover"
                       />
                     </div>
                     <div>
@@ -296,6 +311,7 @@ export default function Header({
                             setShowCreditsTooltip(!showCreditsTooltip)
                           }}
                           className="text-white/60 hover:text-white transition-colors"
+                          aria-label="Informações sobre créditos mensais"
                         >
                           <Info className="w-3.5 h-3.5" />
                         </button>

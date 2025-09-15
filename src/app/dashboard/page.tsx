@@ -21,25 +21,33 @@ const MOCK_TRACKS: Track[] = [
     id: 1,
     title: 'Marketing Digital para Iniciantes',
     progress: 70,
-    backgroundImage: 'https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=800&q=80'
+    backgroundImage: 'https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=800&q=80',
+    categories: ['Marketing'],
+    level: 'Iniciante'
   },
   {
     id: 2,
     title: 'Análise de Dados com Google Analytics',
     progress: 35,
-    backgroundImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80'
+    backgroundImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
+    categories: ['Análise'],
+    level: 'Intermediário'
   },
   {
     id: 3,
     title: 'Gestão de Redes Sociais',
     progress: 55,
-    backgroundImage: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&q=80'
+    backgroundImage: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&q=80',
+    categories: ['Social Media'],
+    level: 'Intermediário'
   },
   {
     id: 4,
     title: 'Planejamento Estratégico Digital',
     progress: 90,
-    backgroundImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80'
+    backgroundImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80',
+    categories: ['Estratégia'],
+    level: 'Avançado'
   }
 ]
 
@@ -48,49 +56,67 @@ const MOCK_RECOMMENDED_TRACKS: Track[] = [
     id: 5,
     title: 'Funil de Vendas para E-commerce',
     tags: ['Vendas', 'Intermediário'],
-    backgroundImage: 'https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?w=800&q=80'
+    backgroundImage: 'https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?w=800&q=80',
+    categories: ['Vendas'],
+    level: 'Intermediário'
   },
   {
     id: 6,
     title: 'Email Marketing Efetivo',
     tags: ['Email', 'Iniciante'],
-    backgroundImage: 'https://images.unsplash.com/photo-1553484771-371a605b060b?w=800&q=80'
+    backgroundImage: 'https://images.unsplash.com/photo-1553484771-371a605b060b?w=800&q=80',
+    categories: ['Marketing'],
+    level: 'Iniciante'
   },
   {
     id: 7,
     title: 'SEO para Negócios Locais',
     tags: ['SEO', 'Intermediário'],
-    backgroundImage: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&q=80'
+    backgroundImage: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&q=80',
+    categories: ['SEO'],
+    level: 'Intermediário'
   }
 ]
 
 const MOCK_TOOLS: Tool[] = [
   {
-    id: 1,
+    id: '1',
     title: 'Crie um Roteiro Viral em 30 Segundos',
     description: 'Transforme qualquer ideia em uma estrutura de roteiro de 3 atos para engajamento máximo.',
+    category: 'Marketing',
+    type: 'text-generation',
     tags: ['roteiro', 'storytelling'],
     compatibility: ['ChatGPT', 'Claude', 'Gemini'],
     content: 'Você é um especialista em storytelling viral para redes sociais.\n\nCONTEXTO:\n- Tema: [TEMA]\n- Público-alvo: [PÚBLICO-ALVO]\n- Tom de voz: [TOM DE VOZ]\n- Duração: 30-60 segundos\n\nESTRUTURA OBRIGATÓRIA:\n1. GANCHO (0-3s): Uma frase impactante que pare o scroll\n2. DESENVOLVIMENTO (3-45s): Apresente o problema/solução/história\n3. CALL TO ACTION (45-60s): Convide para ação específica\n\nCRITÉRIOS DE SUCESSO:\n- Use linguagem simples e direta\n- Inclua elementos de curiosidade ou surpresa\n- Termine com uma pergunta ou convite à interação\n- Mantenha o ritmo acelerado\n\nCrie o roteiro seguindo exatamente esta estrutura.',
-    how_to_use: 'Substitua [TEMA], [PÚBLICO-ALVO] e [TOM DE VOZ] pelos seus dados específicos antes de usar o prompt.'
+    how_to_use: 'Substitua [TEMA], [PÚBLICO-ALVO] e [TOM DE VOZ] pelos seus dados específicos antes de usar o prompt.',
+    isFavorite: false,
+    isEdited: false
   },
   {
-    id: 2,
+    id: '2',
     title: 'Crie Títulos Otimizados para SEO',
     description: 'Use este prompt para gerar títulos magnéticos e otimizados para mecanismos de busca.',
+    category: 'SEO',
+    type: 'text-generation',
     tags: ['seo', 'títulos'],
     compatibility: ['ChatGPT', 'Claude'],
     content: 'Você é um especialista em SEO e copywriting.\n\nCrie 5 títulos SEO-otimizados para o seguinte conteúdo:\n\n[CONTEÚDO]: {seu_conteudo_aqui}\n[PALAVRA-CHAVE]: {palavra_chave_principal}\n\nDIRETRIZES:\n- Máximo 60 caracteres\n- Inclua a palavra-chave principal no início\n- Use power words (como \'definitivo\', \'completo\', \'secreto\')\n- Crie urgência ou curiosidade\n- Seja específico com números quando possível\n\nRetorne 5 opções numeradas com explicação do por que cada uma funciona.',
-    how_to_use: 'Substitua {seu_conteudo_aqui} e {palavra_chave_principal} pelas suas informações específicas.'
+    how_to_use: 'Substitua {seu_conteudo_aqui} e {palavra_chave_principal} pelas suas informações específicas.',
+    isFavorite: false,
+    isEdited: false
   },
   {
-    id: 3,
+    id: '3',
     title: 'Copy de Vendas Irresistível',
     description: 'Crie textos persuasivos que convertem usando gatilhos mentais comprovados.',
+    category: 'Marketing',
+    type: 'text-generation',
     tags: ['copywriting', 'vendas'],
     compatibility: ['ChatGPT', 'Claude'],
     content: 'Você é um copywriter experiente especializado em vendas.\n\nEscreva uma copy de vendas persuasiva usando o framework AIDA:\n\n[PRODUTO/SERVIÇO]: {seu_produto_aqui}\n[PÚBLICO-ALVO]: {sua_persona_aqui}\n\nESTRUTURA AIDA:\n🎯 ATENÇÃO\n- Headline impactante\n- Estatística ou pergunta provocativa\n- Promessa específica\n\n🔥 INTERESSE\n- Desenvolva o problema\n- Conte uma história relacionável\n- Apresente credibilidade\n\n💎 DESEJO\n- Benefícios transformadores\n- Prova social (depoimentos)\n- Urgência/escassez\n\n⚡ AÇÃO\n- Call-to-action claro\n- Garantia/redução de risco\n- Instruções específicas\n\nCopy completa otimizada para conversão.',
-    how_to_use: 'Substitua {seu_produto_aqui} e {sua_persona_aqui} pelas informações do seu negócio.'
+    how_to_use: 'Substitua {seu_produto_aqui} e {sua_persona_aqui} pelas informações do seu negócio.',
+    isFavorite: false,
+    isEdited: false
   }
 ]
 
@@ -104,8 +130,8 @@ export default function DashboardPage() {
   const [isCommandFocused, setIsCommandFocused] = useState(false)
   const [showToolModal, setShowToolModal] = useState(false)
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null)
-  const [favoriteTrackIds, setFavoriteTrackIds] = useState<number[]>([])
-  const [favoriteToolIds, setFavoriteToolIds] = useState<number[]>([])
+  const [favoriteTrackIds, setFavoriteTrackIds] = useState<Array<number | string>>([])
+  const [favoriteToolIds, setFavoriteToolIds] = useState<string[]>([])
 
   const icebreakers = [
     'Me dê ideias para um vídeo',

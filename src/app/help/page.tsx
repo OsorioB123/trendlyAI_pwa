@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { respectReducedMotion } from '@/lib/motion'
 import { useRouter } from 'next/navigation'
 import { 
   Sparkles, 
@@ -22,6 +24,7 @@ export default function HelpPage() {
   const router = useRouter()
   const { currentBackground } = useBackground()
   const helpData = useHelp('primeiros-passos')
+  const transitionSafe = respectReducedMotion({ transition: { duration: 0.3 } }).transition as any
   
   // Local state for UI
   const [activeTab, setActiveTab] = useState('primeiros-passos')
@@ -110,7 +113,11 @@ export default function HelpPage() {
         <div className="max-w-5xl relative mr-auto ml-auto px-4 space-y-28">
 
           {/* Salina Reminder Section */}
-          <section className="animate-entry">
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={transitionSafe}
+          >
             <div className="relative overflow-hidden rounded-2xl">
               <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 animate-pulse"></div>
               <div className="relative bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-8 hover:-translate-y-2 hover:shadow-2xl transition-all duration-400">
@@ -135,10 +142,14 @@ export default function HelpPage() {
                 </div>
               </div>
             </div>
-          </section>
+          </motion.section>
 
           {/* FAQ Section */}
-          <section className="animate-entry delay-1">
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...(transitionSafe || {}), delay: 0.1 }}
+          >
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12 lg:items-start">
               {/* Sidebar Navigation */}
               <aside className="lg:col-span-1">
@@ -185,6 +196,10 @@ export default function HelpPage() {
                     {helpData.faqItems.map((item) => (
                       <div key={item.id} className="border-b border-white/10 last:border-b-0">
                         <button
+                          type="button"
+                          id={`faq-toggle-${item.id}`}
+                          aria-expanded={openAccordion === item.question}
+                          aria-controls={`faq-panel-${item.id}`}
                           onClick={() => handleFAQItemClick(item)}
                           className="w-full flex justify-between items-center text-left py-5 hover:bg-white/5 transition-colors rounded-lg px-2"
                         >
@@ -198,6 +213,9 @@ export default function HelpPage() {
                           />
                         </button>
                         <div 
+                          id={`faq-panel-${item.id}`}
+                          role="region"
+                          aria-labelledby={`faq-toggle-${item.id}`}
                           className={`overflow-hidden transition-all duration-500 ${
                             openAccordion === item.question ? 'max-h-96 pb-5' : 'max-h-0'
                           }`}
@@ -228,10 +246,15 @@ export default function HelpPage() {
                 )}
               </div>
             </div>
-          </section>
+          </motion.section>
 
           {/* Contact Support Section */}
-          <section className="animate-entry delay-2 text-center border-t border-white/10 pt-16">
+          <motion.section
+            className="text-center border-t border-white/10 pt-16"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...(transitionSafe || {}), delay: 0.2 }}
+          >
             <h2 className="text-3xl font-semibold text-white mb-3 tracking-tight">
               Não encontrou o que procurava?
             </h2>
@@ -244,7 +267,7 @@ export default function HelpPage() {
             >
               Iniciar Conversa com um Especialista
             </button>
-          </section>
+          </motion.section>
         </div>
       </main>
 
@@ -260,7 +283,8 @@ export default function HelpPage() {
               </div>
               <button 
                 onClick={closeChatWidget}
-                className="text-white/60 hover:text-white bg-white/10 backdrop-blur-md border border-white/14 rounded-full w-9 h-9 flex items-center justify-center hover:bg-white/15 transition-all"
+                className="text-white/60 hover:text-white bg-white/10 backdrop-blur-md border border-white/14 rounded-full w-11 h-11 flex items-center justify-center hover:bg-white/15 transition-all"
+                aria-label="Fechar conversa de suporte"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -285,6 +309,7 @@ export default function HelpPage() {
               <input 
                 type="text" 
                 placeholder="Digite sua mensagem..." 
+                aria-label="Mensagem para o suporte"
                 className="w-full bg-white/10 border border-white/14 rounded-full p-3 px-4 text-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 backdrop-blur-md" 
               />
             </div>
@@ -292,20 +317,7 @@ export default function HelpPage() {
         </div>
       )}
 
-      {/* CSS Animations */}
-      <style jsx>{`
-        .animate-entry {
-          opacity: 0;
-          transform: translateY(30px) scale(0.98);
-          animation: slideInFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .animate-entry.delay-1 { animation-delay: 0.2s; }
-        .animate-entry.delay-2 { animation-delay: 0.4s; }
-        
-        @keyframes slideInFade { 
-          to { opacity: 1; transform: translateY(0) scale(1); } 
-        }
-      `}</style>
+      {/* Motion now handled via Framer Motion */}
     </div>
   )
 }

@@ -1,6 +1,9 @@
+
 'use client'
 
 import { Lightbulb, Play } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { MOTION_CONSTANTS, respectReducedMotion } from '@/lib/motion'
 import type { NextActionProps } from '../../types/profile'
 
 export default function NextActionCard({
@@ -11,9 +14,16 @@ export default function NextActionCard({
   if (!recommendation) {
     return null
   }
+  const transitionSafe = respectReducedMotion({ transition: { duration: 0.3 } }).transition as any
 
   return (
-    <section className={`mb-16 animate-entry delay-1 ${className}`}>
+    <motion.section 
+      className={`mb-16 ${className}`}
+      variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
+      initial="initial"
+      animate="animate"
+      transition={transitionSafe}
+    >
       <div className="relative overflow-hidden rounded-2xl">
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 animate-pulse"></div>
         <div className="relative bg-white/8 backdrop-blur-lg border border-white/12 rounded-2xl p-8 flex flex-col md:flex-row items-start md:items-center gap-6">
@@ -36,24 +46,6 @@ export default function NextActionCard({
         </div>
       </div>
 
-      {/* CSS animations */}
-      <style jsx>{`
-        .animate-entry {
-          opacity: 0;
-          transform: translateY(30px);
-          animation: slideInFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .animate-entry.delay-1 { 
-          animation-delay: 0.15s; 
-        }
-        
-        @keyframes slideInFade {
-          to { 
-            opacity: 1; 
-            transform: translateY(0); 
-          }
-        }
-      `}</style>
-    </section>
+    </motion.section>
   )
 }

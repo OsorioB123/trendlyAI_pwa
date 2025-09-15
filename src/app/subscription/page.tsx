@@ -1,9 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { respectReducedMotion } from '@/lib/motion'
 import { ArrowLeft, Gem, Download, PauseCircle, XCircle, ChevronDown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useSubscription } from '../../hooks/useSubscription'
+import { useToastActions } from '../../components/ui/Toast'
 import { useAuth } from '../../contexts/AuthContext'
 import { 
   SUBSCRIPTION_STATUS_LABELS,
@@ -15,6 +18,7 @@ export default function SubscriptionPage() {
   const router = useRouter()
   const { profile } = useAuth()
   const subscription = useSubscription()
+  const toast = useToastActions()
   
   // UI state
   const [showPlanOptions, setShowPlanOptions] = useState(false)
@@ -27,6 +31,7 @@ export default function SubscriptionPage() {
   const [selectedPauseMonths, setSelectedPauseMonths] = useState<number | null>(null)
   const [isPauseLoading, setIsPauseLoading] = useState(false)
   const [isCancelLoading, setIsCancelLoading] = useState(false)
+  const transitionSafe = respectReducedMotion({ transition: { duration: 0.35 } }).transition as any
 
   if (subscription.isLoading) {
     return (
@@ -60,13 +65,15 @@ export default function SubscriptionPage() {
           month: 'long',
           year: 'numeric'
         })
-        
-        // Show success message (you might want to use a toast here)
-        alert(`Assinatura pausada com sucesso! Será reativada em ${formattedDate}.`)
+        toast.success('Assinatura pausada', `Será reativada em ${formattedDate}.`)
         
         setShowPauseModal(false)
         setSelectedPauseMonths(null)
+      } else if (response.error) {
+        toast.error('Erro ao pausar assinatura', response.error)
       }
+    } catch (e) {
+      toast.error('Erro ao pausar assinatura')
     } finally {
       setIsPauseLoading(false)
     }
@@ -80,10 +87,14 @@ export default function SubscriptionPage() {
       })
 
       if (response.success) {
-        alert('Assinatura cancelada com sucesso!')
+        toast.success('Assinatura cancelada')
         setShowCancelView(false)
         setCancelReason('')
+      } else if (response.error) {
+        toast.error('Erro ao cancelar', response.error)
       }
+    } catch (e) {
+      toast.error('Erro ao cancelar assinatura')
     } finally {
       setIsCancelLoading(false)
     }
@@ -95,7 +106,12 @@ export default function SubscriptionPage() {
   }
 
   const handleDownloadReceipt = async (item: BillingHistoryItem) => {
-    await subscription.downloadReceipt(item.id)
+    const res = await subscription.downloadReceipt(item.id)
+    if (res.success) {
+      toast.success('Recibo gerado', 'Abrindo em nova aba...')
+    } else if (res.error) {
+      toast.error('Erro ao baixar recibo', res.error)
+    }
   }
 
   // Calculate usage percentage
@@ -110,7 +126,7 @@ export default function SubscriptionPage() {
         
         <main className="w-full mx-auto">
           <div className="max-w-3xl relative mr-auto ml-auto px-4 py-8">
-            <div className="animate-entry">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={transitionSafe}>
               <h1 className="text-3xl lg:text-4xl font-semibold text-white tracking-tight mb-4">
                 Temos pena de o ver partir.
               </h1>
@@ -120,9 +136,9 @@ export default function SubscriptionPage() {
                   : 'Seu acesso continuará até o fim do ciclo de cobrança.'
                 }
               </p>
-            </div>
+            </motion.div>
             
-            <div className="liquid-glass p-6 md:p-8 rounded-2xl animate-entry delay-1">
+            <motion.div className="liquid-glass p-6 md:p-8 rounded-2xl" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...(transitionSafe || {}), delay: 0.1 }}>
               <label htmlFor="cancel-reason" className="font-medium text-white block mb-2">
                 O que poderíamos ter feito melhor? (Opcional)
               </label>
@@ -150,7 +166,7 @@ export default function SubscriptionPage() {
                   Não, quero continuar
                 </button>
               </div>
-            </div>
+            </motion.div>
           </div>
         </main>
       </div>
@@ -163,7 +179,7 @@ export default function SubscriptionPage() {
 
       <main className="w-full mx-auto">
         <div className="max-w-3xl relative mr-auto ml-auto px-4 py-8">
-          <div className="animate-entry">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={transitionSafe}>
             <div className="flex items-center gap-4 mb-6">
               <button
                 onClick={() => router.back()}
@@ -178,10 +194,10 @@ export default function SubscriptionPage() {
                 <p className="text-white/60">Seu painel de controle de valor.</p>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Main Subscription Card */}
-          <div className="liquid-glass p-6 md:p-8 my-8 rounded-2xl animate-entry delay-1 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
+          <motion.div className="liquid-glass p-6 md:p-8 my-8 rounded-2xl hover:-translate-y-1 hover:shadow-2xl transition-all duration-300" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...(transitionSafe || {}), delay: 0.1 }}>
             <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
               <div className="w-full">
                 <div className="flex items-center gap-3 mb-4">
@@ -265,22 +281,26 @@ export default function SubscriptionPage() {
               <button 
                 onClick={() => setShowBillingHistory(!showBillingHistory)}
                 className="text-sm text-white/60 hover:text-white transition-colors"
+                aria-expanded={showBillingHistory}
+                aria-controls="billing-history-section"
               >
                 {showBillingHistory ? 'Ocultar histórico de cobranças' : 'Ver histórico completo de cobranças'}
               </button>
               <button 
                 onClick={() => setShowPlanOptions(!showPlanOptions)}
                 className="bg-white/10 backdrop-blur-md border border-white/14 rounded-full px-6 py-3 text-sm font-medium w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-white/15 transition-all"
+                aria-expanded={showPlanOptions}
+                aria-controls="plan-options-section"
               >
                 <span>{showPlanOptions ? 'Ocultar Opções' : 'Ver Opções de Plano'}</span>
                 <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${showPlanOptions ? 'rotate-180' : ''}`} />
               </button>
             </div>
-          </div>
+          </motion.div>
 
           {/* Billing History */}
           {showBillingHistory && (
-            <div className="mb-10 animate-entry delay-2">
+            <motion.div id="billing-history-section" className="mb-10" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...(transitionSafe || {}), delay: 0.2 }}>
               <h2 className="text-2xl font-semibold tracking-tight text-white mb-6">
                 Histórico de Cobranças
               </h2>
@@ -327,12 +347,12 @@ export default function SubscriptionPage() {
                   </div>
                 )}
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Plan Options */}
           {showPlanOptions && (
-            <div className="mb-10 animate-entry delay-3">
+            <motion.div id="plan-options-section" className="mb-10" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...(transitionSafe || {}), delay: 0.3 }}>
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="liquid-glass p-6 rounded-2xl hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
                   <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mb-4 border border-white/20">
@@ -368,7 +388,7 @@ export default function SubscriptionPage() {
                   </button>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
         </div>
       </main>

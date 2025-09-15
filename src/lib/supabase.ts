@@ -1,6 +1,7 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/database'
 
-let supabaseInstance: ReturnType<typeof createClient> | null = null
+let supabaseInstance: SupabaseClient<Database> | null = null
 
 export const getSupabase = () => {
   if (supabaseInstance) {
@@ -18,7 +19,7 @@ export const getSupabase = () => {
     throw new Error(`Missing NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable. Got: ${supabaseAnonKey}`)
   }
 
-  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
+  supabaseInstance = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
@@ -35,8 +36,8 @@ export const getSupabase = () => {
 }
 
 // For backward compatibility - lazy initialization
-let _supabase: ReturnType<typeof createClient> | null = null
-export const supabase = new Proxy({} as ReturnType<typeof createClient>, {
+let _supabase: SupabaseClient<Database> | null = null
+export const supabase = new Proxy({} as SupabaseClient<Database>, {
   get(target, prop) {
     if (!_supabase) {
       _supabase = getSupabase()

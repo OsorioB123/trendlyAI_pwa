@@ -1,7 +1,9 @@
+
 'use client'
 
 import { motion } from 'framer-motion'
 import { ToolCategory } from '../../types/tool'
+import { respectReducedMotion } from '@/lib/motion'
 
 interface EnhancedFilterChipsProps {
   categories: ToolCategory[]
@@ -109,10 +111,28 @@ const getCategoryStyles = (category: ToolCategory) => {
         backgroundColor: "rgba(249, 115, 22, 0.15)",
         borderColor: "rgba(249, 115, 22, 0.3)"
       }
+    },
+    'Imagem': {
+      idle: {
+        backgroundColor: "rgba(168, 85, 247, 0.1)",
+        borderColor: "rgba(168, 85, 247, 0.2)",
+        color: "rgba(216, 180, 254, 0.8)"
+      },
+      active: {
+        backgroundColor: "rgba(168, 85, 247, 0.25)",
+        borderColor: "rgba(168, 85, 247, 0.5)",
+        color: "#d8b4fe",
+        boxShadow: "0 0 20px rgba(168, 85, 247, 0.3), 0 4px 12px rgba(0, 0, 0, 0.2)"
+      },
+      hover: {
+        backgroundColor: "rgba(168, 85, 247, 0.15)",
+        borderColor: "rgba(168, 85, 247, 0.3)"
+      }
     }
   }
 
-  return styles[category] || {
+  // Provide fallback for categories not explicitly styled (e.g., 'Negócios')
+  return (styles as any)[category] || {
     idle: {
       backgroundColor: "rgba(255, 255, 255, 0.05)",
       borderColor: "rgba(255, 255, 255, 0.1)",
@@ -136,6 +156,7 @@ export default function EnhancedFilterChips({
   selectedCategory,
   onCategoryChange
 }: EnhancedFilterChipsProps) {
+  const reducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   
   // Container animation for staggered entrance
   const containerVariants = {
@@ -143,8 +164,8 @@ export default function EnhancedFilterChips({
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
+        staggerChildren: reducedMotion ? 0 : 0.1,
+        delayChildren: reducedMotion ? 0 : 0.2
       }
     }
   }
@@ -153,17 +174,15 @@ export default function EnhancedFilterChips({
   const chipVariants = {
     hidden: {
       opacity: 0,
-      scale: 0.8,
-      y: 20
+      scale: reducedMotion ? 1 : 0.8,
+      y: reducedMotion ? 0 : 20
     },
     visible: {
       opacity: 1,
       scale: 1,
       y: 0,
       transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 25
+        ...(respectReducedMotion({ transition: { duration: 0.2 } }).transition as any)
       }
     }
   }
@@ -178,34 +197,30 @@ export default function EnhancedFilterChips({
         scale: 1,
         y: 0,
         transition: {
-          duration: 0.2,
-          ease: EASING.primary
+          ...(respectReducedMotion({ transition: { duration: 0.2, ease: EASING.primary } }).transition as any)
         }
       },
       hover: {
         ...styles.hover,
-        scale: 1.05,
-        y: -2,
+        scale: reducedMotion ? 1 : 1.05,
+        y: reducedMotion ? 0 : -2,
         transition: {
-          duration: 0.2,
-          ease: EASING.quick
+          ...(respectReducedMotion({ transition: { duration: 0.2, ease: EASING.quick } }).transition as any)
         }
       },
       active: {
         ...styles.active,
-        scale: isActive ? 1.1 : 1.05,
-        y: isActive ? 0 : -2,
+        scale: isActive ? (reducedMotion ? 1 : 1.1) : (reducedMotion ? 1 : 1.05),
+        y: isActive ? 0 : (reducedMotion ? 0 : -2),
         transition: {
-          type: "spring",
-          ...SPRING.bouncy
+          ...(respectReducedMotion({ transition: { duration: 0.2 } }).transition as any)
         }
       },
       tap: {
-        scale: 0.95,
+        scale: reducedMotion ? 1 : 0.95,
         y: 0,
         transition: {
-          duration: 0.1,
-          ease: EASING.quick
+          ...(respectReducedMotion({ transition: { duration: 0.1, ease: EASING.quick } }).transition as any)
         }
       }
     }
@@ -226,7 +241,7 @@ export default function EnhancedFilterChips({
   return (
     <motion.div
       className="flex flex-wrap gap-2 mb-6"
-      variants={containerVariants}
+      variants={containerVariants as any}
       initial="hidden"
       animate="visible"
     >
@@ -238,7 +253,7 @@ export default function EnhancedFilterChips({
           <motion.button
             key={category}
             className="px-4 py-2 text-sm rounded-full backdrop-blur-[10px] border font-medium relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
-            variants={chipVariants}
+            variants={chipVariants as any}
             animate={isActive ? "active" : "idle"}
             whileHover="hover"
             whileTap="tap"
@@ -254,14 +269,9 @@ export default function EnhancedFilterChips({
             <motion.div
               className="absolute inset-0 rounded-full"
               initial={{ scale: 0, opacity: 0 }}
-              animate={{
-                scale: isActive ? 1 : 0,
-                opacity: isActive ? 0.3 : 0
-              }}
+              animate={reducedMotion ? { scale: 0, opacity: 0 } : { scale: isActive ? 1 : 0, opacity: isActive ? 0.3 : 0 }}
               transition={{
-                type: "spring",
-                stiffness: 400,
-                damping: 25
+                ...(respectReducedMotion({ transition: { duration: 0.2 } }).transition as any)
               }}
               style={{
                 background: `radial-gradient(circle at center, ${
@@ -274,14 +284,8 @@ export default function EnhancedFilterChips({
             <motion.div
               className="absolute inset-0 rounded-full pointer-events-none"
               initial={false}
-              animate={isActive ? {
-                scale: [0, 2, 2],
-                opacity: [0.5, 0.2, 0]
-              } : {}}
-              transition={{
-                duration: 0.6,
-                ease: EASING.primary
-              }}
+              animate={reducedMotion ? {} : (isActive ? { scale: [0, 2, 2], opacity: [0.5, 0.2, 0] } : {})}
+              transition={respectReducedMotion({ transition: { duration: 0.6, ease: EASING.primary } }).transition as any}
               style={{
                 background: `radial-gradient(circle at center, ${
                   getCategoryStyles(category).active.color
@@ -312,15 +316,8 @@ export default function EnhancedFilterChips({
                   backgroundColor: getCategoryStyles(category).active.color
                 }}
                 initial={{ scale: 0, opacity: 0 }}
-                animate={{ 
-                  scale: [0, 1.2, 1], 
-                  opacity: 1 
-                }}
-                transition={{
-                  type: "spring",
-                  stiffness: 400,
-                  damping: 20
-                }}
+                animate={reducedMotion ? { opacity: 1, scale: 1 } : { scale: [0, 1.2, 1], opacity: 1 }}
+                transition={respectReducedMotion({ transition: { duration: 0.2 } }).transition as any}
               >
                 {/* Pulsing glow effect */}
                 <motion.div
@@ -328,15 +325,8 @@ export default function EnhancedFilterChips({
                   style={{
                     backgroundColor: getCategoryStyles(category).active.color
                   }}
-                  animate={{
-                    scale: [1, 1.5, 1],
-                    opacity: [0.8, 0, 0.8]
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
+                  animate={reducedMotion ? {} : { scale: [1, 1.5, 1], opacity: [0.8, 0, 0.8] }}
+                  transition={reducedMotion ? { duration: 0 } : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 />
               </motion.div>
             )}
@@ -345,14 +335,8 @@ export default function EnhancedFilterChips({
             <motion.div
               className="absolute inset-0 rounded-full pointer-events-none"
               initial={{ opacity: 0 }}
-              whileHover={{
-                opacity: 0.6,
-                scale: 1.1
-              }}
-              transition={{
-                duration: 0.3,
-                ease: EASING.primary
-              }}
+              whileHover={reducedMotion ? {} : { opacity: 0.6, scale: 1.1 }}
+              transition={respectReducedMotion({ transition: { duration: 0.3, ease: EASING.primary } }).transition as any}
               style={{
                 background: `radial-gradient(circle at center, ${
                   getCategoryStyles(category).hover.borderColor
@@ -369,26 +353,9 @@ export default function EnhancedFilterChips({
         <motion.button
           className="px-4 py-2 text-sm rounded-full backdrop-blur-[10px] border border-white/20 font-medium text-white/70 hover:text-white hover:border-white/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30 transition-all duration-200"
           initial={{ opacity: 0, scale: 0.8, x: -20 }}
-          animate={{ 
-            opacity: 1, 
-            scale: 1, 
-            x: 0,
-            transition: {
-              type: "spring",
-              stiffness: 400,
-              damping: 25,
-              delay: categories.length * 0.1 + 0.3
-            }
-          }}
-          whileHover={{
-            scale: 1.05,
-            backgroundColor: "rgba(255, 255, 255, 0.1)",
-            transition: { duration: 0.2 }
-          }}
-          whileTap={{
-            scale: 0.95,
-            transition: { duration: 0.1 }
-          }}
+          animate={{ opacity: 1, scale: 1, x: 0, transition: { ...(respectReducedMotion({ transition: { duration: 0.2 } }).transition as any), delay: reducedMotion ? 0 : categories.length * 0.1 + 0.3 } }}
+          whileHover={reducedMotion ? {} : { scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)", transition: { duration: 0.2 } }}
+          whileTap={reducedMotion ? {} : { scale: 0.95, transition: { duration: 0.1 } }}
           onClick={() => onCategoryChange('all')}
           aria-label="Limpar todos os filtros"
         >

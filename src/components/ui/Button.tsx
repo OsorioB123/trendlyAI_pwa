@@ -164,8 +164,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       }
     )
 
+    const MButton = motion.button as any
     return (
-      <motion.button
+      <MButton
         ref={ref}
         className={buttonClasses}
         onClick={handleClick}
@@ -257,7 +258,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           whileHover={{ opacity: 1, x: ['-100%', '100%'] }}
           transition={{ duration: 1.5, ease: 'easeInOut' }}
         />
-      </motion.button>
+      </MButton>
     )
   }
 )

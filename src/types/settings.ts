@@ -68,6 +68,11 @@ export interface NotificationPreferences {
   track_progress_updates: boolean
   new_features: boolean
   security_alerts: boolean // Always true, cannot be disabled
+  // Extra flags used in UI components (aliases/extended options)
+  marketing_communications?: boolean
+  feature_updates?: boolean
+  community_activity?: boolean
+  system_maintenance?: boolean
 }
 
 // Settings API response interfaces
@@ -259,5 +264,9 @@ export const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
   marketing_emails: false,
   track_progress_updates: true,
   new_features: true,
-  security_alerts: true
+  security_alerts: true,
+  marketing_communications: false,
+  feature_updates: true,
+  community_activity: false,
+  system_maintenance: true
 }

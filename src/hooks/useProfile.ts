@@ -64,21 +64,21 @@ export function useProfile(): UseProfileReturn {
 
       // Load profile data from auth context first (it may already be available)
       if (authProfile) {
-        setProfile(authProfile)
-        setFormData({
-          display_name: authProfile.display_name || '',
-          bio: authProfile.bio || '',
-          level: authProfile.level || 'Explorador'
-        })
+        setProfile(authProfile as unknown as UserProfile)
+          setFormData({
+            display_name: authProfile.display_name || '',
+            bio: authProfile.bio || '',
+            level: (authProfile.level || 'Explorador') as any
+          })
       } else {
         // Fallback to service if auth context doesn't have profile
         const profileResponse = await ProfileService.getUserProfile(user.id)
         if (profileResponse.success && profileResponse.data) {
-          setProfile(profileResponse.data)
+          setProfile(profileResponse.data as UserProfile)
           setFormData({
             display_name: profileResponse.data.display_name || '',
             bio: profileResponse.data.bio || '',
-            level: profileResponse.data.level || 'Explorador'
+            level: (profileResponse.data.level || 'Explorador') as any
           })
         }
       }
@@ -134,11 +134,11 @@ export function useProfile(): UseProfileReturn {
   // Update local profile when auth profile changes
   useEffect(() => {
     if (authProfile) {
-      setProfile(authProfile)
+      setProfile(authProfile as unknown as UserProfile)
       setFormData({
         display_name: authProfile.display_name || '',
         bio: authProfile.bio || '',
-        level: authProfile.level || 'Explorador'
+        level: (authProfile.level || 'Explorador') as any
       })
     }
   }, [authProfile])
@@ -200,16 +200,7 @@ export function useProfile(): UseProfileReturn {
       setIsUploading(true)
       setError(null)
 
-      // Use auth context method first
-      if (updateAuthAvatar) {
-        const result = await updateAuthAvatar(file)
-        if (result) {
-          setIsUploading(false)
-          return true
-        }
-      }
-
-      // Fallback to service
+      // Upload via service (simple path)
       const response = await ProfileService.uploadAvatar(user.id, file)
       
       if (response.success && response.data) {
@@ -274,7 +265,7 @@ export function useProfile(): UseProfileReturn {
       setFormData({
         display_name: profile.display_name || '',
         bio: profile.bio || '',
-        level: profile.level || 'Explorador'
+        level: (profile.level || 'Explorador') as any
       })
     }
     setEditingField(null)
@@ -449,14 +440,9 @@ export function useProfile(): UseProfileReturn {
     clearError,
 
     // Extended methods for convenience
-    refreshArsenal,
-    refreshMetrics,
-    refreshReferral,
+    // Note: internal refresh helpers are not part of the public API to keep it simple
 
-    // Computed values
-    hasProfileData,
-    isProfileComplete,
-    completionPercentage
+    // Computed values omitted from public API
   }
 }
 

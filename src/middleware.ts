@@ -103,7 +103,13 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    // Temporarily disable middleware by matching nothing to allow testing
-    '/middleware-disabled-for-testing'
+    // Protect authenticated and onboarding routes
+    '/dashboard/:path*',
+    '/tools/:path*',
+    '/tracks/:path*',
+    '/chat/:path*',
+    '/profile/:path*',
+    '/settings/:path*',
+    '/onboarding'
   ],
 }

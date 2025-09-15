@@ -332,8 +332,8 @@ class HelpService {
         .from('faq_items')
         .update({
           helpful_count: helpful 
-            ? supabase.sql`helpful_count + 1`
-            : supabase.sql`GREATEST(helpful_count - 1, 0)`
+            ? ( (supabase as any).sql`helpful_count + 1` )
+            : ( (supabase as any).sql`GREATEST(helpful_count - 1, 0)` )
         })
         .eq('id', item_id)
 

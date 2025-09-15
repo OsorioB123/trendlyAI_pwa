@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../../../contexts/AuthContext'
@@ -214,9 +215,11 @@ export default function RegisterPage() {
 
         <main className="w-full max-w-md flex flex-col items-center">
           {/* Logo */}
-          <img 
+          <Image 
             src="https://i.ibb.co/DfMChfL8/Trendly-AI-branco.webp?w=800&q=80" 
             alt="Logo da TrendlyAI" 
+            width={800}
+            height={200}
             className="w-48 mb-10 animate-fade-in-up object-cover"
           />
 
@@ -264,9 +267,11 @@ export default function RegisterPage() {
 
       <main className="w-full max-w-md flex flex-col items-center">
         {/* Logo */}
-        <img 
+        <Image 
           src="https://i.ibb.co/DfMChfL8/Trendly-AI-branco.webp?w=800&q=80" 
           alt="Logo da TrendlyAI" 
+          width={800}
+          height={200}
           className="w-48 mb-10 animate-fade-in-up object-cover"
         />
 

@@ -3,11 +3,14 @@
 // Message display with streaming support and animations
 // =====================================================
 
+
 'use client'
 
 import React, { useEffect, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Message } from '../../types/chat'
 import { PORTUGUESE_MESSAGES } from '../../types/chat'
+import { MOTION_CONSTANTS } from '@/lib/motion'
 
 interface ChatMessagesProps {
   messages: Message[]
@@ -23,52 +26,59 @@ interface MessageBubbleProps {
 
 function MessageBubble({ message, isLatest }: MessageBubbleProps) {
   const isUser = message.role === 'user'
-  
+  const bubbleVariants = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0, transition: { duration: MOTION_CONSTANTS.DURATION.normal } },
+    exit: { opacity: 0, y: -10, transition: { duration: MOTION_CONSTANTS.DURATION.fast } },
+  }
+
   return (
-    <div
-      className={`flex items-start gap-4 w-full ${
-        isUser ? 'justify-end' : ''
-      }`}
-      style={{ 
-        animation: isLatest ? 'fadeInUpBubble 0.4s cubic-bezier(0.16, 1, 0.3, 1)' : 'none'
-      }}
+    <motion.div
+      layout
+      variants={bubbleVariants as any}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      className={`flex items-start gap-4 w-full ${isUser ? 'justify-end' : ''}`}
     >
-      <div 
+      <div
         className={`message-bubble border-radius-18 p-3 ${
-          isUser 
-            ? 'user-bubble bg-white/12 border border-white/20 max-w-[70%] md:max-w-[60%]' 
+          isUser
+            ? 'user-bubble bg-white/12 border border-white/20 max-w-[70%] md:max-w-[60%]'
             : 'assistant-bubble bg-white/5 border border-white/15 max-w-[90%] md:max-w-[75%]'
         }`}
-        style={{ 
-          borderRadius: '18px', 
-          padding: '12px 16px' 
-        }}
+        style={{ borderRadius: '18px', padding: '12px 16px' }}
       >
         <div className="markdown-content text-white/95 leading-relaxed">
-          <p className="whitespace-pre-wrap break-words">
-            {message.content}
-          </p>
+          <p className="whitespace-pre-wrap break-words">{message.content}</p>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
 function ThinkingIndicator() {
   return (
-    <div className="flex items-start gap-4 ai-thinking-container">
-      <div 
-        className="assistant-bubble message-bubble bg-white/5 border border-white/15" 
-        style={{ 
-          borderRadius: '18px', 
-          padding: '12px 16px' 
-        }}
+    <motion.div
+      layout
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="flex items-start gap-4 ai-thinking-container"
+    >
+      <div
+        className="assistant-bubble message-bubble bg-white/5 border border-white/15"
+        style={{ borderRadius: '18px', padding: '12px 16px' }}
       >
-        <div className="ai-thinking-text text-lg font-semibold bg-gradient-to-r from-white/40 via-white/90 to-white/40 bg-clip-text text-transparent animate-pulse">
+        <motion.div
+          className="ai-thinking-text text-lg font-semibold bg-gradient-to-r from-white/40 via-white/90 to-white/40 bg-clip-text text-transparent"
+          animate={{ opacity: [0.6, 1, 0.6] }}
+          transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+        >
           {PORTUGUESE_MESSAGES.THINKING}
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -145,15 +155,21 @@ export function ChatMessages({
     return () => container.removeEventListener('scroll', handleScroll)
   }, [])
 
-  if (!messages || messages.length === 0 && !isLoading) {
+  if (!messages || (messages.length === 0 && !isLoading)) {
     return (
-      <main 
+      <main
+        id="chat-log"
         ref={containerRef}
         className={`flex-grow overflow-y-auto hide-scrollbar scroll-smooth ${className}`}
         style={{ 
           paddingTop: '100px', 
           paddingBottom: '160px' 
         }}
+        role="log"
+        aria-live="polite"
+        aria-relevant="additions"
+        aria-atomic="false"
+        tabIndex={-1}
       >
         <EmptyState />
         <div ref={messagesEndRef} />
@@ -162,30 +178,41 @@ export function ChatMessages({
   }
 
   return (
-    <main 
+    <main
+      id="chat-log"
       ref={containerRef}
       className={`flex-grow overflow-y-auto hide-scrollbar scroll-smooth ${className}`}
       style={{ 
         paddingTop: '100px', 
         paddingBottom: '160px' 
       }}
+      role="log"
+      aria-live={isStreaming ? 'polite' : 'off'}
+      aria-relevant="additions"
+      aria-atomic="false"
+      aria-busy={isLoading || isStreaming}
+      tabIndex={-1}
     >
-      <div className="w-full max-w-3xl mx-auto p-4 flex flex-col gap-6">
-        {/* Messages */}
-        {messages.map((message, index) => (
-          <MessageBubble
-            key={message.id}
-            message={message}
-            isLatest={index === messages.length - 1}
-          />
-        ))}
-        
-        {/* Loading/Thinking Indicator */}
-        {(isLoading || isStreaming) && <ThinkingIndicator />}
-        
-        {/* Scroll anchor */}
+      <motion.div
+        className="w-full max-w-3xl mx-auto p-4 flex flex-col gap-6"
+        variants={MOTION_CONSTANTS.VARIANTS.staggerContainer as any}
+        initial="initial"
+        animate="animate"
+      >
+        <AnimatePresence initial={false} mode="popLayout">
+          {messages.map((message, index) => (
+            <MessageBubble
+              key={message.id}
+              message={message}
+              isLatest={index === messages.length - 1}
+            />
+          ))}
+          {(isLoading || isStreaming) && (
+            <ThinkingIndicator />
+          )}
+        </AnimatePresence>
         <div ref={messagesEndRef} />
-      </div>
+      </motion.div>
     </main>
   )
 }

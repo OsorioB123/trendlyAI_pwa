@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../../../contexts/AuthContext'
@@ -123,9 +124,11 @@ export default function LoginPage() {
       <main className="w-full max-w-md px-4">
         <div className="w-full flex flex-col items-center">
           {/* Logo */}
-          <img 
+          <Image 
             src="https://i.ibb.co/DfMChfL8/Trendly-AI-branco.webp?w=800&q=80" 
-            alt="Logo da TrendlyAI" 
+            alt="Logo da TrendlyAI"
+            width={800}
+            height={200}
             className="w-48 mb-10 object-cover animate-fade-in-up"
           />
 

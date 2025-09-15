@@ -134,6 +134,7 @@ const ToastItem = ({ toast }: { toast: Toast }) => {
         'min-h-[48px]', // Minimum touch target
         getToastStyles(toast.type)
       )}
+      role="status"
     >
       {/* Icon */}
       <div className="flex-shrink-0 mt-0.5">
@@ -192,7 +193,13 @@ const ToastContainer = () => {
   const { toasts } = useToast()
 
   return (
-    <div className="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none">
+    <div 
+      className="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"
+      aria-live="polite"
+      aria-atomic="false"
+      role="region"
+      aria-label="Notificações"
+    >
       <AnimatePresence mode="popLayout">
         {toasts.map(toast => (
           <div key={toast.id} className="pointer-events-auto">

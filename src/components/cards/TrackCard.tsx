@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Heart } from 'lucide-react'
 import { Track } from '../../types/track'
@@ -115,10 +116,13 @@ export default function TrackCard({
         className="rounded-2xl overflow-hidden relative h-64 cursor-pointer group hover:-translate-y-1 transition-all duration-200"
         onClick={handleCardClick}
       >
-        <img 
-          src={track.backgroundImage} 
+        <Image 
+          src={track.backgroundImage || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80'} 
           alt={track.title}
-          className="absolute w-full h-full object-cover"
+          fill
+          sizes="(max-width: 768px) 100vw, 33vw"
+          className="object-cover"
+          priority={false}
         />
         
         {/* Favorite Button */}

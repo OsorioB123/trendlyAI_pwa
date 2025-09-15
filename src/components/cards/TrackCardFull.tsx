@@ -61,9 +61,11 @@ export default function TrackCardFull({
     return colors[category.length % colors.length]
   }
 
+  const progress = track.progress ?? 0
+
   const getProgressBarColor = () => {
-    if (track.progress >= 100) return 'bg-green-500'
-    if (track.progress >= 50) return 'bg-blue-500'
+    if (progress >= 100) return 'bg-green-500'
+    if (progress >= 50) return 'bg-blue-500'
     return 'bg-white'
   }
 
@@ -124,13 +126,13 @@ export default function TrackCardFull({
         <div className="progress-section">
           <div className="flex items-center justify-between text-sm mb-2 text-white/80 opacity-70 transition-opacity duration-300 group-hover:opacity-100">
             <span>Progresso</span>
-            <span>{track.progress}%</span>
+            <span>{progress}%</span>
           </div>
           
           <div className="w-full bg-white/10 rounded-full h-2">
             <div 
               className={`h-2 rounded-full transition-all duration-500 ${getProgressBarColor()}`}
-              style={{ width: `${Math.min(track.progress, 100)}%` }}
+              style={{ width: `${Math.min(progress, 100)}%` }}
             />
           </div>
         </div>

@@ -117,8 +117,7 @@ export default function ProfileContent() {
 
       {/* Header */}
       <Header 
-        variant={HeaderVariant.Profile}
-        user={user}
+        variant={HeaderVariant.SECONDARY}
       />
 
       {/* Toast Messages */}
@@ -142,20 +141,22 @@ export default function ProfileContent() {
           
           {/* Profile Header */}
           <ProfileHeader 
-            user={user}
-            profile={profileData.profile}
-            metrics={profileData.metrics}
-            onProfileUpdate={handleProfileUpdate}
-            onAvatarUpdate={handleAvatarUpdate}
-            isUpdating={profileData.isUploading || profileData.isSaving}
+            profile={profileData.profile as any}
+            isEditing={!!profileData.editingField}
+            editingField={profileData.editingField}
+            onEditField={profileData.setEditingField}
+            onSaveField={profileData.saveField}
+            onAvatarUpload={profileData.uploadAvatar}
+            isUploading={profileData.isUploading}
+            isSaving={profileData.isSaving}
           />
 
           {/* Next Action Card */}
           {profileData.nextAction && (
             <NextActionCard 
               recommendation={profileData.nextAction}
-              onActionTaken={(actionType) => {
-                console.log('Action taken:', actionType)
+              onActionClick={() => {
+                console.log('Next action clicked')
                 // Could trigger analytics or profile update here
               }}
             />
@@ -166,21 +167,25 @@ export default function ProfileContent() {
             
             {/* Arsenal Section */}
             <ArsenalSection
-              arsenal={profileData.arsenalData}
+              arsenalData={profileData.arsenalData as any}
               activeTab={activeArsenalTab}
               onTabChange={setActiveArsenalTab}
+              onTrackClick={(t) => console.log('Track click', t)}
+              onToolClick={(tool) => console.log('Tool click', tool)}
+              onNavigateToTools={() => router.push('/tools')}
               isLoading={profileData.isLoading}
             />
 
             {/* Referral Section */}
             <ReferralSection
-              referralInfo={profileData.referralInfo}
+              referralInfo={profileData.referralInfo as any}
               activeTab={activeReferralTab}
               onTabChange={setActiveReferralTab}
-              onReferralCodeCopy={() => {
+              onCopyReferralLink={() => {
                 setSuccessMessage('Código de referência copiado!')
                 setTimeout(() => setSuccessMessage(''), 3000)
               }}
+              onNavigateToAffiliate={() => console.log('Navigate to affiliate')}
             />
 
           </div>

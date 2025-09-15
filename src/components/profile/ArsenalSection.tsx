@@ -1,10 +1,13 @@
+
 'use client'
 
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { Wrench, Compass } from 'lucide-react'
 import TrackCard from '../cards/TrackCard'
 import type { ArsenalSectionProps, ArsenalTab } from '../../types/profile'
 import { ARSENAL_TABS } from '../../types/profile'
+import { MOTION_CONSTANTS, respectReducedMotion } from '@/lib/motion'
 
 export default function ArsenalSection({
   arsenalData,
@@ -20,6 +23,7 @@ export default function ArsenalSection({
     trails: 133,
     tools: 108
   })
+  const transitionSafe = respectReducedMotion({ transition: { duration: 0.3 } }).transition as any
 
   const getTabPosition = () => {
     return activeTab === 'trails' ? '0px' : '133px'
@@ -39,7 +43,13 @@ export default function ArsenalSection({
 
   if (isLoading) {
     return (
-      <section className={`bg-white/8 backdrop-blur-lg border border-white/12 rounded-2xl p-8 animate-entry delay-2 ${className}`}>
+      <motion.section 
+        className={`bg-white/8 backdrop-blur-lg border border-white/12 rounded-2xl p-8 ${className}`}
+        variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
+        initial="initial"
+        animate="animate"
+        transition={transitionSafe}
+      >
         <div className="animate-pulse">
           <div className="h-8 bg-white/10 rounded w-48 mb-8"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -48,12 +58,18 @@ export default function ArsenalSection({
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
     )
   }
 
   return (
-    <section className={`bg-white/8 backdrop-blur-lg border border-white/12 rounded-2xl p-8 animate-entry delay-2 ${className}`}>
+    <motion.section 
+      className={`bg-white/8 backdrop-blur-lg border border-white/12 rounded-2xl p-8 ${className}`}
+      variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
+      initial="initial"
+      animate="animate"
+      transition={transitionSafe}
+    >
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-6 mb-8">
         <h2 className="text-3xl font-medium text-white tracking-tight">Seu Arsenal</h2>
         
@@ -96,7 +112,7 @@ export default function ArsenalSection({
               arsenalData.tracks.map((track) => (
                 <TrackCard
                   key={track.id}
-                  track={track}
+                  track={track as any}
                   variant="compact"
                   onClick={handleTrackClick}
                 />
@@ -161,6 +177,6 @@ export default function ArsenalSection({
           }
         }
       `}</style>
-    </section>
+    </motion.section>
   )
 }

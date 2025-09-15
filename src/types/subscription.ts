@@ -188,6 +188,21 @@ export interface UseSubscriptionReturn {
   
   // Refresh data
   refetch: () => Promise<void>
+
+  // Computed helpers (optional)
+  subscriptionStatus?: Subscription['status']
+  isActive?: boolean
+  isPaused?: boolean
+  isCanceled?: boolean
+  isPastDue?: boolean
+  creditsInfo?: {
+    used: number
+    limit: number
+    remaining: number
+    percentage: number
+    isUnlimited: boolean
+  } | null
+  defaultPaymentMethod?: PaymentMethod
 }
 
 // =====================================================

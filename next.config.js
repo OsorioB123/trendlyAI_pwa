@@ -1,11 +1,18 @@
 /** @type {import('next').NextConfig} */
+const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_HOST || (() => {
+  try {
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+    }
+  } catch {}
+  return 'gugfvihfkimixnetcayg.supabase.co'
+})()
+
 const nextConfig = {
   reactStrictMode: true,
   serverExternalPackages: ['@supabase/supabase-js'],
-  // Disable static optimization completely for problem pages
-  experimental: {
-    outputFileTracingRoot: process.cwd(),
-  },
+  // Set tracing root at top-level (moved from experimental)
+  outputFileTracingRoot: process.cwd(),
   async generateBuildId() {
     return 'build-' + Date.now()
   },
@@ -13,7 +20,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'gugfvihfkimixnetcayg.supabase.co',
+        hostname: supabaseHost,
       },
       {
         protocol: 'https',

@@ -1,6 +1,8 @@
+
 'use client'
 
 import { useState, useRef } from 'react'
+import Image from 'next/image'
 import { Camera, Upload, X, Check, AlertCircle } from 'lucide-react'
 import { AvatarUploadResult } from '../../types/settings'
 
@@ -160,10 +162,12 @@ export default function AvatarUpload({ currentAvatarUrl, onUpload, isUploading =
           onDragOver={handleDragOver}
           onDrop={handleDrop}
         >
-          <img
+          <Image
             src={currentImage}
             alt="Avatar"
-            className={`w-full h-full object-cover transition-all duration-300 ${
+            fill
+            sizes="80px"
+            className={`object-cover transition-all duration-300 ${
               uploadStatus === 'uploading' ? 'opacity-50' : 'group-hover:opacity-80'
             }`}
           />

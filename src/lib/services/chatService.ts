@@ -52,8 +52,8 @@ class ChatService {
       }
 
       // Transform data to include message count and last message info
-      const conversations: Conversation[] = data?.map(conv => {
-        const sortedMessages = conv.messages?.sort((a, b) => 
+      const conversations: Conversation[] = (data as any[] | undefined)?.map((conv: any) => {
+        const sortedMessages = conv.messages?.sort((a: any, b: any) => 
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         ) || []
         
@@ -94,7 +94,7 @@ class ChatService {
     request: CreateConversationRequest
   ): Promise<ChatServiceResponse<Conversation>> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('conversations')
         .insert([{
           user_id: userId,
@@ -169,7 +169,7 @@ class ChatService {
     updates: UpdateConversationRequest
   ): Promise<ChatServiceResponse<Conversation>> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('conversations')
         .update({
           ...updates,
@@ -213,7 +213,7 @@ class ChatService {
   ): Promise<ChatServiceResponse<void>> {
     try {
       // First delete all messages
-      const { error: messagesError } = await supabase
+      const { error: messagesError } = await (supabase as any)
         .from('messages')
         .delete()
         .eq('conversation_id', conversationId)
@@ -224,7 +224,7 @@ class ChatService {
       }
 
       // Then delete the conversation
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('conversations')
         .delete()
         .eq('id', conversationId)
@@ -263,7 +263,7 @@ class ChatService {
       const offset = (page - 1) * limit
 
       // Verify user has access to this conversation
-      const { data: conversation } = await supabase
+      const { data: conversation } = await (supabase as any)
         .from('conversations')
         .select('id')
         .eq('id', conversationId)
@@ -277,7 +277,7 @@ class ChatService {
         }
       }
 
-      const { data, error, count } = await supabase
+      const { data, error, count } = await (supabase as any)
         .from('messages')
         .select('*', { count: 'exact' })
         .eq('conversation_id', conversationId)
@@ -289,7 +289,7 @@ class ChatService {
         return { success: false, error: error.message }
       }
 
-      const messages: Message[] = data?.map(msg => ({
+      const messages: Message[] = ((data as any[]) || []).map((msg: any) => ({
         id: msg.id,
         conversation_id: msg.conversation_id,
         role: msg.role,
@@ -325,7 +325,7 @@ class ChatService {
   ): Promise<ChatServiceResponse<Message>> {
     try {
       // Verify user has access to this conversation
-      const { data: conversation } = await supabase
+      const { data: conversation } = await (supabase as any)
         .from('conversations')
         .select('id')
         .eq('id', request.conversation_id)
@@ -347,7 +347,7 @@ class ChatService {
         }
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('messages')
         .insert([{
           conversation_id: request.conversation_id,
@@ -365,7 +365,7 @@ class ChatService {
       }
 
       // Update conversation's updated_at timestamp
-      await supabase
+      await (supabase as any)
         .from('conversations')
         .update({ updated_at: new Date().toISOString() })
         .eq('id', request.conversation_id)
@@ -577,7 +577,7 @@ class ChatService {
    */
   static async getUserCredits(userId: string): Promise<ChatServiceResponse<UserCredits>> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_credits')
         .select('*')
         .eq('user_id', userId)
@@ -593,11 +593,12 @@ class ChatService {
         return await this.initializeUserCredits(userId)
       }
 
+      const row: any = data as any
       const credits: UserCredits = {
-        current: data.current_credits || 0,
-        total: data.total_credits || 50,
-        percentage: Math.round(((data.current_credits || 0) / (data.total_credits || 50)) * 100),
-        renewal_date: data.renewal_date
+        current: row?.current_credits || 0,
+        total: row?.total_credits || 50,
+        percentage: Math.round(((row?.current_credits || 0) / (row?.total_credits || 50)) * 100),
+        renewal_date: row?.renewal_date
       }
 
       return { success: true, data: credits }
@@ -619,7 +620,7 @@ class ChatService {
       const renewalDate = new Date()
       renewalDate.setDate(renewalDate.getDate() + 1) // Next day
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_credits')
         .insert([{
           user_id: userId,
@@ -635,11 +636,12 @@ class ChatService {
         return { success: false, error: error.message }
       }
 
+      const row: any = data as any
       const credits: UserCredits = {
-        current: data.current_credits,
-        total: data.total_credits,
+        current: row.current_credits,
+        total: row.total_credits,
         percentage: 100,
-        renewal_date: data.renewal_date
+        renewal_date: row.renewal_date
       }
 
       return { success: true, data: credits }
@@ -658,7 +660,7 @@ class ChatService {
    */
   static async consumeUserCredits(userId: string, amount: number = 1): Promise<ChatServiceResponse<UserCredits>> {
     try {
-      const { data, error } = await supabase.rpc('consume_user_credits', {
+      const { data, error } = await (supabase as any).rpc('consume_user_credits', {
         user_id: userId,
         credit_amount: amount
       })
@@ -692,7 +694,7 @@ class ChatService {
     limit: number = 20
   ): Promise<ChatServiceResponse<Conversation[]>> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('conversations')
         .select('*')
         .eq('user_id', userId)
@@ -727,17 +729,17 @@ class ChatService {
   }>> {
     try {
       const [conversationsResult, messagesResult, creditsResult] = await Promise.all([
-        supabase
+        (supabase as any)
           .from('conversations')
           .select('id', { count: 'exact' })
           .eq('user_id', userId),
 
-        supabase
+        (supabase as any)
           .from('messages')
           .select('id', { count: 'exact' })
           .eq('conversations.user_id', userId),
 
-        supabase.rpc('get_credits_used_today', { user_id: userId })
+        (supabase as any).rpc('get_credits_used_today', { user_id: userId })
       ])
 
       const stats = {

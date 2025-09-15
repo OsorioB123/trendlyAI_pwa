@@ -1,9 +1,12 @@
+
 'use client'
 
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { Gift, DollarSign, Copy, ArrowRight, Check } from 'lucide-react'
 import type { ReferralSectionProps, ReferralTab } from '../../types/profile'
 import { REFERRAL_TABS } from '../../types/profile'
+import { MOTION_CONSTANTS, respectReducedMotion } from '@/lib/motion'
 
 export default function ReferralSection({
   referralInfo,
@@ -14,6 +17,7 @@ export default function ReferralSection({
   className = ''
 }: ReferralSectionProps) {
   const [copySuccess, setCopySuccess] = useState(false)
+  const transitionSafe = respectReducedMotion({ transition: { duration: 0.3 } }).transition as any
 
   const handleCopyReferralLink = async () => {
     if (!referralInfo?.referral_code) return
@@ -37,7 +41,13 @@ export default function ReferralSection({
   }
 
   return (
-    <section className={`mt-16 animate-entry delay-3 ${className}`}>
+    <motion.section 
+      className={`mt-16 ${className}`}
+      variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
+      initial="initial"
+      animate="animate"
+      transition={transitionSafe}
+    >
       <h2 className="text-3xl font-medium text-white tracking-tight mb-8">Convidar e Ganhar</h2>
 
       {/* Tab Buttons */}
@@ -154,24 +164,6 @@ export default function ReferralSection({
         </div>
       </div>
 
-      {/* CSS animations */}
-      <style jsx>{`
-        .animate-entry {
-          opacity: 0;
-          transform: translateY(30px);
-          animation: slideInFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .animate-entry.delay-3 { 
-          animation-delay: 0.45s; 
-        }
-        
-        @keyframes slideInFade {
-          to { 
-            opacity: 1; 
-            transform: translateY(0); 
-          }
-        }
-      `}</style>
-    </section>
+    </motion.section>
   )
 }

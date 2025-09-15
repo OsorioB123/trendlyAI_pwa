@@ -1,6 +1,9 @@
+
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { motion } from 'framer-motion'
+import { MOTION_CONSTANTS, respectReducedMotion } from '../../lib/motion'
 import { ArrowRight, Check } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useBackground } from '../../contexts/BackgroundContext'
@@ -118,6 +121,7 @@ export default function OnboardingPage() {
   const observerRef = useRef<IntersectionObserver | null>(null)
   
   const totalSlides = 4
+  const transitionSafe = respectReducedMotion({ transition: { duration: MOTION_CONSTANTS.DURATION.normal } }).transition as any
 
   // Handle slide navigation - exact match from HTML reference
   const showSlide = useCallback((slideNumber: number) => {
@@ -152,22 +156,7 @@ export default function OnboardingPage() {
       }, 100)
     }
     
-    // Restart animations for current slide
-    setTimeout(() => {
-      if (typeof document !== 'undefined') {
-        const slide = document.getElementById(`slide-${slideNumber}`)
-        if (slide) {
-          const fadeElements = slide.querySelectorAll('.fade-in-up, .animate-entry')
-          fadeElements.forEach(el => {
-            const element = el as HTMLElement
-            element.style.animation = 'none'
-            // Force reflow
-            element.offsetHeight
-            element.style.animation = ''
-          })
-        }
-      }
-    }, 50)
+    // Framer Motion handles entrance animations; no manual CSS restart needed
   }, [selectedThemeId, themesInitialized])
 
   // Setup intersection observer for mobile theme selection - exact from HTML reference
@@ -325,45 +314,77 @@ export default function OnboardingPage() {
 
       {/* Main content - Exact layout match from HTML reference */}
       <main className="absolute inset-0 z-10 flex flex-col justify-end px-6 sm:px-8 pb-10">
-        <div id="slides-container" className="relative flex-1 min-h-0">
+        <motion.div
+          id="slides-container"
+          key={`slide-${currentSlide}`}
+          className="relative flex-1 min-h-0"
+          variants={MOTION_CONSTANTS.VARIANTS.staggerContainer as any}
+          initial="initial"
+          animate="animate"
+          transition={transitionSafe}
+        >
           
           {/* Slide 1 - Bottom-left positioning on desktop, centered on mobile */}
           <div id="slide-1" className={`slide ${currentSlide === 1 ? 'active' : ''}`}>
-            <div className="lg:max-w-md">
-              <h1 className="text-3xl md:text-4xl fade-in-up font-semibold tracking-tight mb-4 font-geist">
+            <motion.div className="lg:max-w-md">
+              <motion.h1
+                className="text-3xl md:text-4xl font-semibold tracking-tight mb-4 font-geist"
+                variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
+              >
                 A tela em branco. O maior inimigo da criatividade.
-              </h1>
-              <p className="fade-in-up max-w-md text-base text-white/80" style={{ animationDelay: '0.15s' }}>
+              </motion.h1>
+              <motion.p
+                className="max-w-md text-base text-white/80"
+                variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
+              >
                 Por anos, as ferramentas nos deram mais botões, mas nunca uma direção. Elas nos deixaram sozinhos com o nosso maior desafio.
-              </p>
-            </div>
+              </motion.p>
+            </motion.div>
           </div>
           
           {/* Slide 2 - Bottom-left positioning on desktop, centered on mobile */}
           <div id="slide-2" className={`slide ${currentSlide === 2 ? 'active' : ''}`}>
-            <div className="lg:max-w-md">
-              <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4 fade-in-up font-geist">
+            <motion.div className="lg:max-w-md">
+              <motion.h1
+                className="text-3xl md:text-4xl font-semibold tracking-tight mb-4 font-geist"
+                variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
+              >
                 E se você tivesse um gênio como co-piloto?
-              </h1>
-              <p className="text-base text-white/80 mb-6 fade-in-up max-w-md" style={{ animationDelay: '0.15s' }}>
+              </motion.h1>
+              <motion.p
+                className="text-base text-white/80 mb-6 max-w-md"
+                variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
+              >
                 Apresentando Salina, sua mente estratégica pessoal. Ela não te dá ferramentas. Ela conversa, guia e co-cria com você, transformando intenção em excelência.
-              </p>
-            </div>
+              </motion.p>
+            </motion.div>
           </div>
           
           {/* Slide 3 - Theme Selection - Centered layout for this slide */}
           <div id="slide-3" className={`slide ${currentSlide === 3 ? 'active' : ''}` + " !justify-center"}>
             <div className="slide-content-theme">
-              <section className="text-center pt-8 pb-4 flex-shrink-0">
-                <h2 className="text-3xl font-semibold tracking-tight animate-entry font-geist">
+              <motion.section
+                className="text-center pt-8 pb-4 flex-shrink-0"
+                variants={MOTION_CONSTANTS.VARIANTS.staggerContainer as any}
+              >
+                <motion.h2
+                  className="text-3xl font-semibold tracking-tight font-geist"
+                  variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
+                >
                   Defina a energia do seu estúdio.
-                </h2>
-                <p className="mt-2 text-white/80 animate-entry delay-1">
+                </motion.h2>
+                <motion.p
+                  className="mt-2 text-white/80"
+                  variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
+                >
                   Escolha o ambiente que inspira seu trabalho hoje.
-                </p>
-              </section>
-              
-              <section className="flex-grow flex flex-col items-center justify-center min-h-0 py-8 animate-entry delay-2">
+                </motion.p>
+              </motion.section>
+
+              <motion.section
+                className="flex-grow flex flex-col items-center justify-center min-h-0 py-8"
+                variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
+              >
                 <div id="themes-gallery" className="w-full hide-scrollbar overflow-x-auto lg:overflow-x-visible pb-4">
                   <ol id="themes-track" className="flex items-center gap-6 lg:p-0 lg:grid lg:grid-cols-4 lg:gap-8 lg:max-w-3xl lg:mx-auto">
                     {THEMES.map((theme, index) => (
@@ -378,47 +399,63 @@ export default function OnboardingPage() {
                     ))}
                   </ol>
                 </div>
-              </section>
+              </motion.section>
             </div>
           </div>
 
           {/* Slide 4 - Bottom-left positioning on desktop, centered on mobile */}
           <div id="slide-4" className={`slide ${currentSlide === 4 ? 'active' : ''}`}>
-            <div className="lg:max-w-md">
-              <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4 fade-in-up font-geist">
+            <motion.div className="lg:max-w-md">
+              <motion.h1
+                className="text-3xl md:text-4xl font-semibold tracking-tight mb-4 font-geist"
+                variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
+              >
                 Bem-vindo ao seu novo estúdio criativo.
-              </h1>
-              <p className="text-base text-white/80 mb-6 fade-in-up max-w-md" style={{ animationDelay: '0.15s' }}>
+              </motion.h1>
+              <motion.p
+                className="text-base text-white/80 mb-6 max-w-md"
+                variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
+              >
                 Explore trilhas de aprendizado, domine ferramentas de precisão e converse com a Salina para transformar qualquer ideia em seu próximo grande projeto. O poder é seu.
-              </p>
-            </div>
+              </motion.p>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
         
         {/* Bottom Controls */}
         <div className="flex-shrink-0 mt-8">
           {/* Progress Dots */}
-          <div className="flex items-center space-x-2 mb-10 fade-in-up" style={{ animationDelay: '0.3s' }}>
+          <motion.div
+            className="flex items-center space-x-2 mb-10"
+            variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
+          >
             {Array.from({ length: totalSlides }, (_, i) => {
               const slideNumber = i + 1
               const isActive = currentSlide === slideNumber
               
               return (
-                <div
+                <button
                   key={slideNumber}
+                  type="button"
                   className="slide-dot"
                   style={{
                     width: isActive ? '24px' : '6px',
                     backgroundColor: isActive ? 'white' : 'rgba(255, 255, 255, 0.3)'
                   }}
+                  aria-label={`Ir para o slide ${slideNumber}`}
+                  aria-current={isActive ? 'true' : undefined}
+                  aria-controls={`slide-${slideNumber}`}
                   onClick={() => handleDotClick(slideNumber)}
                 />
               )
             })}
-          </div>
+          </motion.div>
           
           {/* Action Buttons */}
-          <div className="flex items-center justify-between fade-in-up" style={{ animationDelay: '0.45s' }}>
+          <motion.div
+            className="flex items-center justify-between"
+            variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
+          >
             <button
               onClick={handleSkip}
               className="text-white/70 hover:text-white px-6 py-3.5 rounded-full font-medium transition-colors"
@@ -443,7 +480,7 @@ export default function OnboardingPage() {
                 )}
               </span>
             </button>
-          </div>
+          </motion.div>
           
           {/* Home Indicator */}
           <div className="w-[134px] h-[5px] bg-white/40 rounded-full mx-auto mt-8" />

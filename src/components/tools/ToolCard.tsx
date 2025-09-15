@@ -149,7 +149,7 @@ export default function ToolCard({
               background: "var(--glass-bg-strong)",
               borderColor: "var(--glass-border-strong)",
             }}
-            transition={{ duration: 0.3, ease: "var(--ease-primary)" }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
           />
           
           {/* Category Tag - Top Left - Enhanced with Design Tokens */}

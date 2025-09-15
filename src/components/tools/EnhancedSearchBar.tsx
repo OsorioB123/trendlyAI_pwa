@@ -1,8 +1,10 @@
+
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, useAnimation } from 'framer-motion'
 import { Search, X } from 'lucide-react'
+import { respectReducedMotion } from '@/lib/motion'
 
 interface EnhancedSearchBarProps {
   value: string
@@ -29,6 +31,16 @@ export default function EnhancedSearchBar({
   const inputRef = useRef<HTMLInputElement>(null)
   const searchIconControls = useAnimation()
   const clearButtonControls = useAnimation()
+  const [reducedMotion, setReducedMotion] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => setReducedMotion(mq.matches)
+    update()
+    mq.addEventListener?.('change', update)
+    return () => mq.removeEventListener?.('change', update)
+  }, [])
   
   // Container variants for focus states
   const containerVariants = {
@@ -44,13 +56,12 @@ export default function EnhancedSearchBar({
       borderColor: "rgba(255, 255, 255, 0.3)",
       backgroundColor: "rgba(255, 255, 255, 0.08)",
       transition: {
-        duration: 0.2,
-        ease: EASING.primary
+        ...(respectReducedMotion({ transition: { duration: 0.2, ease: EASING.primary } }).transition as any)
       }
     },
     typing: {
       scale: 1.02,
-      boxShadow: [
+      boxShadow: reducedMotion ? "0 0 0 3px rgba(255, 255, 255, 0.1)" : [
         "0 0 0 3px rgba(255, 255, 255, 0.1)",
         "0 0 0 3px rgba(255, 255, 255, 0.2)",
         "0 0 0 3px rgba(255, 255, 255, 0.1)"
@@ -58,15 +69,8 @@ export default function EnhancedSearchBar({
       borderColor: "rgba(255, 255, 255, 0.4)",
       backgroundColor: "rgba(255, 255, 255, 0.1)",
       transition: {
-        boxShadow: {
-          duration: 1.5,
-          repeat: Infinity,
-          ease: "easeInOut"
-        },
-        scale: {
-          duration: 0.2,
-          ease: EASING.primary
-        }
+        boxShadow: reducedMotion ? { duration: 0 } : { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
+        scale: respectReducedMotion({ transition: { duration: 0.2, ease: EASING.primary } }).transition
       }
     }
   }
@@ -83,34 +87,20 @@ export default function EnhancedSearchBar({
       rotate: 0,
       color: "rgba(255, 255, 255, 0.8)",
       transition: {
-        duration: 0.2,
-        ease: EASING.quick
+        ...(respectReducedMotion({ transition: { duration: 0.2, ease: EASING.quick } }).transition as any)
       }
     },
     typing: {
-      scale: [1.1, 1.2, 1.1],
-      rotate: [0, 5, -5, 0],
+      scale: reducedMotion ? 1.05 : [1.1, 1.2, 1.1],
+      rotate: reducedMotion ? 0 : [0, 5, -5, 0],
       color: "rgba(255, 255, 255, 0.9)",
-      transition: {
-        duration: 1,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }
+      transition: reducedMotion ? { duration: 0 } : { duration: 1, repeat: Infinity, ease: "easeInOut" }
     },
     searching: {
-      rotate: 360,
-      scale: 1.1,
+      rotate: reducedMotion ? 0 : 360,
+      scale: 1.05,
       color: "rgba(255, 255, 255, 0.9)",
-      transition: {
-        rotate: {
-          duration: 1,
-          repeat: Infinity,
-          ease: "linear"
-        },
-        scale: {
-          duration: 0.2
-        }
-      }
+      transition: reducedMotion ? { duration: 0 } : { rotate: { duration: 1, repeat: Infinity, ease: "linear" }, scale: { duration: 0.2 } }
     }
   }
 
@@ -126,24 +116,21 @@ export default function EnhancedSearchBar({
       opacity: 1,
       rotate: 0,
       transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 25
+        ...(respectReducedMotion({ transition: { duration: 0.2 } }).transition as any)
       }
     },
     hover: {
-      scale: 1.1,
-      rotate: 90,
+      scale: reducedMotion ? 1 : 1.1,
+      rotate: reducedMotion ? 0 : 90,
       backgroundColor: "rgba(255, 255, 255, 0.2)",
       transition: {
-        duration: 0.2,
-        ease: EASING.quick
+        ...(respectReducedMotion({ transition: { duration: 0.2, ease: EASING.quick } }).transition as any)
       }
     },
     tap: {
-      scale: 0.9,
+      scale: reducedMotion ? 1 : 0.9,
       transition: {
-        duration: 0.1
+        ...(respectReducedMotion({ transition: { duration: 0.1 } }).transition as any)
       }
     }
   }
@@ -156,7 +143,7 @@ export default function EnhancedSearchBar({
     focus: {
       color: "rgba(255, 255, 255, 0.95)",
       transition: {
-        duration: 0.2
+        ...(respectReducedMotion({ transition: { duration: 0.2 } }).transition as any)
       }
     }
   }
@@ -215,10 +202,12 @@ export default function EnhancedSearchBar({
     
     if (e.key === 'Enter') {
       // Add visual feedback for search action
-      searchIconControls.start("searching")
-      setTimeout(() => {
-        searchIconControls.start(isTyping ? "typing" : isFocused ? "focus" : "idle")
-      }, 1000)
+      if (!reducedMotion) {
+        searchIconControls.start("searching")
+        setTimeout(() => {
+          searchIconControls.start(isTyping ? "typing" : isFocused ? "focus" : "idle")
+        }, 1000)
+      }
     }
   }
 
@@ -240,7 +229,7 @@ export default function EnhancedSearchBar({
   return (
     <motion.div 
       className={`relative group ${className}`}
-      variants={containerVariants}
+      variants={containerVariants as any}
       animate={getCurrentContainerState()}
       whileTap={{
         scale: 0.99,
@@ -250,7 +239,7 @@ export default function EnhancedSearchBar({
       {/* Search icon */}
       <motion.div
         className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none"
-        variants={searchIconVariants}
+        variants={searchIconVariants as any}
         animate={searchIconControls}
       >
         <Search className="w-5 h-5" />
@@ -266,7 +255,7 @@ export default function EnhancedSearchBar({
         onFocus={handleFocus}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
-        variants={inputVariants}
+        variants={inputVariants as any}
         animate={isFocused ? "focus" : "idle"}
         className={`
           w-full h-12 border rounded-xl py-2.5 pl-12 pr-12
@@ -286,7 +275,7 @@ export default function EnhancedSearchBar({
       {/* Clear button */}
       <motion.button
         className="absolute right-3 top-1/2 transform -translate-y-1/2 z-10 w-6 h-6 rounded-full backdrop-blur-md border border-white/10 flex items-center justify-center"
-        variants={clearButtonVariants}
+        variants={clearButtonVariants as any}
         animate={value ? "visible" : "hidden"}
         whileHover="hover"
         whileTap="tap"
@@ -307,10 +296,7 @@ export default function EnhancedSearchBar({
             ? "0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 20px rgba(255, 255, 255, 0.05)"
             : "0 0 0 0px rgba(255, 255, 255, 0)",
         }}
-        transition={{
-          duration: 0.2,
-          ease: EASING.primary
-        }}
+        transition={respectReducedMotion({ transition: { duration: 0.2, ease: EASING.primary } }).transition as any}
       />
 
       {/* Typing indicator glow */}
@@ -318,7 +304,7 @@ export default function EnhancedSearchBar({
         <motion.div
           className="absolute inset-0 rounded-xl pointer-events-none"
           initial={{ opacity: 0 }}
-          animate={{
+          animate={reducedMotion ? { opacity: 0.3 } : {
             opacity: [0.3, 0.6, 0.3],
             boxShadow: [
               "0 0 0 0px rgba(255, 255, 255, 0.1)",
@@ -326,11 +312,7 @@ export default function EnhancedSearchBar({
               "0 0 0 0px rgba(255, 255, 255, 0.1)"
             ]
           }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
+          transition={reducedMotion ? { duration: 0 } : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
         />
       )}
     </motion.div>

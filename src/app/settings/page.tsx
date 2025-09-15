@@ -64,7 +64,7 @@ export default function SettingsPage() {
       case 'profile':
         return (
           <ProfileTab
-            profile={settings.profile}
+            profile={settings.profile as any}
             themes={[]}
             isLoading={settings.isLoading}
             onUpdateProfile={settings.updateProfile}
@@ -77,7 +77,7 @@ export default function SettingsPage() {
       case 'security':
         return (
           <SecurityTab
-            security={settings.security}
+            security={settings.security as any}
             onChangeEmail={settings.changeEmail}
             onChangePassword={settings.changePassword}
             onSetup2FA={settings.setup2FA}
@@ -89,15 +89,15 @@ export default function SettingsPage() {
       case 'notifications':
         return (
           <NotificationsTab
-            notifications={settings.notifications}
-            onUpdateNotifications={settings.updateNotifications}
+            preferences={settings.notifications as any}
+            onUpdatePreferences={settings.updateNotifications}
             isLoading={settings.isLoading}
           />
         )
       default:
         return (
           <ProfileTab
-            profile={settings.profile}
+            profile={settings.profile as any}
             themes={[]}
             isLoading={settings.isLoading}
             onUpdateProfile={settings.updateProfile}

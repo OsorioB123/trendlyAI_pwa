@@ -59,8 +59,8 @@ export function BackgroundProvider({ children }: BackgroundProviderProps) {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const { data: profile } = await supabase
-        .from('profiles')
+      const { data: profile } = await (supabase
+        .from('profiles') as any)
         .select('preferences')
         .eq('id', user.id)
         .single()
@@ -91,8 +91,8 @@ export function BackgroundProvider({ children }: BackgroundProviderProps) {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         // Get current preferences
-        const { data: profile } = await supabase
-          .from('profiles')
+      const { data: profile } = await (supabase
+          .from('profiles') as any)
           .select('preferences')
           .eq('id', user.id)
           .single()
@@ -104,8 +104,8 @@ export function BackgroundProvider({ children }: BackgroundProviderProps) {
         }
 
         // Update preferences
-        await supabase
-          .from('profiles')
+        await (supabase
+          .from('profiles') as any)
           .update({ preferences: updatedPreferences })
           .eq('id', user.id)
 

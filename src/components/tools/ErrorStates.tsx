@@ -6,7 +6,7 @@ import {
   Clock, 
   Wifi, 
   RefreshCw, 
-  ServerX,
+  Server,
   Search,
   ArchiveX
 } from 'lucide-react'
@@ -82,7 +82,7 @@ export function ServerErrorState({ onRetry, className = "" }: ErrorStateProps) {
           ease: "easeInOut"
         }}
       >
-        <ServerX className="w-10 h-10 text-orange-400" />
+        <Server className="w-10 h-10 text-orange-400" />
       </motion.div>
       
       <h3 className="text-2xl font-semibold text-white mb-2">

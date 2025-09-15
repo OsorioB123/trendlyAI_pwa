@@ -3,7 +3,7 @@
  * Manages user onboarding status and flow
  */
 
-const ONBOARDING_STORAGE_KEY = 'trendly-onboarding-completed'
+export const ONBOARDING_STORAGE_KEY = 'trendly-onboarding-completed'
 
 /**
  * Check if user has completed onboarding
@@ -76,9 +76,16 @@ export function resetOnboarding(): void {
  */
 export function hasCompletedOnboardingFromCookies(cookies?: any): boolean {
   if (!cookies) return false
-  
+
   try {
-    return cookies.get('trendly-onboarding-completed')?.value === 'true'
+    // Support both NextRequest cookie store and plain object maps
+    if (typeof cookies.get === 'function') {
+      return cookies.get(ONBOARDING_STORAGE_KEY)?.value === 'true'
+    }
+    if (typeof cookies === 'object') {
+      return cookies[ONBOARDING_STORAGE_KEY] === 'true'
+    }
+    return false
   } catch (error) {
     console.error('Error checking onboarding status from cookies:', error)
     return false

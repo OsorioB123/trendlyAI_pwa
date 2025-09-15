@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '../../contexts/AuthContext'
+import { optimizeUnsplash } from '../../utils/image'
 import Header from '../../components/layout/Header'
 import { HeaderVariant } from '../../types/header'
 import ChatSidebar from '../../components/chat/ChatSidebar'
@@ -26,6 +27,15 @@ function ChatPageContent() {
   // Chat hooks
   const chat = useChat()
   const conversations = useConversations()
+
+  // Responsive background optimization for Unsplash
+  const [bgUrl, setBgUrl] = useState(CURRENT_BACKGROUND.value)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const width = window.innerWidth
+    const target = width <= 640 ? 800 : width <= 1280 ? 1280 : 1920
+    setBgUrl(optimizeUnsplash(CURRENT_BACKGROUND.value, target))
+  }, [])
 
   // Handle initial message from dashboard
   useEffect(() => {
@@ -105,11 +115,11 @@ function ChatPageContent() {
       <div 
         className="min-h-screen flex items-center justify-center"
         style={{
-          backgroundImage: `url("${CURRENT_BACKGROUND.value}?w=800&q=80")`,
+          backgroundImage: `url("${optimizeUnsplash(CURRENT_BACKGROUND.value, 800)}")`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed'
+          
         }}
       >
         <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
@@ -123,17 +133,19 @@ function ChatPageContent() {
 
   return (
     <div 
-      className="min-h-screen flex text-white font-['Inter'] antialiased"
+      className="min-h-screen flex text-white font-['Inter'] antialiased bg-fixed-desktop"
       style={{
-        backgroundImage: `url("${CURRENT_BACKGROUND.value}")`,
+        backgroundImage: `url("${bgUrl}")`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed'
+        
       }}
     >
       {/* Background overlay */}
       <div className="fixed inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+      {/* Skip to chat messages */}
+      <a href="#chat-log" className="skip-link">Pular para mensagens</a>
 
       {/* Chat Sidebar */}
       <ChatSidebar onConversationSelect={handleConversationSelect} />
