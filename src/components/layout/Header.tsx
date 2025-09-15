@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { 
   Bell, 
   ChevronLeft, 
@@ -15,6 +15,8 @@ import {
   X
 } from 'lucide-react'
 import { HeaderVariant, Notification, mockUser } from '../../types/header'
+import ChatService from '../../lib/services/chatService'
+import type { UserCredits } from '../../types/chat'
 import { useAuth } from '../../contexts/AuthContext'
 
 interface HeaderProps {
@@ -34,10 +36,15 @@ export default function Header({
   const [showProfile, setShowProfile] = useState(false)
   const [showCreditsTooltip, setShowCreditsTooltip] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [credits, setCredits] = useState<UserCredits | null>(null)
+  const pathname = usePathname()
+  const [creditsUsedToday, setCreditsUsedToday] = useState<number | null>(null)
   
   const notificationsRef = useRef<HTMLDivElement>(null)
   const profileRef = useRef<HTMLDivElement>(null)
   const creditsRef = useRef<HTMLDivElement>(null)
+  const notificationsMenuRef = useRef<HTMLDivElement>(null)
+  const profileMenuRef = useRef<HTMLDivElement>(null)
 
   // Mock notifications data
   const notifications: Notification[] = [
@@ -118,10 +125,89 @@ export default function Header({
     }
 
     document.addEventListener('mousedown', handleClickOutside)
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeAllMenus()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleKeyDown)
     }
   }, [])
+
+  // Close menus on route change
+  useEffect(() => {
+    closeAllMenus()
+  }, [pathname])
+
+  // Body scroll lock when menus are open (mobile-friendly)
+  useEffect(() => {
+    const anyOpen = showProfile || showNotifications || showCreditsTooltip
+    if (anyOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [showProfile, showNotifications, showCreditsTooltip])
+
+  // Load real credits from Supabase (user_credits)
+  useEffect(() => {
+    let mounted = true
+    const loadCredits = async () => {
+      if (!user?.id) { setCredits(null); return }
+      const result = await ChatService.getUserCredits(user.id)
+      if (mounted) {
+        setCredits(result.success ? result.data! : null)
+      }
+    }
+    const loadStats = async () => {
+      if (!user?.id) { setCreditsUsedToday(null); return }
+      const result = await ChatService.getConversationStats(user.id)
+      if (mounted) {
+        setCreditsUsedToday(result.success ? result.data!.credits_used_today : null)
+      }
+    }
+    loadCredits()
+    loadStats()
+    // Optionally, refresh periodically or on interval
+    return () => { mounted = false }
+  }, [user?.id])
+
+  // Focus trap helpers
+  const focusFirst = (container: HTMLDivElement | null) => {
+    if (!container) return
+    const focusables = container.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+    const first = focusables[0]
+    first?.focus()
+  }
+  const trapFocus = (e: React.KeyboardEvent, container: HTMLDivElement | null) => {
+    if (e.key !== 'Tab' || !container) return
+    const focusables = Array.from(container.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')).filter(el => !el.hasAttribute('disabled'))
+    if (focusables.length === 0) return
+    const first = focusables[0]
+    const last = focusables[focusables.length - 1]
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (showProfile) focusFirst(profileMenuRef.current)
+  }, [showProfile])
+  useEffect(() => {
+    if (showNotifications) focusFirst(notificationsMenuRef.current)
+  }, [showNotifications])
 
   const renderLeftSection = () => {
     switch (variant) {
@@ -208,6 +294,8 @@ export default function Header({
                   setShowNotifications(!showNotifications)
                 }}
                 className="relative w-11 h-11 flex items-center justify-center text-white rounded-full transition-all hover:bg-white/10 active:scale-95 focus-ring"
+                aria-haspopup="menu"
+                aria-expanded={showNotifications}
                 aria-label={showNotifications ? 'Fechar notificações' : 'Abrir notificações'}
               >
                 <Bell className="w-5 h-5" />
@@ -218,7 +306,11 @@ export default function Header({
               </button>
 
               {showNotifications && (
-                <div className={`dropdown-menu liquid-glass-opaque absolute top-full right-0 mt-2 p-2 w-72 md:w-80 z-50 transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[top_right] ${showNotifications ? 'show' : ''}`}>
+                <div
+                  ref={notificationsMenuRef}
+                  onKeyDown={(e) => trapFocus(e, notificationsMenuRef.current!)}
+                  className={`dropdown-menu absolute top-full right-0 mt-2 p-2 w-72 md:w-80 z-50 backdrop-blur-[24px] bg-black/80 border border-white/14 shadow-[0_8px_24px_rgba(0,0,0,0.4)] rounded-2xl transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[top_right] ${showNotifications ? 'show' : ''}`}
+                >
                   <div className="p-2 flex justify-between items-center">
                     <h4 className="text-white font-semibold text-sm">Notificações</h4>
                     <button className="text-xs text-white/60 hover:text-white transition-colors">
@@ -257,6 +349,8 @@ export default function Header({
                     ? 'bg-white/20 ring-white/40 scale-105 shadow-[0_8px_24px_rgba(0,0,0,0.3)]' 
                     : 'bg-white/10 hover:bg-white/15 hover:ring-white/30 hover:scale-105 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)]'
                 } focus-ring`}
+                aria-haspopup="menu"
+                aria-expanded={showProfile}
                 aria-label={showProfile ? 'Fechar menu do perfil' : 'Abrir menu do perfil'}
               >
                 <div className="w-9 h-9 rounded-full overflow-hidden relative">
@@ -271,7 +365,11 @@ export default function Header({
               </button>
 
               {showProfile && (
-                <div className={`dropdown-menu absolute top-full right-0 mt-2 p-4 w-64 md:w-72 z-50 backdrop-blur-[24px] bg-[rgba(30,30,40,0.85)] border border-white/14 shadow-[0_8px_24px_rgba(0,0,0,0.3)] rounded-2xl transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[top_right] ${showProfile ? 'show' : ''}`}>
+                <div
+                  ref={profileMenuRef}
+                  onKeyDown={(e) => trapFocus(e, profileMenuRef.current!)}
+                  className={`dropdown-menu absolute top-full right-0 mt-2 p-4 w-64 md:w-72 z-50 backdrop-blur-[24px] bg-black/85 border border-white/14 shadow-[0_12px_28px_rgba(0,0,0,0.45)] rounded-2xl transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[top_right] ${showProfile ? 'show' : ''}`}
+                >
                   {/* Profile Header */}
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 relative">
@@ -316,27 +414,34 @@ export default function Header({
                           <Info className="w-3.5 h-3.5" />
                         </button>
                         {showCreditsTooltip && (
-                          <div className={`credit-tooltip backdrop-blur-[24px] bg-[rgba(30,30,40,0.85)] border border-white/14 shadow-[0_8px_24px_rgba(0,0,0,0.3)] absolute bottom-full right-0 mb-2 p-3 w-64 rounded-xl transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[bottom_right] ${showCreditsTooltip ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-[5px] scale-[0.98] pointer-events-none'}`}>
-                            <p className="text-xs text-white/90">
-                              Seus créditos são usados para conversas com a Salina e se renovam a cada 24h. Precisa de mais? <button onClick={() => {
+                          <div className={`credit-tooltip backdrop-blur-[24px] bg-black/90 border border-white/14 shadow-[0_12px_28px_rgba(0,0,0,0.45)] absolute bottom-full right-0 mb-2 p-3 w-72 rounded-xl transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[bottom_right] ${showCreditsTooltip ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-[5px] scale-[0.98] pointer-events-none'}`} role="dialog" aria-live="polite">
+                            <p className="text-xs text-white/90 leading-relaxed mb-2">
+                              Seus créditos são usados para conversas com a Salina e se renovam a cada 24 horas. Precisa de mais? <button onClick={() => {
                                 setShowCreditsTooltip(false)
                                 setShowProfile(false)
                                 router.push('/subscription')
                               }} className="font-semibold text-[#2fd159] hover:underline">Torne-se um Maestro</button> para ter acesso ilimitado.
                             </p>
+                            {typeof creditsUsedToday === 'number' && (
+                              <p className="text-xs text-white/70">Créditos usados hoje: {creditsUsedToday}</p>
+                            )}
                           </div>
                         )}
                       </div>
                     </div>
                     <div>
-                      <div className="credits-progress-bar w-full bg-white/10 rounded-full h-3 overflow-hidden relative">
-                        <div 
-                          className="credits-progress-fill h-full bg-white rounded-full relative overflow-hidden shadow-[0_0_15px_3px_rgba(255,255,255,0.4)] transition-[width] duration-[800ms] ease-[cubic-bezier(0.2,0.8,0.2,1)]" 
-                          style={{ width: `${profile?.credits && profile?.max_credits ? (profile.credits / profile.max_credits * 100) : 70}%` }}
-                        />
+                      <div className="credits-progress-bar w-full bg-white/10 rounded-full h-3 overflow-hidden relative" aria-label="Progresso de créditos">
+                        {credits ? (
+                          <div 
+                            className="credits-progress-fill h-full bg-white rounded-full relative overflow-hidden shadow-[0_0_15px_3px_rgba(255,255,255,0.4)] transition-[width] duration-[800ms] ease-[cubic-bezier(0.2,0.8,0.2,1)]" 
+                            style={{ width: `${credits.percentage}%` }}
+                          />
+                        ) : (
+                          <div className="loading-shimmer-bar h-full w-full rounded-full" />
+                        )}
                       </div>
                       <p className="text-xs text-right text-white/60 mt-1">
-                        {profile?.credits || 35}/{profile?.max_credits || 50}
+                        {(credits?.current ?? profile?.credits ?? 35)}/{(credits?.total ?? profile?.max_credits ?? 50)}
                       </p>
                     </div>
                   </div>

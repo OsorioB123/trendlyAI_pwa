@@ -6,6 +6,7 @@ import { Send, ArrowRight } from 'lucide-react'
 import { useBackground } from '../../contexts/BackgroundContext'
 import { useAuth } from '../../contexts/AuthContext'
 import Header from '../../components/layout/Header'
+import BackgroundOverlay from '../../components/common/BackgroundOverlay'
 import { HeaderVariant } from '../../types/header'
 import TrackCard from '../../components/cards/TrackCard'
 import ToolCard from '../../components/cards/ToolCard'
@@ -233,7 +234,7 @@ export default function DashboardPage() {
         }}
       >
         {/* Background overlay */}
-        <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
+        <BackgroundOverlay />
         
         {/* Header */}
         <Header variant={HeaderVariant.PRIMARY} />

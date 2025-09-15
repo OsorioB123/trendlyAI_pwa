@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import BackgroundOverlay from '../../../components/common/BackgroundOverlay'
 import { ArrowLeft, MailCheck, Lock } from 'lucide-react'
 import { useAuth } from '../../../contexts/AuthContext'
 
@@ -65,7 +66,7 @@ export default function ForgotPasswordPage() {
   if (isEmailSent) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center font-sans text-white p-4 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 antialiased selection:bg-white/10 selection:text-white">
-        <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
+        <BackgroundOverlay />
 
         <main className="w-full max-w-md flex flex-col items-center">
           {/* Logo */}
@@ -128,7 +129,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center font-sans text-white p-4 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 antialiased selection:bg-white/10 selection:text-white">
       {/* Background overlay */}
-      <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
+      <BackgroundOverlay />
 
       <main className="w-full max-w-md flex flex-col items-center">
         {/* Logo */}

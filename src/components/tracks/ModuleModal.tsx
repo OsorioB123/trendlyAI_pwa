@@ -87,9 +87,9 @@ export default function ModuleModal({
             : 'scale-75 opacity-0 translate-y-8'
         }`}
       >
-        <div className="bg-[#111] rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+        <div className="rounded-3xl overflow-hidden glass-strong">
           {/* Header */}
-          <div className="relative p-6 bg-gradient-to-r from-blue-600/20 to-purple-600/20">
+          <div className="relative p-6 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-b border-white/10">
             <button 
               onClick={onClose}
               className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
@@ -326,7 +326,7 @@ export default function ModuleModal({
             onClick={() => setSelectedPrompt(null)}
           />
           <div className="relative w-full max-w-2xl mx-4">
-            <div className="bg-[#111] rounded-2xl border border-white/10 p-6">
+            <div className="rounded-2xl p-6 glass-strong">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-xl font-bold text-white">{selectedPrompt.title}</h3>
                 <button 

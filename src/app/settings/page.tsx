@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useSettings } from '../../hooks/useSettings'
+import { useBackground } from '../../contexts/BackgroundContext'
+import BackgroundOverlay from '../../components/common/BackgroundOverlay'
 import SettingsTabs from '../../components/settings/SettingsTabs'
 import { ToastContainer } from '../../components/settings/ToastNotification'
 import ProfileTab from '../../components/settings/ProfileTab'
@@ -15,10 +17,21 @@ export default function SettingsPage() {
   const router = useRouter()
   const settings = useSettings()
   const [toasts, setToasts] = useState<any[]>([])
+  const { currentBackground } = useBackground()
 
   if (settings.isLoading) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] text-white">
+      <div
+        className="min-h-screen text-white"
+        style={{
+          backgroundImage: `url("${currentBackground.value}?w=1600&q=80")`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        <BackgroundOverlay />
         <div className="h-20" />
         <main className="max-w-4xl mx-auto px-4 pb-32">
           <div className="mb-10 mt-12">
@@ -40,7 +53,17 @@ export default function SettingsPage() {
 
   if (settings.error) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] text-white flex items-center justify-center">
+      <div
+        className="min-h-screen text-white flex items-center justify-center"
+        style={{
+          backgroundImage: `url("${currentBackground.value}?w=1600&q=80")`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        <BackgroundOverlay />
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Erro ao Carregar Configurações</h1>
           <p className="text-white/70 mb-6">{settings.error}</p>
@@ -111,13 +134,26 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white">
+    <div
+      className="min-h-screen text-white"
+      style={{
+        backgroundImage: `url("${currentBackground.value}?w=1600&q=80")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      <BackgroundOverlay />
       {/* Spacer for header */}
       <div className="h-20" />
 
       <main className="max-w-4xl mx-auto px-4 pb-32">
         {/* Header */}
-        <header className="mb-10 mt-12 animate-fade-in">
+        <header
+          className="mb-10 mt-12 opacity-0 animate-fade-in"
+          style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}
+        >
           <div className="flex items-center gap-4 mb-6">
             <button
               onClick={() => router.back()}
@@ -126,7 +162,7 @@ export default function SettingsPage() {
               <ArrowLeft size={20} />
             </button>
             <div>
-              <h1 className="text-3xl font-semibold tracking-tight">Configurações</h1>
+              <h2 className="text-3xl font-semibold tracking-tight font-geist">Configurações</h2>
               <p className="text-white/70 mt-2">Gerencie seu perfil, conta e preferências.</p>
             </div>
           </div>

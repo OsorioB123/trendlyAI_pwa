@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Star, Heart, ArrowLeft, Play, Lock, CheckCircle2, Circle } from 'lucide-react'
+import BackgroundOverlay from '../../../components/common/BackgroundOverlay'
 import { TrackService } from '../../../lib/services/trackService'
 import { TrackWithModules, TrackModule, ModuleState } from '../../../types/track'
 import { supabase } from '../../../lib/supabase'
@@ -216,7 +217,7 @@ export default function TrackPage() {
           className="h-64 bg-cover bg-center relative"
           style={{ backgroundImage: `url('${track.thumbnailUrl}')` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+          <BackgroundOverlay position="absolute" behind={false} />
           
           <div className="absolute top-6 left-6">
             <button 

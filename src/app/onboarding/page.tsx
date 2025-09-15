@@ -4,6 +4,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { MOTION_CONSTANTS, respectReducedMotion } from '../../lib/motion'
+import BackgroundOverlay from '../../components/common/BackgroundOverlay'
 import { ArrowRight, Check } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useBackground } from '../../contexts/BackgroundContext'
@@ -316,7 +317,7 @@ export default function OnboardingPage() {
       />
 
       {/* Gradient overlay */}
-      <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
+      <BackgroundOverlay />
 
       {/* Main content - Exact layout match from HTML reference */}
       <main className="absolute inset-0 z-10 flex flex-col justify-end px-6 sm:px-8 pb-10">

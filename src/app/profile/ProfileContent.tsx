@@ -6,6 +6,7 @@ import { Check, X, Loader } from 'lucide-react'
 import { useProfile } from '../../hooks/useProfile'
 import { useAuth } from '../../contexts/AuthContext'
 import Header from '../../components/layout/Header'
+import BackgroundOverlay from '../../components/common/BackgroundOverlay'
 import { HeaderVariant } from '../../types/header'
 import ProfileHeader from '../../components/profile/ProfileHeader'
 import NextActionCard from '../../components/profile/NextActionCard'
@@ -59,7 +60,7 @@ export default function ProfileContent() {
           backgroundAttachment: 'fixed'
         }}
       >
-        <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
+        <BackgroundOverlay />
         <div className="text-white text-center">
           <Loader className="w-8 h-8 animate-spin mx-auto mb-4" />
           <p>Carregando perfil...</p>
@@ -112,7 +113,7 @@ export default function ProfileContent() {
       }}
     >
       {/* Background overlay */}
-      <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
+      <BackgroundOverlay />
 
       {/* Header */}
       <Header 

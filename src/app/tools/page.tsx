@@ -19,6 +19,7 @@ import { Tool, ToolsFilters, ToolCategory } from '../../types/tool'
 import { useBackground } from '../../contexts/BackgroundContext'
 import { supabase } from '../../lib/supabase'
 import type { Database } from '@/types/database'
+import BackgroundOverlay from '../../components/common/BackgroundOverlay'
 
 // Categorias serão derivadas dos dados do Supabase
 
@@ -706,7 +707,7 @@ export default function ToolsPage() {
       />
 
       {/* Overlay para garantir cobertura do background */}
-      <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
+      <BackgroundOverlay />
 
       {/* Tool Modal (mesmo da Dashboard) */}
       <ToolModal

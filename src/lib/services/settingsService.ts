@@ -356,11 +356,27 @@ export class SettingsService {
 
   static async setup2FA(password: string): Promise<SettingsResponse<Verify2FASetup>> {
     try {
-      const { data, error } = await supabase.auth.mfa.enroll({
-        factorType: 'totp'
-      })
+      // Some projects may not have MFA enabled; handle gracefully
+      if (!('mfa' in supabase.auth)) {
+        return {
+          success: false,
+          error: 'MFA não está habilitado neste projeto Supabase. Ative MFA para usar esta função.'
+        }
+      }
 
-      if (error) throw error
+      const { data, error } = await (supabase.auth as any).mfa.enroll({ factorType: 'totp' })
+
+      if (error) {
+        const msg = (error as any)?.message || String(error)
+        // Friendly messages for common cases
+        if (/not enabled|not supported|404/i.test(msg)) {
+          return {
+            success: false,
+            error: 'MFA não está habilitado no projeto. Habilite MFA no Supabase (Authentication → MFA) e tente novamente.'
+          }
+        }
+        throw error
+      }
 
       const backupCodes = Array.from({ length: 10 }, () => 
         Math.random().toString(36).substring(2, 8).toUpperCase()

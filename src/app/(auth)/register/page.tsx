@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import BackgroundOverlay from '../../../components/common/BackgroundOverlay'
 import { useAuth } from '../../../contexts/AuthContext'
 import { ArrowLeft, Lock } from 'lucide-react'
 
@@ -211,7 +212,7 @@ export default function RegisterPage() {
   if (success) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center font-sans text-white p-4 bg-gradient-to-br from-gray-900 via-black to-gray-900">
-        <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
+        <BackgroundOverlay />
 
         <main className="w-full max-w-md flex flex-col items-center">
           {/* Logo */}

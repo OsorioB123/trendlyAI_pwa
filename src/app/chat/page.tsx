@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '../../contexts/AuthContext'
 import { optimizeUnsplash } from '../../utils/image'
 import Header from '../../components/layout/Header'
+import BackgroundOverlay from '../../components/common/BackgroundOverlay'
 import { HeaderVariant } from '../../types/header'
 import ChatSidebar from '../../components/chat/ChatSidebar'
 import ChatMessages from '../../components/chat/ChatMessages'
@@ -143,7 +144,7 @@ function ChatPageContent() {
       }}
     >
       {/* Background overlay */}
-      <div className="fixed inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+      <BackgroundOverlay />
       {/* Skip to chat messages */}
       <a href="#chat-log" className="skip-link">Pular para mensagens</a>
 

@@ -156,7 +156,7 @@ export default function ProfileTab({
                     key={theme.id}
                     onClick={() => onUpdateTheme(theme.id)}
                     className={`
-                      relative flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden transition-all duration-400 cursor-pointer
+                      relative flex-shrink-0 w-20 h-20 rounded-full overflow-hidden transition-all duration-400 cursor-pointer
                       ${isSelected 
                         ? 'border-2 border-white scale-110' 
                         : 'border-2 border-transparent hover:scale-110'
@@ -171,14 +171,13 @@ export default function ProfileTab({
                     title={theme.name}
                   >
                     {/* Glass overlay effect */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/35 to-transparent opacity-60 mix-blend-overlay" />
-                    
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/35 to-transparent opacity-60 mix-blend-overlay" />
                     {/* Inner shadow */}
-                    <div className="absolute inset-0 shadow-inset-lg" />
+                    <div className="absolute inset-0 rounded-full shadow-[inset_0_0_20px_3px_rgba(0,0,0,0.3)]" />
 
                     {/* Selection indicator */}
                     {isSelected && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/40 transition-all duration-300">
+                      <div className="absolute inset-0 rounded-full flex items-center justify-center bg-black/40 transition-all duration-300">
                         <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center animate-scale-in">
                           <Check size={16} className="text-black" />
                         </div>

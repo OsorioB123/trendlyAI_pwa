@@ -65,11 +65,13 @@ export function BackgroundProvider({ children }: BackgroundProviderProps) {
         .eq('id', user.id)
         .single()
 
-      if (profile?.preferences?.background) {
-        const savedBackground = BACKGROUNDS.find(bg => bg.id === profile.preferences.background)
+      const pref: any = profile?.preferences || {}
+      const bgId: string | undefined = pref.background || pref.studio_theme
+      if (bgId) {
+        const savedBackground = BACKGROUNDS.find(bg => bg.id === bgId)
         if (savedBackground) {
           setCurrentBackground(savedBackground)
-          localStorage.setItem('trendlyai-background', profile.preferences.background)
+          localStorage.setItem('trendlyai-background', bgId)
         }
       }
     } catch (error) {
@@ -100,7 +102,8 @@ export function BackgroundProvider({ children }: BackgroundProviderProps) {
         const currentPreferences = profile?.preferences || {}
         const updatedPreferences = {
           ...currentPreferences,
-          background: backgroundId
+          background: backgroundId,
+          studio_theme: backgroundId
         }
 
         // Update preferences

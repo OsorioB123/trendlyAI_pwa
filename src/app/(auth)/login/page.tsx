@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import BackgroundOverlay from '../../../components/common/BackgroundOverlay'
 import { useAuth } from '../../../contexts/AuthContext'
 import { Lock } from 'lucide-react'
 
@@ -119,7 +120,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 font-sans antialiased selection:bg-white/10 selection:text-white">
       {/* Background overlay */}
-      <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
+      <BackgroundOverlay />
 
       <main className="w-full max-w-md px-4">
         <div className="w-full flex flex-col items-center">

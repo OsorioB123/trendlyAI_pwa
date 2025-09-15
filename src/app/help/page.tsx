@@ -17,6 +17,7 @@ import {
 import { useBackground } from '../../contexts/BackgroundContext'
 import { useHelp } from '../../hooks/useHelp'
 import Header from '../../components/layout/Header'
+import BackgroundOverlay from '../../components/common/BackgroundOverlay'
 import { HeaderVariant } from '../../types/header'
 import type { FAQItem } from '../../types/help'
 
@@ -30,6 +31,12 @@ export default function HelpPage() {
   const [activeTab, setActiveTab] = useState('primeiros-passos')
   const [openAccordion, setOpenAccordion] = useState<string | null>('O que é a TrendlyAI?')
   const [showChatWidget, setShowChatWidget] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showCreateTicket, setShowCreateTicket] = useState(false)
+  const [ticketSubject, setTicketSubject] = useState('')
+  const [ticketDescription, setTicketDescription] = useState('')
+  const [ticketPriority, setTicketPriority] = useState<'low' | 'normal' | 'high' | 'urgent'>('normal')
+  const [ticketFeedback, setTicketFeedback] = useState<string | null>(null)
 
   // Update FAQ items when active tab changes
   useEffect(() => {
@@ -73,6 +80,39 @@ export default function HelpPage() {
     handleAccordionClick(item.question)
   }
 
+  // Search handler
+  const handleSearch = async () => {
+    const query = searchQuery.trim()
+    await helpData.searchFAQ({ query, category: activeTab })
+  }
+
+  // Create ticket handler
+  const handleCreateTicket = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setTicketFeedback(null)
+    const subject = ticketSubject.trim()
+    const description = ticketDescription.trim()
+    if (!subject || !description) {
+      setTicketFeedback('Preencha assunto e descrição.')
+      return
+    }
+    const { success, error } = await helpData.createSupportTicket({
+      subject,
+      description,
+      category: activeTab,
+      priority: ticketPriority,
+    })
+    if (success) {
+      setTicketFeedback('Ticket criado com sucesso!')
+      setTicketSubject('')
+      setTicketDescription('')
+      setTicketPriority('normal')
+      setTimeout(() => setShowCreateTicket(false), 800)
+    } else {
+      setTicketFeedback(error || 'Erro ao criar ticket')
+    }
+  }
+
   // Loading state
   if (helpData.isLoading) {
     return (
@@ -82,7 +122,7 @@ export default function HelpPage() {
           backgroundImage: `url("${currentBackground.value}?w=800&q=80")`
         }}
       >
-        <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
+        <BackgroundOverlay />
         <Header variant={HeaderVariant.SECONDARY} />
         
         <div className="text-center">
@@ -101,7 +141,7 @@ export default function HelpPage() {
       }}
     >
       {/* Background overlay */}
-      <div className="fixed inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent -z-10" />
+      <BackgroundOverlay />
       
       {/* Header */}
       <Header variant={HeaderVariant.SECONDARY} />
@@ -111,6 +151,35 @@ export default function HelpPage() {
 
       <main className="w-full mx-auto pb-32">
         <div className="max-w-5xl relative mr-auto ml-auto px-4 space-y-28">
+
+          {/* Search Bar + Create Ticket */}
+          <section>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleSearch() }}
+                  placeholder="Busque por palavras-chave (ex.: trilhas, ferramentas, assinatura)"
+                  className="w-full h-12 px-4 rounded-xl bg-white/10 border border-white/15 text-white placeholder-white/50 focus:outline-none focus:border-white/30"
+                />
+                <button
+                  onClick={handleSearch}
+                  disabled={helpData.isSearching}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-white text-black rounded-lg text-sm font-semibold hover:bg-gray-100 disabled:opacity-50"
+                >
+                  {helpData.isSearching ? 'Buscando...' : 'Buscar'}
+                </button>
+              </div>
+              <button
+                onClick={() => setShowCreateTicket(true)}
+                className="h-12 px-5 rounded-xl bg-white/10 border border-white/15 text-white hover:bg-white/15"
+              >
+                Criar ticket
+              </button>
+            </div>
+          </section>
 
           {/* Salina Reminder Section */}
           <motion.section
@@ -126,7 +195,7 @@ export default function HelpPage() {
                     <Sparkles className="w-14 h-14 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-semibold text-white mb-2 tracking-tight">
+                    <h2 className="text-2xl font-semibold text-white mb-2 tracking-tight font-geist">
                       A Salina é sua primeira guia.
                     </h2>
                     <p className="text-white/70 mb-6 max-w-prose">
@@ -255,7 +324,7 @@ export default function HelpPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...(transitionSafe || {}), delay: 0.2 }}
           >
-            <h2 className="text-3xl font-semibold text-white mb-3 tracking-tight">
+            <h2 className="text-3xl font-semibold text-white mb-3 tracking-tight font-geist">
               Não encontrou o que procurava?
             </h2>
             <p className="text-white/70 mb-8 max-w-lg mx-auto">
@@ -314,6 +383,69 @@ export default function HelpPage() {
               />
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Create Ticket Modal */}
+      {showCreateTicket && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowCreateTicket(false)} />
+          <form 
+            onSubmit={handleCreateTicket}
+            className="relative bg-white/8 backdrop-blur-lg border border-white/14 rounded-2xl w-full max-w-lg p-6 text-white"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Novo Ticket de Suporte</h3>
+              <button type="button" onClick={() => setShowCreateTicket(false)} className="text-white/70 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <label className="block text-sm text-white/70 mb-2">Assunto</label>
+            <input
+              type="text"
+              value={ticketSubject}
+              onChange={(e) => setTicketSubject(e.target.value)}
+              className="w-full mb-4 px-3 py-2 rounded-lg bg-white/10 border border-white/15 focus:outline-none focus:border-white/30"
+              placeholder="Descreva brevemente o problema"
+            />
+
+            <label className="block text-sm text-white/70 mb-2">Descrição</label>
+            <textarea
+              value={ticketDescription}
+              onChange={(e) => setTicketDescription(e.target.value)}
+              rows={5}
+              className="w-full mb-4 px-3 py-2 rounded-lg bg-white/10 border border-white/15 focus:outline-none focus:border-white/30 resize-y"
+              placeholder="Explique em detalhes o que aconteceu"
+            />
+
+            <div className="flex items-center gap-3 mb-4">
+              <label className="block text-sm text-white/70">Prioridade</label>
+              <select
+                value={ticketPriority}
+                onChange={(e) => setTicketPriority(e.target.value as any)}
+                className="px-3 py-2 rounded-lg bg-white/10 border border-white/15 focus:outline-none focus:border-white/30"
+              >
+                <option value="low" className="bg-black">Baixa</option>
+                <option value="normal" className="bg-black">Normal</option>
+                <option value="high" className="bg-black">Alta</option>
+                <option value="urgent" className="bg-black">Urgente</option>
+              </select>
+            </div>
+
+            {ticketFeedback && (
+              <div className="mb-3 text-sm text-white/80">{ticketFeedback}</div>
+            )}
+
+            <div className="flex justify-end gap-2">
+              <button type="button" onClick={() => setShowCreateTicket(false)} className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 border border-white/15">
+                Cancelar
+              </button>
+              <button type="submit" className="px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-gray-100">
+                Enviar
+              </button>
+            </div>
+          </form>
         </div>
       )}
 
