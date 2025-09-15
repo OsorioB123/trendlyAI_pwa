@@ -20,7 +20,7 @@ const MOCK_FAVORITE_TOOLS: Tool[] = [
     description: "Transforme qualquer ideia em uma estrutura de roteiro de 3 atos para engajamento máximo.",
     category: "Copywriting",
     type: "text-generation",
-    compatibility: ["ChatGPT", "Claude", "Gemini"],
+    compatibility: ["chatgpt", "claude", "gemini"],
     tags: ["roteiro", "storytelling", "reels"],
     content: "Prompt content here...",
     isFavorite: true,
@@ -32,7 +32,7 @@ const MOCK_FAVORITE_TOOLS: Tool[] = [
     description: "Crie textos persuasivos que convertem usando gatilhos mentais comprovados.",
     category: "Marketing",
     type: "text-generation",
-    compatibility: ["ChatGPT", "Claude"],
+    compatibility: ["chatgpt", "claude"],
     tags: ["copywriting", "vendas", "conversão"],
     content: "Prompt content here...",
     isFavorite: true,
@@ -117,7 +117,7 @@ export default function FavoritesPage() {
             {/* Page Header */}
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center border border-white/15">
+                <div className="w-12 h-12 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center">
                   <Heart className="w-6 h-6 text-red-400 fill-red-400" />
                 </div>
                 <div>
@@ -128,7 +128,7 @@ export default function FavoritesPage() {
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex gap-1 p-1 bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 mb-8 w-fit">
+            <div className="flex gap-1 p-1 bg-white/5 backdrop-blur-xl rounded-xl mb-8 w-fit">
               <button
                 onClick={() => setActiveTab('tools')}
                 className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
@@ -159,7 +159,7 @@ export default function FavoritesPage() {
                 placeholder="Buscar favoritos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-xl border border-white/15 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
+                className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-xl rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
               />
             </div>
 

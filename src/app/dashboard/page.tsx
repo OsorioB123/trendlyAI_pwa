@@ -87,7 +87,7 @@ const MOCK_TOOLS: Tool[] = [
     category: 'Marketing',
     type: 'text-generation',
     tags: ['roteiro', 'storytelling'],
-    compatibility: ['ChatGPT', 'Claude', 'Gemini'],
+    compatibility: ['chatgpt', 'claude', 'gemini'],
     content: 'Você é um especialista em storytelling viral para redes sociais.\n\nCONTEXTO:\n- Tema: [TEMA]\n- Público-alvo: [PÚBLICO-ALVO]\n- Tom de voz: [TOM DE VOZ]\n- Duração: 30-60 segundos\n\nESTRUTURA OBRIGATÓRIA:\n1. GANCHO (0-3s): Uma frase impactante que pare o scroll\n2. DESENVOLVIMENTO (3-45s): Apresente o problema/solução/história\n3. CALL TO ACTION (45-60s): Convide para ação específica\n\nCRITÉRIOS DE SUCESSO:\n- Use linguagem simples e direta\n- Inclua elementos de curiosidade ou surpresa\n- Termine com uma pergunta ou convite à interação\n- Mantenha o ritmo acelerado\n\nCrie o roteiro seguindo exatamente esta estrutura.',
     how_to_use: 'Substitua [TEMA], [PÚBLICO-ALVO] e [TOM DE VOZ] pelos seus dados específicos antes de usar o prompt.',
     isFavorite: false,
@@ -100,7 +100,7 @@ const MOCK_TOOLS: Tool[] = [
     category: 'SEO',
     type: 'text-generation',
     tags: ['seo', 'títulos'],
-    compatibility: ['ChatGPT', 'Claude'],
+    compatibility: ['chatgpt', 'claude'],
     content: 'Você é um especialista em SEO e copywriting.\n\nCrie 5 títulos SEO-otimizados para o seguinte conteúdo:\n\n[CONTEÚDO]: {seu_conteudo_aqui}\n[PALAVRA-CHAVE]: {palavra_chave_principal}\n\nDIRETRIZES:\n- Máximo 60 caracteres\n- Inclua a palavra-chave principal no início\n- Use power words (como \'definitivo\', \'completo\', \'secreto\')\n- Crie urgência ou curiosidade\n- Seja específico com números quando possível\n\nRetorne 5 opções numeradas com explicação do por que cada uma funciona.',
     how_to_use: 'Substitua {seu_conteudo_aqui} e {palavra_chave_principal} pelas suas informações específicas.',
     isFavorite: false,
@@ -113,7 +113,7 @@ const MOCK_TOOLS: Tool[] = [
     category: 'Marketing',
     type: 'text-generation',
     tags: ['copywriting', 'vendas'],
-    compatibility: ['ChatGPT', 'Claude'],
+    compatibility: ['chatgpt', 'claude'],
     content: 'Você é um copywriter experiente especializado em vendas.\n\nEscreva uma copy de vendas persuasiva usando o framework AIDA:\n\n[PRODUTO/SERVIÇO]: {seu_produto_aqui}\n[PÚBLICO-ALVO]: {sua_persona_aqui}\n\nESTRUTURA AIDA:\n🎯 ATENÇÃO\n- Headline impactante\n- Estatística ou pergunta provocativa\n- Promessa específica\n\n🔥 INTERESSE\n- Desenvolva o problema\n- Conte uma história relacionável\n- Apresente credibilidade\n\n💎 DESEJO\n- Benefícios transformadores\n- Prova social (depoimentos)\n- Urgência/escassez\n\n⚡ AÇÃO\n- Call-to-action claro\n- Garantia/redução de risco\n- Instruções específicas\n\nCopy completa otimizada para conversão.',
     how_to_use: 'Substitua {seu_produto_aqui} e {sua_persona_aqui} pelas informações do seu negócio.',
     isFavorite: false,
@@ -271,7 +271,7 @@ export default function DashboardPage() {
                     {icebreakers.map((text, index) => (
                       <button
                         key={text}
-                        className="px-4 py-2 text-sm font-medium rounded-full backdrop-blur-lg bg-white/10 border border-white/15 text-white hover:bg-white/20 transition-all duration-300"
+                        className="px-4 py-2 text-sm font-medium rounded-full backdrop-blur-lg bg-white/10 text-white hover:bg-white/20 transition-all duration-300"
                         style={{ animationDelay: `${index * 100}ms` }}
                         onClick={() => handleIcebreakerClick(text)}
                       >
@@ -284,7 +284,7 @@ export default function DashboardPage() {
                 {/* FIXED: Search/Command Bar - Exact match to HTML reference */}
                 <div className={`enhanced-search-bar search-glow fluid-motion transition-all duration-[400ms] ${isCommandFocused ? 'scale-[1.02]' : ''}`}>
                   <form onSubmit={handleCommandSubmit}>
-                    <div className={`flex gap-3 backdrop-blur-md border rounded-2xl p-4 items-center transition-all duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isCommandFocused ? 'border-white/30 bg-white/15' : 'border-white/15 bg-white/10'}`}>
+                    <div className={`flex gap-3 backdrop-blur-md rounded-2xl p-4 items-center transition-all duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isCommandFocused ? 'bg-white/15' : 'bg-white/10'}`}>
                       <input
                         type="text"
                         placeholder="O que vamos criar hoje?"
@@ -296,7 +296,7 @@ export default function DashboardPage() {
                       />
                       <button 
                         type="submit" 
-                        className="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 border border-white/15 hover:bg-white/15 backdrop-blur-lg transition-all duration-300 fluid-motion hover:scale-110 active:scale-95"
+                        className="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/15 backdrop-blur-lg transition-all duration-300 fluid-motion hover:scale-110 active:scale-95"
                       >
                         <Send className="w-4 h-4 text-white" />
                       </button>

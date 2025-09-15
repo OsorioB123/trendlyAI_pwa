@@ -44,7 +44,7 @@ Skeleton.displayName = 'Skeleton'
 const SkeletonCard = ({ className, ...props }: SkeletonProps) => (
   <Skeleton
     className={cn(
-      'h-72 rounded-2xl border border-white/10 backdrop-blur-sm',
+      'h-72 rounded-2xl backdrop-blur-sm',
       className
     )}
     {...props}
@@ -143,7 +143,7 @@ const SkeletonToolCard = ({ className, ...props }: SkeletonProps) => (
           </div>
           
           {/* Footer */}
-          <div className="flex items-center justify-between pt-3 border-t border-white/10">
+          <div className="flex items-center justify-between pt-3">
             <Skeleton className="h-3 w-24" delay={0.85} />
             <Skeleton className="h-3 w-4" delay={0.9} />
           </div>

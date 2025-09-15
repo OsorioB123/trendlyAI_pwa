@@ -14,10 +14,10 @@ const buttonVariants = cva(
         default: 'bg-white text-black hover:bg-gray-100 shadow-lg shadow-black/25 hover:shadow-black/35',
         destructive: 'bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-600/25',
         outline: 'border-2 border-white/20 text-white hover:bg-white/10 hover:border-white/30 backdrop-blur-sm',
-        secondary: 'bg-white/10 text-white hover:bg-white/15 backdrop-blur-sm border border-white/15',
-        ghost: 'text-white hover:bg-white/10 border border-transparent hover:border-white/15',
+        secondary: 'bg-white/10 text-white hover:bg-white/15 backdrop-blur-sm',
+        ghost: 'text-white hover:bg-white/10',
         link: 'text-yellow-400 underline-offset-4 hover:underline hover:text-yellow-300',
-        glass: 'bg-white/5 text-white backdrop-blur-xl border border-white/10 hover:bg-white/10 hover:border-white/20 shadow-xl',
+        glass: 'bg-white/5 text-white backdrop-blur-xl hover:bg-white/10 shadow-xl',
       },
       size: {
         default: 'min-h-[48px] px-6 py-3',

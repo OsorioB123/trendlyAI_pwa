@@ -1,8 +1,14 @@
 'use client'
 
 import React, { useCallback, useEffect, useState, useRef } from 'react'
-import { X } from 'lucide-react'
+import { X, Filter, Search, Tag, Zap } from 'lucide-react'
 import { ToolsFilters, ToolCategory } from '../../types/tool'
+import { Button } from "@/components/ui/Button"
+import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Separator } from "@/components/ui/separator"
 
 interface ToolsFiltersDrawerProps {
   isOpen: boolean
@@ -12,9 +18,34 @@ interface ToolsFiltersDrawerProps {
   categories?: ToolCategory[]
 }
 
-// Somente filtros compatíveis: favoritos e ordenação
+// Opções de filtros expandidas
 const ACTIVITY_OPTIONS = [
-  { value: 'isFavorite' as const, label: 'Meus Favoritos' }
+  { value: 'isFavorite' as const, label: 'Meus Favoritos', icon: '❤️' },
+  { value: 'isEdited' as const, label: 'Editados por mim', icon: '✏️' }
+]
+
+const TOOL_TYPES = [
+  { value: 'text-generation' as const, label: 'Geração de Texto', icon: '📝' },
+  { value: 'image-generation' as const, label: 'Geração de Imagem', icon: '🎨' },
+  { value: 'code-generation' as const, label: 'Geração de Código', icon: '💻' },
+  { value: 'data-analysis' as const, label: 'Análise de Dados', icon: '📊' },
+  { value: 'automation' as const, label: 'Automação', icon: '🤖' },
+  { value: 'optimization' as const, label: 'Otimização', icon: '⚡' }
+]
+
+const AI_COMPATIBILITY = [
+  { value: 'chatgpt' as const, label: 'ChatGPT', icon: '🤖' },
+  { value: 'claude' as const, label: 'Claude', icon: '🧠' },
+  { value: 'gemini' as const, label: 'Gemini', icon: '💎' },
+  { value: 'midjourney' as const, label: 'Midjourney', icon: '🎨' },
+  { value: 'dalle' as const, label: 'DALL-E', icon: '🖼️' },
+  { value: 'stable-diffusion' as const, label: 'Stable Diffusion', icon: '🎭' }
+]
+
+const DIFFICULTY_LEVELS = [
+  { value: 'beginner' as const, label: 'Iniciante', icon: '🌱' },
+  { value: 'intermediate' as const, label: 'Intermediário', icon: '📈' },
+  { value: 'advanced' as const, label: 'Avançado', icon: '🚀' }
 ]
 
 export default function ToolsFiltersDrawer({ 
@@ -91,7 +122,7 @@ export default function ToolsFiltersDrawer({
     }
   }, [isOpen, onClose])
 
-  const handleToggleArrayFilter = useCallback(<K extends keyof Pick<ToolsFilters, 'activity'>>(
+  const handleToggleArrayFilter = useCallback(<K extends keyof Pick<ToolsFilters, 'activity' | 'type' | 'compatibility'>>(
     key: K,
     value: string
   ) => {
@@ -106,14 +137,14 @@ export default function ToolsFiltersDrawer({
   const handleClearFilters = useCallback(() => {
     const clearedFilters: ToolsFilters = {
       search: filters.search, // mantém busca
-      category: filters.category, // não altera categoria aqui
-      sort: filters.sort, // mantém ordenação
-      type: [], // removido do UI
-      compatibility: [], // removido do UI
+      category: 'all', // reseta categoria
+      sort: 'relevance', // reseta para relevância
+      type: [], // limpa tipos
+      compatibility: [], // limpa compatibilidade
       activity: [] // limpa atividade
     }
     setTempFilters(clearedFilters)
-  }, [filters.search, filters.sort])
+  }, [filters.search])
 
   const handleApplyFilters = useCallback(() => {
     onFiltersChange(tempFilters)
@@ -127,7 +158,10 @@ export default function ToolsFiltersDrawer({
   }, [onClose])
 
   // Count active filters
-  const activeFiltersCount = (tempFilters.category !== 'all' ? 1 : 0) + tempFilters.activity.length
+  const activeFiltersCount = (tempFilters.category !== 'all' ? 1 : 0) +
+    tempFilters.activity.length +
+    tempFilters.type.length +
+    tempFilters.compatibility.length
 
   if (!isOpen) return null
 
@@ -149,7 +183,6 @@ export default function ToolsFiltersDrawer({
           lg:top-0 lg:right-0 lg:h-full lg:w-full lg:max-w-md 
           bottom-0 left-0 right-0 max-h-[85vh]
           bg-black overflow-y-auto
-          border border-white/20 lg:border-l lg:border-t-0
           transform transition-transform duration-300 ease-out
           ${isOpen 
             ? 'translate-y-0 lg:translate-x-0' 
@@ -163,116 +196,192 @@ export default function ToolsFiltersDrawer({
       >
         <div className="p-6">
           {/* Header */}
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h2 id="drawer-title" className="text-2xl font-semibold text-white">
-                Filtros Avançados
-              </h2>
-              <p id="drawer-description" className="text-white/70 text-sm mt-1">
-                Refine sua busca por ferramentas de IA
-              </p>
+          <div className="flex justify-between items-start mb-8">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 rounded-lg bg-white/10">
+                <Filter className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 id="drawer-title" className="text-2xl font-semibold text-white">
+                  Filtros Avançados
+                </h2>
+                <p id="drawer-description" className="text-white/70 text-sm mt-1">
+                  Refine sua busca por ferramentas de IA
+                </p>
+                {activeFiltersCount > 0 && (
+                  <Badge variant="secondary" className="mt-2 bg-white/20 text-white">
+                    {activeFiltersCount} filtro{activeFiltersCount !== 1 ? 's' : ''} ativo{activeFiltersCount !== 1 ? 's' : ''}
+                  </Badge>
+                )}
+              </div>
             </div>
-            <button
+            <Button
               ref={firstFocusableRef}
+              variant="ghost"
+              size="icon"
               onClick={onClose}
-              className="min-w-[44px] min-h-[44px] rounded-full bg-black border border-white/20 flex items-center justify-center text-white hover:border-white/40 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30"
+              className="min-w-[44px] min-h-[44px] rounded-full bg-black hover:bg-black/80 text-white"
               aria-label="Fechar painel de filtros"
             >
               <X className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
 
           {/* Categoria */}
-          <fieldset className="mb-8">
-            <legend className="text-lg font-medium text-white mb-4">CATEGORIA</legend>
+          <div className="space-y-6">
             <div className="space-y-3">
-              <select
+              <Label className="text-sm font-medium text-white flex items-center gap-2">
+                <Tag className="w-4 h-4" />
+                Categoria
+              </Label>
+              <Select
                 value={tempFilters.category}
-                onChange={(e) => setTempFilters(prev => ({ ...prev, category: e.target.value as any }))}
-                className="w-full h-12 px-4 text-white bg-black border border-white/20 rounded-xl appearance-none focus:outline-none focus:border-white/40"
+                onValueChange={(value) => setTempFilters(prev => ({ ...prev, category: value as any }))}
               >
-                <option value="all" className="bg-black">Todas as Categorias</option>
-                {categories.map(cat => (
-                  <option key={cat} value={cat} className="bg-black">{cat}</option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full bg-black/50 border-white/20 text-white focus:ring-white/30">
+                  <SelectValue placeholder="Selecione uma categoria" />
+                </SelectTrigger>
+                <SelectContent className="bg-black border-white/20">
+                  <SelectItem value="all" className="text-white hover:bg-white/10">
+                    Todas as Categorias
+                  </SelectItem>
+                  {categories.map(cat => (
+                    <SelectItem key={cat} value={cat} className="text-white hover:bg-white/10">
+                      {cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          </fieldset>
 
-          {/* Ordenação */}
-          <fieldset className="mb-8">
-            <legend className="text-lg font-medium text-white mb-4">ORDENAR POR</legend>
-            <div className="space-y-3" role="group" aria-labelledby="sort-legend">
-              <select
+            <Separator className="bg-white/10" />
+
+            {/* Ordenação */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-white flex items-center gap-2">
+                <Search className="w-4 h-4" />
+                Ordenar por
+              </Label>
+              <Select
                 value={tempFilters.sort}
-                onChange={(e) => setTempFilters(prev => ({ ...prev, sort: e.target.value as any }))}
-                className="w-full h-12 px-4 text-white bg-black border border-white/20 rounded-xl appearance-none focus:outline-none focus:border-white/40"
+                onValueChange={(value) => setTempFilters(prev => ({ ...prev, sort: value as any }))}
               >
-                <option value="relevance" className="bg-black">Mais Relevantes</option>
-                <option value="recent" className="bg-black">Mais Recentes</option>
-              </select>
+                <SelectTrigger className="w-full bg-black/50 border-white/20 text-white focus:ring-white/30">
+                  <SelectValue placeholder="Selecione a ordenação" />
+                </SelectTrigger>
+                <SelectContent className="bg-black border-white/20">
+                  <SelectItem value="relevance" className="text-white hover:bg-white/10">
+                    Mais Relevantes
+                  </SelectItem>
+                  <SelectItem value="recent" className="text-white hover:bg-white/10">
+                    Mais Recentes
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          </fieldset>
 
-          {/* Minha Atividade */}
-          <fieldset className="mb-8">
-            <legend className="text-lg font-medium text-white mb-4">MINHA ATIVIDADE</legend>
-            <div className="space-y-3" role="group" aria-labelledby="activity-legend">
-              {ACTIVITY_OPTIONS.map(activity => (
-                <label key={activity.value} className="flex items-center cursor-pointer group min-h-[44px]">
-                  <div className="relative flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={tempFilters.activity.includes(activity.value)}
-                      onChange={() => handleToggleArrayFilter('activity', activity.value)}
-                      className="sr-only"
+            <Separator className="bg-white/10" />
+
+            {/* Tipo de Ferramenta */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-white flex items-center gap-2">
+                <Zap className="w-4 h-4" />
+                Tipo de Ferramenta
+              </Label>
+              <div className="grid grid-cols-2 gap-2">
+                {TOOL_TYPES.map(type => (
+                  <div key={type.value} className="flex items-center space-x-2 p-3 rounded-lg bg-black/30 hover:bg-black/50 transition-colors">
+                    <Checkbox
+                      id={type.value}
+                      checked={tempFilters.type.includes(type.value)}
+                      onCheckedChange={() => handleToggleArrayFilter('type', type.value)}
+                      className="border-white/30 data-[state=checked]:bg-white data-[state=checked]:border-white"
                     />
-                    <div className={`
-                      w-6 h-6 rounded border-2 transition-all duration-200 flex items-center justify-center
-                      ${tempFilters.activity.includes(activity.value)
-                        ? 'bg-white border-white'
-                        : 'border-white/40 hover:border-white/60 group-focus-within:border-white'
-                      }
-                    `}>
-                      {tempFilters.activity.includes(activity.value) && (
-                        <svg className="w-4 h-4 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                    </div>
+                    <Label htmlFor={type.value} className="text-sm text-white/90 cursor-pointer flex items-center gap-2 flex-1">
+                      <span>{type.icon}</span>
+                      {type.label}
+                    </Label>
                   </div>
-                  <span className="ml-3 text-white group-hover:text-white/80 transition-colors duration-200 flex-1 py-2">
-                    {activity.label}
-                  </span>
-                </label>
-              ))}
+                ))}
+              </div>
             </div>
-          </fieldset>
+
+            <Separator className="bg-white/10" />
+
+            {/* Compatibilidade IA */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-white flex items-center gap-2">
+                🤖 Compatibilidade IA
+              </Label>
+              <div className="grid grid-cols-2 gap-2">
+                {AI_COMPATIBILITY.map(ai => (
+                  <div key={ai.value} className="flex items-center space-x-2 p-3 rounded-lg bg-black/30 hover:bg-black/50 transition-colors">
+                    <Checkbox
+                      id={ai.value}
+                      checked={tempFilters.compatibility.includes(ai.value)}
+                      onCheckedChange={() => handleToggleArrayFilter('compatibility', ai.value)}
+                      className="border-white/30 data-[state=checked]:bg-white data-[state=checked]:border-white"
+                    />
+                    <Label htmlFor={ai.value} className="text-sm text-white/90 cursor-pointer flex items-center gap-2 flex-1">
+                      <span>{ai.icon}</span>
+                      {ai.label}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Separator className="bg-white/10" />
+
+            {/* Minha Atividade */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-white flex items-center gap-2">
+                ❤️ Minha Atividade
+              </Label>
+              <div className="space-y-2">
+                {ACTIVITY_OPTIONS.map(activity => (
+                  <div key={activity.value} className="flex items-center space-x-2 p-3 rounded-lg bg-black/30 hover:bg-black/50 transition-colors">
+                    <Checkbox
+                      id={activity.value}
+                      checked={tempFilters.activity.includes(activity.value)}
+                      onCheckedChange={() => handleToggleArrayFilter('activity', activity.value)}
+                      className="border-white/30 data-[state=checked]:bg-white data-[state=checked]:border-white"
+                    />
+                    <Label htmlFor={activity.value} className="text-sm text-white/90 cursor-pointer flex items-center gap-2 flex-1">
+                      <span>{activity.icon}</span>
+                      {activity.label}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
 
           {/* Actions Footer */}
-          <div className="flex gap-3 sticky bottom-0 bg-black pt-4 -mx-6 px-6 pb-6 border-t border-white/20">
-            <button
+          <div className="flex gap-3 sticky bottom-0 bg-black pt-6 -mx-6 px-6 pb-6 border-t border-white/10">
+            <Button
+              variant="outline"
               onClick={handleClearFilters}
-              className="flex-1 min-h-[48px] px-4 py-3 rounded-xl bg-black text-white/80 border border-white/20 hover:border-white/40 transition-all duration-200 font-medium focus:outline-none focus:ring-2 focus:ring-white/20"
+              className="flex-1 min-h-[48px] bg-white/10 border-white/20 text-white hover:bg-white/15 hover:border-white/30"
             >
-              Limpar
-            </button>
-            <button
+              Limpar Filtros
+            </Button>
+            <Button
               ref={lastFocusableRef}
               onClick={handleApplyFilters}
               className={`
-                flex-1 min-h-[48px] px-4 py-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/20
-                ${activeFiltersCount > 0 
-                  ? 'bg-black text-white border border-white/40 hover:border-white/60'
-                  : 'bg-black text-white/80 border border-white/20 hover:border-white/30'
+                flex-1 min-h-[48px] font-medium transition-all duration-200
+                ${activeFiltersCount > 0
+                  ? 'bg-white text-black hover:bg-gray-100'
+                  : 'bg-white/20 text-white hover:bg-white/30'
                 }
               `}
               aria-describedby="apply-button-description"
             >
-              Aplicar {activeFiltersCount > 0 && `(${activeFiltersCount})`}
-            </button>
+              Aplicar Filtros {activeFiltersCount > 0 && `(${activeFiltersCount})`}
+            </Button>
             <div id="apply-button-description" className="sr-only">
-              {activeFiltersCount > 0 
+              {activeFiltersCount > 0
                 ? `Aplicar ${activeFiltersCount} filtros selecionados`
                 : 'Nenhum filtro selecionado'
               }

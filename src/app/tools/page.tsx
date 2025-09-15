@@ -14,6 +14,7 @@ import Header from '../../components/layout/Header'
 import ToolCard from '../../components/cards/ToolCard'
 import ToolsFiltersDrawer from '../../components/tools/ToolsFiltersDrawer'
 import ToolModal from '../../components/modals/ToolModal'
+import ImprovedSearchBar from '../../components/tools/ImprovedSearchBar'
 import { HeaderVariant } from '../../types/header'
 import { Tool, ToolsFilters, ToolCategory } from '../../types/tool'
 import { useBackground } from '../../contexts/BackgroundContext'
@@ -303,87 +304,34 @@ export default function ToolsPage() {
           </p>
         </div>
 
-        {/* Filtros: apenas uma seleção de categoria + busca + ordenação */}
-        <div className="grid grid-cols-1 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-3 p-3 mb-6 rounded-xl border border-white/15 bg-black/70">
-          {/* Advanced Glass Background */}
-          <div className="hidden">
-            {/* Base frosted layer */}
-            <div 
-              className="absolute inset-0 backdrop-blur-[32px]"
-              style={{
-                background: `
-                  linear-gradient(135deg, 
-                    rgba(255,255,255,0.12) 0%,
-                    rgba(255,255,255,0.08) 35%,
-                    rgba(255,255,255,0.04) 100%
-                  ),
-                  radial-gradient(circle at 20% 20%, 
-                    rgba(255,255,255,0.08) 0%,
-                    transparent 50%
-                  ),
-                  radial-gradient(circle at 80% 80%, 
-                    rgba(255,255,255,0.06) 0%,
-                    transparent 50%
-                  )
-                `,
-              }}
-            />
-            
-            {/* Texture noise overlay */}
-            <div 
-              className="absolute inset-0 opacity-[0.02] mix-blend-overlay"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='1'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noiseFilter)' opacity='0.6'/%3E%3C/svg%3E")`,
-              }}
-            />
-            
-            {/* Border highlight */}
-            <div 
-              className="absolute inset-0 rounded-xl"
-              style={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05), rgba(255,255,255,0.1))',
-                mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                WebkitMaskComposite: 'xor',
-                maskComposite: 'exclude',
-                padding: '1px',
-              }}
-            />
-          </div>
-          
-          {/* Search Bar - Enhanced Glass - Responsive Span */}
-          <div className="md:col-span-4 lg:col-span-5 xl:col-span-6 relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Busque por objetivo, técnica ou ferramenta..."
+        {/* Controles de Busca e Filtros - Layout Simplificado */}
+        <div className="flex flex-col lg:flex-row gap-4 mb-8">
+          {/* Barra de Busca Principal - Mais Proeminente */}
+          <div className="flex-1">
+            <ImprovedSearchBar
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full h-12 py-2.5 pl-12 pr-4 text-white placeholder-white/50 rounded-xl bg-black border border-white/20 focus:outline-none focus:border-white/40"
+              onChange={setSearchTerm}
+              totalTools={tools.length}
+              onQuickFilter={(category) => updateFilter('category', category as any)}
+              className="w-full"
             />
           </div>
-          
-          {/* Categoria removida do painel principal: utilizar Drawer */}
-          <div className="hidden" />
-          
-          {/* Filters Button - Enhanced Glass - Responsive Span */}
-          <div className="md:col-span-2 lg:col-span-2 xl:col-span-2">
+
+          {/* Botão de Filtros Avançados */}
+          <div className="lg:w-auto">
             <button
               onClick={() => setShowFiltersDrawer(true)}
-              className="w-full h-12 flex items-center justify-between px-4 text-white rounded-xl bg-black border border-white/20 hover:border-white/40"
+              className="relative w-full lg:w-auto h-12 flex items-center justify-center gap-2 px-6 text-white rounded-xl bg-black/50 hover:bg-black/70 border border-white/10 hover:border-white/20 transition-all duration-200"
             >
-              <span className="truncate pr-2">Filtros</span>
-              <SlidersHorizontal className="w-4 h-4 text-white/60" />
+              <SlidersHorizontal className="w-4 h-4" />
+              <span className="font-medium">Filtros Avançados</span>
               {activeFiltersCount > 0 && (
-                <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full text-xs font-semibold flex items-center justify-center text-black bg-white border border-white/60">
+                <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full text-xs font-semibold flex items-center justify-center text-black bg-white">
                   {activeFiltersCount}
                 </div>
               )}
             </button>
           </div>
-          
-          {/* Ordenação fora do Drawer removida para evitar duplicidade */}
-          <div className="hidden" />
         </div>
         
         {/* Ordenação mobile removida: usar Drawer */}
@@ -413,7 +361,7 @@ export default function ToolsPage() {
 
         {/* Error Toast */}
         {error && (
-          <div className="fixed top-24 right-4 z-50 p-4 rounded-lg text-white border border-white/20 bg-black shadow-lg">
+          <div className="fixed top-24 right-4 z-50 p-4 rounded-lg text-white bg-black shadow-lg">
             <p className="font-medium drop-shadow-sm">{error}</p>
           </div>
         )}
@@ -526,21 +474,58 @@ export default function ToolsPage() {
             ))}
           </div>
         ) : (
-          /* Empty State */
+          /* Empty State Aprimorado */
           <div className="text-center py-16">
             <div className="
               w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center
               backdrop-blur-[20px] bg-gradient-to-br from-white/[0.15] to-white/[0.08]
               border border-white/[0.2] shadow-[0_8px_24px_rgba(0,0,0,0.15)]
             ">
-              <ArchiveX className="w-10 h-10 text-white/60" />
+              {filters.search ? (
+                <Search className="w-10 h-10 text-white/60" />
+              ) : (
+                <ArchiveX className="w-10 h-10 text-white/60" />
+              )}
             </div>
-            <h3 className="text-2xl font-semibold text-white mb-2 drop-shadow-sm">
-              Nenhuma ferramenta encontrada
-            </h3>
-            <p className="text-white/70 mb-6 drop-shadow-sm">
-              Tente ajustar seus filtros ou fazer uma nova busca
-            </p>
+
+            {filters.search ? (
+              <>
+                <h3 className="text-2xl font-semibold text-white mb-2 drop-shadow-sm">
+                  Nenhuma ferramenta encontrada para "{filters.search}"
+                </h3>
+                <p className="text-white/70 mb-6 drop-shadow-sm max-w-md mx-auto">
+                  Experimente termos mais gerais ou explore nossas categorias populares
+                </p>
+              </>
+            ) : (
+              <>
+                <h3 className="text-2xl font-semibold text-white mb-2 drop-shadow-sm">
+                  Nenhuma ferramenta encontrada
+                </h3>
+                <p className="text-white/70 mb-6 drop-shadow-sm">
+                  Tente ajustar seus filtros ou fazer uma nova busca
+                </p>
+              </>
+            )}
+
+            {/* Categorias Populares */}
+            <div className="flex flex-wrap gap-2 justify-center mb-6 max-w-lg mx-auto">
+              {['Copywriting', 'SEO', 'Imagem', 'Análise', 'Marketing'].map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => updateFilter('category', cat as any)}
+                  className="
+                    px-4 py-2 rounded-full text-sm font-medium text-white
+                    backdrop-blur-[16px] bg-white/[0.1] border border-white/[0.2]
+                    hover:bg-white/[0.15] hover:border-white/[0.3] transition-all duration-200
+                    hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(255,255,255,0.1)]
+                  "
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
             <button
               onClick={clearFilters}
               className="

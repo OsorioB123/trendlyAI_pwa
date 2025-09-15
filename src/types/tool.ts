@@ -9,20 +9,23 @@ export type ToolCategory =
   | 'Design'
 
 // Tool types for filtering
-export type ToolType = 
-  | 'text-generation' 
-  | 'image-generation' 
-  | 'data-analysis' 
+export type ToolType =
+  | 'text-generation'
+  | 'image-generation'
+  | 'code-generation'
+  | 'data-analysis'
+  | 'automation'
+  | 'optimization'
   | 'research'
 
 // AI model compatibility
-export type AICompatibility = 
-  | 'ChatGPT' 
-  | 'Claude' 
-  | 'Gemini' 
-  | 'Midjourney' 
-  | 'DALL-E' 
-  | 'Stable Diffusion'
+export type AICompatibility =
+  | 'chatgpt'
+  | 'claude'
+  | 'gemini'
+  | 'midjourney'
+  | 'dalle'
+  | 'stable-diffusion'
 
 // Sort options
 export type ToolSortOption = 'relevance' | 'recent'
@@ -41,6 +44,8 @@ export interface Tool {
   isFavorite: boolean
   isEdited: boolean
   usageCount?: number
+  difficulty?: 'beginner' | 'intermediate' | 'advanced'
+  estimatedTime?: string
   createdAt?: Date
   updatedAt?: Date
 }
