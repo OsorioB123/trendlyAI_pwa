@@ -18,12 +18,14 @@ export const viewport = {
   maximumScale: 1,
 };
 
+// Fonts from next/font must be initialized at module scope
+const inter = Inter({ subsets: ["latin"], display: "swap" });
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const inter = Inter({ subsets: ["latin"], display: "swap" });
   return (
     <html lang="pt-BR" className={inter.className}>
       <head>
