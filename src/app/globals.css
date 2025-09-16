@@ -16,6 +16,30 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Global Focus Ring for Accessibility */
+:root {
+  --focus-ring-color: rgba(239, 209, 53, 0.8); /* brand yellow glow */
+}
+
+.focus-ring,
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(239, 209, 53, 0.2);
+  border-radius: 8px;
+}
+
+/* Ensure keyboard focus visibility even on glass backgrounds */
+.focus-ring-dark {
+  outline: 2px solid rgba(255,255,255,0.9);
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.25);
+}
+
 /* Layout Classes */
 .min-h-screen { min-height: 100vh; }
 .h-full { height: 100%; }
@@ -718,8 +742,8 @@ body {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   transform-origin: top right;
   backdrop-filter: blur(20px);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.8);
+  border: none;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
 }
 .dropdown-menu.show {
@@ -1181,4 +1205,40 @@ button:active {
 
 .drop-shadow-lg {
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+}
+
+
+
+@layer base {
+  :root {
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+  .dark {
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

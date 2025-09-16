@@ -5,6 +5,8 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import BackgroundOverlay from '../../../components/common/BackgroundOverlay'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { useAuth } from '../../../contexts/AuthContext'
 import { ArrowLeft, Lock } from 'lucide-react'
 
@@ -225,7 +227,7 @@ export default function RegisterPage() {
           />
 
           {/* Success Card */}
-          <div className="w-full liquid-glass rounded-3xl p-8 flex flex-col items-center text-center backdrop-blur-2xl bg-white/10 border border-white/15 shadow-2xl">
+        <div className="w-full liquid-glass rounded-3xl p-8 flex flex-col items-center text-center backdrop-blur-2xl bg-white/10 shadow-2xl">
             <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-6">
               <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -246,7 +248,7 @@ export default function RegisterPage() {
             <div className="w-full space-y-4">
               <button
                 onClick={() => router.push('/login')}
-                className="w-full text-white text-[15px] font-semibold py-3 rounded-xl bg-white/10 border border-white/20 shadow-lg hover:bg-white/15 hover:-translate-y-1 hover:shadow-2xl active:-translate-y-0.5 active:scale-[0.99] transition-all duration-300"
+              className="w-full text-white text-[15px] font-semibold py-3 rounded-xl bg-white/10 shadow-lg hover:bg-white/15 hover:-translate-y-1 hover:shadow-2xl active:-translate-y-0.5 active:scale-[0.99] transition-all duration-300"
               >
                 Ir para Login
               </button>
@@ -277,7 +279,7 @@ export default function RegisterPage() {
         />
 
         {/* Signup Card */}
-        <div className="w-full liquid-glass rounded-3xl p-8 flex flex-col animate-fade-in-up backdrop-blur-2xl bg-white/10 border border-white/15 shadow-2xl">
+        <div className="w-full liquid-glass rounded-3xl p-8 flex flex-col animate-fade-in-up backdrop-blur-2xl bg-white/10 shadow-2xl">
           <div>
             <Link 
               href="/login"
@@ -293,7 +295,7 @@ export default function RegisterPage() {
 
           {/* General Error Message */}
           {errors.general && (
-            <div className="mt-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 text-sm">
+            <div id="register-error" role="alert" className="mt-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 text-sm">
               {errors.general}
             </div>
           )}
@@ -302,24 +304,23 @@ export default function RegisterPage() {
             <div className="space-y-4">
               {/* Name Field */}
               <div className="animate-fade-in-up">
-                <label htmlFor="name" className="block text-sm font-medium text-white/80 mb-1.5">
+                <Label htmlFor="name" className="block text-sm font-medium text-white/80 mb-1.5">
                   Seu nome
-                </label>
-                <input
-                  type="text"
+                </Label>
+                <Input
                   id="name"
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
                   disabled={isLoading}
-                  className={`form-input w-full rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/50 bg-black/20 border transition-all duration-300 outline-none focus:bg-black/25 focus:border-white/40 focus:ring-4 focus:ring-white/10 disabled:opacity-50 ${
-                    errors.name ? 'border-rose-400' : 'border-white/15'
-                  }`}
+                  className="bg-black/20 text-white placeholder-white/50 focus:bg-black/25"
                   placeholder="Como devemos te chamar?"
                   required
+                  aria-invalid={!!errors.name}
+                  aria-describedby={errors.name ? 'name-error' : undefined}
                 />
                 {errors.name && (
-                  <p className="error-message show text-rose-400 text-xs mt-1">
+                  <p id="name-error" className="error-message show text-rose-400 text-xs mt-1">
                     {errors.name}
                   </p>
                 )}
@@ -327,24 +328,24 @@ export default function RegisterPage() {
 
               {/* Email Field */}
               <div className="animate-fade-in-up">
-                <label htmlFor="email" className="block text-sm font-medium text-white/80 mb-1.5">
+                <Label htmlFor="email" className="block text-sm font-medium text-white/80 mb-1.5">
                   Seu e-mail
-                </label>
-                <input
-                  type="email"
+                </Label>
+                <Input
                   id="email"
+                  type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
                   disabled={isLoading}
-                  className={`form-input w-full rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/50 bg-black/20 border transition-all duration-300 outline-none focus:bg-black/25 focus:border-white/40 focus:ring-4 focus:ring-white/10 disabled:opacity-50 ${
-                    errors.email ? 'border-rose-400' : 'border-white/15'
-                  }`}
+                  className="bg-black/20 text-white placeholder-white/50 focus:bg-black/25"
                   placeholder="seu@email.com"
                   required
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? 'email-error' : undefined}
                 />
                 {errors.email && (
-                  <p className="error-message show text-rose-400 text-xs mt-1">
+                  <p id="email-error" className="error-message show text-rose-400 text-xs mt-1">
                     {errors.email}
                   </p>
                 )}
@@ -352,24 +353,24 @@ export default function RegisterPage() {
 
               {/* Password Field */}
               <div className="animate-fade-in-up">
-                <label htmlFor="password" className="block text-sm font-medium text-white/80 mb-1.5">
+                <Label htmlFor="password" className="block text-sm font-medium text-white/80 mb-1.5">
                   Crie uma senha
-                </label>
-                <input
-                  type="password"
+                </Label>
+                <Input
                   id="password"
+                  type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
                   disabled={isLoading}
-                  className={`form-input w-full rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/50 bg-black/20 border transition-all duration-300 outline-none focus:bg-black/25 focus:border-white/40 focus:ring-4 focus:ring-white/10 disabled:opacity-50 ${
-                    errors.password ? 'border-rose-400' : 'border-white/15'
-                  }`}
+                  className="bg-black/20 text-white placeholder-white/50 focus:bg-black/25"
                   placeholder="Mínimo 6 caracteres"
                   required
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? 'password-error' : undefined}
                 />
                 {errors.password && (
-                  <p className="error-message show text-rose-400 text-xs mt-1">
+                  <p id="password-error" className="error-message show text-rose-400 text-xs mt-1">
                     {errors.password}
                   </p>
                 )}
@@ -377,24 +378,24 @@ export default function RegisterPage() {
 
               {/* Confirm Password Field */}
               <div className="animate-fade-in-up">
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-white/80 mb-1.5">
+                <Label htmlFor="confirmPassword" className="block text-sm font-medium text-white/80 mb-1.5">
                   Confirme a senha
-                </label>
-                <input
-                  type="password"
+                </Label>
+                <Input
                   id="confirmPassword"
+                  type="password"
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   disabled={isLoading}
-                  className={`form-input w-full rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/50 bg-black/20 border transition-all duration-300 outline-none focus:bg-black/25 focus:border-white/40 focus:ring-4 focus:ring-white/10 disabled:opacity-50 ${
-                    errors.confirmPassword ? 'border-rose-400' : 'border-white/15'
-                  }`}
+                  className="bg-black/20 text-white placeholder-white/50 focus:bg-black/25"
                   placeholder="Digite a senha novamente"
                   required
+                  aria-invalid={!!errors.confirmPassword}
+                  aria-describedby={errors.confirmPassword ? 'confirm-error' : undefined}
                 />
                 {errors.confirmPassword && (
-                  <p className="error-message show text-rose-400 text-xs mt-1">
+                  <p id="confirm-error" className="error-message show text-rose-400 text-xs mt-1">
                     {errors.confirmPassword}
                   </p>
                 )}
@@ -411,7 +412,7 @@ export default function RegisterPage() {
                   checked={formData.terms}
                   onChange={handleInputChange}
                   disabled={isLoading}
-                  className="custom-checkbox h-4 w-4 mt-0.5 rounded-sm shrink-0 appearance-none bg-black/20 border border-white/20 transition-all duration-200 cursor-pointer checked:border-white/80 checked:bg-white disabled:opacity-50"
+                  className="custom-checkbox h-4 w-4 mt-0.5 rounded-sm shrink-0 appearance-none bg-black/20 transition-all duration-200 cursor-pointer checked:bg-white disabled:opacity-50"
                   required
                 />
                 <label htmlFor="terms" className="ml-3 text-xs text-white/70">
@@ -438,7 +439,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={isLoading || !formData.email || !formData.password || !formData.name || !formData.terms}
-                className="primary-action-btn w-full text-white text-[15px] font-semibold py-3 rounded-xl shadow-lg animate-fade-in-up bg-white/10 border border-white/20 hover:bg-white/15 hover:-translate-y-1 hover:shadow-2xl active:-translate-y-0.5 active:scale-[0.99] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+                className="primary-action-btn w-full text-white text-[15px] font-semibold py-3 rounded-xl shadow-lg animate-fade-in-up bg-white/10 hover:bg-white/15 hover:-translate-y-1 hover:shadow-2xl active:-translate-y-0.5 active:scale-[0.99] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center gap-2">
@@ -473,21 +474,20 @@ export default function RegisterPage() {
         /* Estilo customizado para os inputs */
         .form-input {
           background-color: rgba(0, 0, 0, 0.2);
-          border: 1px solid rgba(255, 255, 255, 0.15);
+          border: none;
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .form-input:focus {
           outline: none;
           background-color: rgba(0, 0, 0, 0.25);
-          border-color: rgba(255, 255, 255, 0.4);
           box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
         }
 
         /* Botão de Ação Principal */
         .primary-action-btn {
           background-color: rgba(255, 255, 255, 0.1);
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          border: none;
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 

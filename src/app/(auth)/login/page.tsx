@@ -5,6 +5,8 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import BackgroundOverlay from '../../../components/common/BackgroundOverlay'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { useAuth } from '../../../contexts/AuthContext'
 import { Lock } from 'lucide-react'
 
@@ -46,7 +48,7 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const { data, error: signInError } = await signIn(formData.email, formData.password)
+      const { data: signInData, error: signInError } = await signIn(formData.email, formData.password)
       
       if (signInError) {
         console.error('Sign in error:', signInError)
@@ -64,8 +66,8 @@ export default function LoginPage() {
         return
       }
 
-      if (data?.user) {
-        console.log('Login successful:', data.user.email)
+      if (signInData?.user) {
+        console.log('Login successful:', signInData.user.email)
         
         // Set localStorage flag for compatibility
         localStorage.setItem('trendlyai-user-authenticated', 'true')
@@ -89,7 +91,7 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     try {
       setError('')
-      const { data, error: googleError } = await signInWithGoogle()
+      const { error: googleError } = await signInWithGoogle()
       
       if (googleError) {
         console.error('Google login error:', googleError)
@@ -134,10 +136,10 @@ export default function LoginPage() {
           />
 
           {/* Login Card */}
-          <div className="w-full rounded-3xl p-8 flex flex-col items-center gap-6 backdrop-blur-2xl bg-white/10 border border-white/15 shadow-2xl">
+          <div className="w-full rounded-3xl p-8 flex flex-col items-center gap-6 backdrop-blur-2xl bg-white/10 shadow-2xl">
             {/* Error Message */}
             {error && (
-              <div className="w-full p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 text-sm animate-pulse">
+              <div id="login-error" role="alert" className="w-full p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 text-sm">
                 {error}
               </div>
             )}
@@ -147,11 +149,13 @@ export default function LoginPage() {
               onClick={handleGoogleLogin}
               type="button"
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-3 rounded-xl py-3 px-4 text-white text-sm font-medium bg-white/5 border border-white/15 hover:bg-white/10 hover:border-white/20 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/10 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-3 rounded-xl py-3 px-4 text-white text-sm font-medium bg-white/5 hover:bg-white/10 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/10 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <img 
-                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
-                alt="Google" 
+              <Image
+                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                alt="Google"
+                width={20}
+                height={20}
                 className="w-5 h-5"
               />
               {isLoading ? 'Conectando...' : 'Continuar com o Google'}
@@ -168,29 +172,35 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
               {/* Email Input */}
               <div className="flex flex-col gap-2">
-                <input
+                <Label htmlFor="email" className="text-white/80">E-mail</Label>
+                <Input
+                  id="email"
                   type="email"
                   name="email"
-                  placeholder="E-mail"
+                  placeholder="seu@email.com"
                   value={formData.email}
                   onChange={handleInputChange}
                   required
                   disabled={isLoading}
-                  className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-white/50 bg-black/20 border border-white/15 transition-all duration-300 outline-none focus:bg-black/25 focus:border-white/40 focus:ring-4 focus:ring-white/10 disabled:opacity-50"
+                  aria-invalid={!!error}
+                  aria-describedby={error ? 'login-error' : undefined}
+                  className="bg-black/20 text-white placeholder-white/50 focus:bg-black/25"
                 />
               </div>
 
               {/* Password Input */}
               <div className="flex flex-col gap-2">
-                <input
+                <Label htmlFor="password" className="text-white/80">Senha</Label>
+                <Input
+                  id="password"
                   type="password"
                   name="password"
-                  placeholder="Senha"
+                  placeholder="••••••••"
                   value={formData.password}
                   onChange={handleInputChange}
                   required
                   disabled={isLoading}
-                  className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-white/50 bg-black/20 border border-white/15 transition-all duration-300 outline-none focus:bg-black/25 focus:border-white/40 focus:ring-4 focus:ring-white/10 disabled:opacity-50"
+                  className="bg-black/20 text-white placeholder-white/50 focus:bg-black/25"
                 />
               </div>
 
@@ -198,7 +208,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading || !formData.email || !formData.password}
-                className="w-full text-white text-[15px] font-semibold py-3 rounded-xl bg-white/10 border border-white/20 shadow-lg hover:bg-white/15 hover:-translate-y-1 hover:shadow-2xl active:-translate-y-0.5 active:scale-[0.99] focus:outline-none focus-visible:ring-4 focus-visible:ring-white/10 transition-all duration-300 mt-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+              className="w-full text-white text-[15px] font-semibold py-3 rounded-xl bg-white/10 shadow-lg hover:bg-white/15 hover:-translate-y-1 hover:shadow-2xl active:-translate-y-0.5 active:scale-[0.99] focus:outline-none focus-visible:ring-4 focus-visible:ring-white/10 transition-all duration-300 mt-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center gap-2">

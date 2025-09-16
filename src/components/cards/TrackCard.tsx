@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
 import { Heart } from 'lucide-react'
 import { Track } from '../../types/track'
+import { MOTION_CONSTANTS } from '@/lib/motion'
 
 interface TrackCardProps {
   track: Track
@@ -23,6 +25,16 @@ export default function TrackCard({
 }: TrackCardProps) {
   const router = useRouter()
   const [favoriteLoading, setFavoriteLoading] = useState(false)
+  const [reducedMotion, setReducedMotion] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => setReducedMotion(mq.matches)
+    update()
+    mq.addEventListener?.('change', update)
+    return () => mq.removeEventListener?.('change', update)
+  }, [])
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -49,21 +61,34 @@ export default function TrackCard({
   if (variant === 'compact') {
     return (
       <div className="min-w-[280px] p-2">
-        <div 
-          className="arsenal-card group rounded-2xl overflow-hidden relative h-80 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:translate-y-[-4px] hover:scale-[1.01]"
+        <motion.div 
+          className="arsenal-card group rounded-2xl overflow-hidden relative h-80 cursor-pointer focus-ring"
+          role="button"
+          tabIndex={0}
+          aria-label={`Abrir trilha: ${track.title}`}
           style={{ 
             backgroundImage: `url('${track.backgroundImage}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleCardClick();
+            }
+          }}
           onClick={handleCardClick}
+          whileHover={reducedMotion ? undefined : { scale: 1.01, y: -4 }}
+          whileTap={reducedMotion ? undefined : { scale: 0.99 }}
+          transition={{ type: 'spring', ...MOTION_CONSTANTS.SPRING.smooth }}
         >
         {/* Favorite Button */}
         <button 
-          className={`absolute top-5 right-5 z-20 w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-[20px] bg-white/10 border border-white/15 transition-all duration-300 hover:bg-white/15 active:scale-90 ${favoriteLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isFavorited ? 'animate-[pop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)]' : ''}`}
+          className={`absolute top-5 right-5 z-20 w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-[20px] bg-white/10 transition-all duration-300 hover:bg-white/15 active:scale-90 ${favoriteLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isFavorited ? 'animate-[pop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)]' : ''}`}
           onClick={handleFavoriteClick}
           disabled={favoriteLoading}
           aria-label={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+          aria-pressed={isFavorited}
           title={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
         >
           <Heart className={`w-5 h-5 transition-all duration-200 ${
@@ -92,7 +117,7 @@ export default function TrackCard({
           
           <div className="card-hover-actions opacity-0 translate-y-[15px] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] delay-100 group-hover:opacity-100 group-hover:translate-y-0">
             <button 
-              className="w-full py-3 font-medium rounded-xl backdrop-blur-[20px] bg-white/10 border border-white/15 text-white hover:bg-white/15 transition-all duration-300"
+              className="w-full py-3 font-medium rounded-xl backdrop-blur-[20px] bg-white/10 text-white hover:bg-white/15 transition-all duration-300"
               onClick={(e) => {
                 e.stopPropagation()
                 handleCardClick()
@@ -104,7 +129,7 @@ export default function TrackCard({
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
       </div>
     )
   }
@@ -112,9 +137,21 @@ export default function TrackCard({
   // Full variant (for recommendations)
   return (
     <div className="min-w-[280px] p-2">
-      <div 
-        className="rounded-2xl overflow-hidden relative h-64 cursor-pointer group hover:-translate-y-1 transition-all duration-200"
+      <motion.div 
+        className="rounded-2xl overflow-hidden relative h-64 cursor-pointer group focus-ring"
+        role="button"
+        tabIndex={0}
+        aria-label={`Abrir trilha: ${track.title}`}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleCardClick();
+          }
+        }}
         onClick={handleCardClick}
+        whileHover={reducedMotion ? undefined : { y: -4, scale: 1.01 }}
+        whileTap={reducedMotion ? undefined : { scale: 0.995 }}
+        transition={{ type: 'spring', ...MOTION_CONSTANTS.SPRING.smooth }}
       >
         <Image 
           src={track.backgroundImage || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80'} 
@@ -127,10 +164,11 @@ export default function TrackCard({
         
         {/* Favorite Button */}
         <button 
-          className={`absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-[20px] bg-white/10 border border-white/15 transition-all duration-300 hover:bg-white/15 active:scale-90 ${favoriteLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isFavorited ? 'animate-[pop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)]' : ''}`}
+          className={`absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-[20px] bg-white/10 transition-all duration-300 hover:bg-white/15 active:scale-90 ${favoriteLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isFavorited ? 'animate-[pop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)]' : ''}`}
           onClick={handleFavoriteClick}
           disabled={favoriteLoading}
           aria-label={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+          aria-pressed={isFavorited}
           title={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
         >
           <Heart className={`w-5 h-5 transition-all duration-200 ${
@@ -142,7 +180,7 @@ export default function TrackCard({
         
         <div className="absolute top-0 left-0 p-5 flex items-start gap-2 flex-wrap">
           {track.tags?.map(tag => (
-            <span key={tag} className="px-2 py-1 text-xs font-medium rounded-full bg-white/10 backdrop-blur-lg border border-white/15 text-white/90">
+            <span key={tag} className="px-2 py-1 text-xs font-medium rounded-full bg-white/10 backdrop-blur-lg text-white/90">
               {tag}
             </span>
           ))}
@@ -153,7 +191,7 @@ export default function TrackCard({
             <h3 className="font-semibold text-white text-lg line-clamp-2">{track.title}</h3>
           </div>
         </div>
-      </div>
+      </motion.div>
       
       {track.progress !== undefined && (
         <div className="mt-2">

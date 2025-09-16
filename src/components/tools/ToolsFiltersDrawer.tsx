@@ -42,11 +42,6 @@ const AI_COMPATIBILITY = [
   { value: 'stable-diffusion' as const, label: 'Stable Diffusion', icon: '🎭' }
 ]
 
-const DIFFICULTY_LEVELS = [
-  { value: 'beginner' as const, label: 'Iniciante', icon: '🌱' },
-  { value: 'intermediate' as const, label: 'Intermediário', icon: '📈' },
-  { value: 'advanced' as const, label: 'Avançado', icon: '🚀' }
-]
 
 export default function ToolsFiltersDrawer({ 
   isOpen, 

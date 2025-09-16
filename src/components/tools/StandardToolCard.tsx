@@ -287,7 +287,7 @@ export default function StandardToolCard({
                 Compatível com:
               </span>
               <div className="flex" style={{ gap: "var(--space-1)" }}>
-                {tool.compatibility.slice(0, 3).map((ai, index) => (
+                {tool.compatibility.slice(0, 3).map((ai) => (
                   <span 
                     key={ai}
                     className="flex items-center justify-center text-white/70 glass-medium border-[--glass-border-medium] touch-target"

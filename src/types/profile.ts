@@ -79,7 +79,6 @@ export interface NextActionRecommendation {
 
 export interface ProfileHeaderProps {
   profile: UserProfile
-  isEditing: boolean
   editingField: string | null
   onEditField: (field: string | null) => void
   onSaveField: (field: string, value: string) => Promise<boolean>
@@ -100,7 +99,6 @@ export interface ArsenalSectionProps {
   activeTab: ArsenalTab
   onTabChange: (tab: ArsenalTab) => void
   onTrackClick: (track: Track) => void
-  onToolClick: (tool: Tool) => void
   onNavigateToTools: () => void
   isLoading?: boolean
   className?: string

@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 import { Heart } from 'lucide-react'
 import { Track } from '../../types/track'
+import { MOTION_CONSTANTS } from '@/lib/motion'
 
 interface TrackCardFullProps {
   track: Track
@@ -18,6 +20,16 @@ export default function TrackCardFull({
   isFavorited
 }: TrackCardFullProps) {
   const [favoriteLoading, setFavoriteLoading] = useState(false)
+  const [reducedMotion, setReducedMotion] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => setReducedMotion(mq.matches)
+    update()
+    mq.addEventListener?.('change', update)
+    return () => mq.removeEventListener?.('change', update)
+  }, [])
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -70,18 +82,21 @@ export default function TrackCardFull({
   }
 
   return (
-    <div 
-      className="interactive-card card-glow group rounded-2xl overflow-hidden relative h-80 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:translate-y-[-4px] hover:scale-[1.02] active:scale-[0.98]"
+    <motion.div 
+      className="interactive-card card-glow group rounded-2xl overflow-hidden relative h-80 cursor-pointer"
       style={{ 
         backgroundImage: `url('${track.backgroundImage}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center'
       }}
       onClick={handleCardClick}
+      whileHover={reducedMotion ? undefined : { y: -4, scale: 1.02 }}
+      whileTap={reducedMotion ? undefined : { scale: 0.98 }}
+      transition={{ type: 'spring', ...MOTION_CONSTANTS.SPRING.smooth }}
     >
       {/* Favorite Button */}
-      <button 
-        className={`absolute top-5 right-5 z-20 w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-[20px] bg-white/10 border border-white/15 transition-all duration-300 hover:bg-white/15 active:scale-90 ${favoriteLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isFavorited ? 'animate-[pop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)]' : ''}`}
+        <button 
+          className={`absolute top-5 right-5 z-20 w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-[20px] bg-white/10 transition-all duration-300 hover:bg-white/15 active:scale-90 ${favoriteLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isFavorited ? 'animate-[pop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)]' : ''}`}
         onClick={handleFavoriteClick}
         disabled={favoriteLoading}
         aria-label={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
@@ -97,7 +112,7 @@ export default function TrackCardFull({
       {/* Tags - Top Left */}
       <div className="absolute top-5 left-5 z-10 flex flex-wrap gap-2">
         {/* Categories */}
-        {track.categories.slice(0, 2).map((category, index) => (
+        {track.categories.slice(0, 2).map((category) => (
           <span 
             key={category}
             className={`px-2 py-1 text-xs font-medium rounded-full backdrop-blur-lg border ${getCategoryColor(category)} transition-all duration-300`}
@@ -171,6 +186,6 @@ export default function TrackCardFull({
           100% { transform: scale(1); }
         }
       `}</style>
-    </div>
+    </motion.div>
   )
 }

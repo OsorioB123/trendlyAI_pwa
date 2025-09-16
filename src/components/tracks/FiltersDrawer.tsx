@@ -114,8 +114,7 @@ export default function FiltersDrawer({ isOpen, onClose, filters, onFiltersChang
         fixed z-50 
         lg:top-0 lg:right-0 lg:h-full lg:w-full lg:max-w-md 
         bottom-0 left-0 right-0 max-h-[85vh]
-        bg-gray-900/95 backdrop-blur-[20px] border-white/15 overflow-y-auto
-        lg:border-l border-t lg:border-t-0
+        bg-gray-900/95 backdrop-blur-[20px] overflow-y-auto
         transform transition-transform duration-300 ease-out
         ${isOpen 
           ? 'translate-y-0 lg:translate-x-0' 
@@ -149,10 +148,10 @@ export default function FiltersDrawer({ isOpen, onClose, filters, onFiltersChang
                       className="sr-only"
                     />
                     <div className={`
-                      w-5 h-5 rounded border-2 transition-all duration-200
+                      w-5 h-5 rounded transition-all duration-200
                       ${tempFilters.levels.includes(level)
-                        ? 'bg-white border-white'
-                        : 'border-white/40 hover:border-white/60'
+                        ? 'bg-white'
+                        : 'bg-white/10 group-hover:bg-white/20'
                       }
                     `}>
                       {tempFilters.levels.includes(level) && (
@@ -184,10 +183,10 @@ export default function FiltersDrawer({ isOpen, onClose, filters, onFiltersChang
                       className="sr-only"
                     />
                     <div className={`
-                      w-5 h-5 rounded border-2 transition-all duration-200
+                      w-5 h-5 rounded transition-all duration-200
                       ${tempFilters.status.includes(status.value)
-                        ? 'bg-white border-white'
-                        : 'border-white/40 hover:border-white/60'
+                        ? 'bg-white'
+                        : 'bg-white/10 group-hover:bg-white/20'
                       }
                     `}>
                       {tempFilters.status.includes(status.value) && (
@@ -216,8 +215,8 @@ export default function FiltersDrawer({ isOpen, onClose, filters, onFiltersChang
                   className={`
                     filter-chip p-3 rounded-lg text-sm text-left transition-all duration-200
                     ${tempFilters.categories.includes(category)
-                      ? 'bg-white/20 text-white border border-white/40'
-                      : 'bg-white/5 text-white/80 border border-white/10 hover:bg-white/10'
+                      ? 'bg-white/20 text-white'
+                      : 'bg-white/5 text-white/80 hover:bg-white/10'
                     }
                   `}
                 >
@@ -228,10 +227,10 @@ export default function FiltersDrawer({ isOpen, onClose, filters, onFiltersChang
           </div>
 
           {/* Actions Footer */}
-          <div className="flex gap-3 sticky bottom-0 bg-gray-900/95 pt-4 -mx-6 px-6 pb-6 border-t border-white/10">
+          <div className="flex gap-3 sticky bottom-0 bg-gray-900/95 pt-4 -mx-6 px-6 pb-6">
             <button
               onClick={handleClearFilters}
-              className="flex-1 px-4 py-3 rounded-xl bg-white/5 text-white/80 border border-white/10 hover:bg-white/10 transition-all duration-200 font-medium"
+              className="flex-1 px-4 py-3 rounded-xl bg-white/10 text-white hover:bg-white/15 transition-all duration-200 font-medium"
             >
               Limpar
             </button>

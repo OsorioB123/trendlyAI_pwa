@@ -88,9 +88,8 @@ export default function SecurityTab({
   const securityScore = getSecurityScore()
 
   const getScoreColor = (percentage: number) => {
-    if (percentage >= 80) return 'text-green-400 bg-green-500/20'
-    if (percentage >= 60) return 'text-yellow-400 bg-yellow-500/20'
-    return 'text-red-400 bg-red-500/20'
+    // Simplified to grayscale styling
+    return 'text-white bg-white/10'
   }
 
   const formatLastChange = (date?: Date) => {
@@ -124,7 +123,7 @@ export default function SecurityTab({
               <Shield size={16} />
               <span>{securityScore.percentage}% Seguro</span>
             </div>
-            <p className="text-xs text-white/50 mt-1">
+            <p className="text-xs text-white/60 mt-1">
               {securityScore.score}/{securityScore.maxScore} configurações ativas
             </p>
           </div>
@@ -135,19 +134,19 @@ export default function SecurityTab({
           {/* Email */}
           <div className="flex items-center justify-between p-4 rounded-lg hover:bg-white/5 transition-colors group">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-500/20 text-blue-400 rounded-lg">
+              <div className="p-2 bg-white/10 text-white rounded-lg">
                 <Mail size={18} />
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-white">Email</span>
-                  <CheckCircle size={14} className="text-green-400" />
+                  <CheckCircle size={14} className="text-white/80" />
                 </div>
                 <p className="text-sm text-white/70 break-all">
                   {security.email}
                 </p>
                 {security.last_email_change && (
-                  <p className="text-xs text-white/50">
+                  <p className="text-xs text-white/60">
                     Alterado {formatLastChange(security.last_email_change)}
                   </p>
                 )}
@@ -155,7 +154,7 @@ export default function SecurityTab({
             </div>
             <button
               onClick={() => onSetActiveModal('change-email')}
-              className="opacity-0 group-hover:opacity-100 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/80 rounded-md text-sm transition-all"
+              className="opacity-0 group-hover:opacity-100 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-md text-sm transition-all"
             >
               Alterar
             </button>
@@ -164,23 +163,23 @@ export default function SecurityTab({
           {/* Password */}
           <div className="flex items-center justify-between p-4 rounded-lg hover:bg-white/5 transition-colors group">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-500/20 text-green-400 rounded-lg">
+              <div className="p-2 bg-white/10 text-white rounded-lg">
                 <Lock size={18} />
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-white">Senha</span>
                   {security.has_password ? (
-                    <CheckCircle size={14} className="text-green-400" />
+                    <CheckCircle size={14} className="text-white/80" />
                   ) : (
-                    <AlertTriangle size={14} className="text-orange-400" />
+                    <AlertTriangle size={14} className="text-white/70" />
                   )}
                 </div>
                 <p className="text-sm text-white/70">
                   {security.has_password ? '••••••••' : 'Não definida'}
                 </p>
                 {security.last_password_change && (
-                  <p className="text-xs text-white/50">
+                  <p className="text-xs text-white/60">
                     Alterada {formatLastChange(security.last_password_change)}
                   </p>
                 )}
@@ -188,7 +187,7 @@ export default function SecurityTab({
             </div>
             <button
               onClick={() => onSetActiveModal('change-password')}
-              className="opacity-0 group-hover:opacity-100 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/80 rounded-md text-sm transition-all"
+              className="opacity-0 group-hover:opacity-100 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-md text-sm transition-all"
             >
               {security.has_password ? 'Alterar' : 'Definir'}
             </button>
@@ -199,8 +198,8 @@ export default function SecurityTab({
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-lg ${
                 security.two_factor_enabled 
-                  ? 'bg-green-500/20 text-green-400' 
-                  : 'bg-orange-500/20 text-orange-400'
+                  ? 'bg-white/10 text-white' 
+                  : 'bg-white/10 text-white'
               }`}>
                 <KeyRound size={18} />
               </div>
@@ -208,9 +207,9 @@ export default function SecurityTab({
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-white">Autenticação de Dois Fatores</span>
                   {security.two_factor_enabled ? (
-                    <CheckCircle size={14} className="text-green-400" />
+                    <CheckCircle size={14} className="text-white/80" />
                   ) : (
-                    <Clock size={14} className="text-orange-400" />
+                    <Clock size={14} className="text-white/70" />
                   )}
                 </div>
                 <p className="text-sm text-white/70">
@@ -223,7 +222,7 @@ export default function SecurityTab({
             </div>
             <button
               onClick={() => onSetActiveModal('setup-2fa')}
-              className="opacity-0 group-hover:opacity-100 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/80 rounded-md text-sm transition-all"
+              className="opacity-0 group-hover:opacity-100 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-md text-sm transition-all"
             >
               {security.two_factor_enabled ? 'Gerenciar' : 'Configurar'}
             </button>
@@ -232,12 +231,12 @@ export default function SecurityTab({
 
         {/* Security Tips */}
         {securityScore.percentage < 100 && (
-          <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+          <div className="mt-6 p-4 bg-white/10 rounded-lg">
             <div className="flex items-start gap-3">
-              <Shield className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+              <Shield className="w-5 h-5 text-white/80 flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-blue-300 font-medium text-sm">Dica de Segurança</h4>
-                <p className="text-blue-200 text-xs mt-1">
+                <h4 className="text-white/80 font-medium text-sm">Dica de Segurança</h4>
+                <p className="text-white/70 text-xs mt-1">
                   {!security.two_factor_enabled && "Configure a autenticação de dois fatores para máxima proteção. "}
                   {security.last_password_change && 
                    Math.floor((Date.now() - security.last_password_change.getTime()) / (1000 * 60 * 60 * 24)) > 90 &&
@@ -253,7 +252,7 @@ export default function SecurityTab({
 
       {/* Danger Zone */}
       <div className="liquid-glass p-8 md:p-10 rounded-2xl">
-        <div className="border border-red-500/40 bg-red-500/5 p-6 rounded-lg">
+        <div className="bg-red-500/10 p-6 rounded-lg">
           <div className="flex items-start gap-4">
             <div className="p-2 bg-red-500/20 text-red-400 rounded-lg flex-shrink-0">
               <AlertTriangle size={20} />

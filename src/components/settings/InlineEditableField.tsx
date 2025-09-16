@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Edit2, Check, X } from 'lucide-react'
 import { InlineEditableFieldProps } from '../../types/settings'
+import { Input } from '@/components/ui/input'
 
 export default function InlineEditableField({
   label,
@@ -160,9 +161,11 @@ export default function InlineEditableField({
     )
   }
 
+  const errorId = `${field}-error`
+
   return (
-    <div className="profile-field editing relative p-4 rounded-lg bg-white/5 border border-white/20">
-      <label className="block text-sm font-medium text-white/70 mb-2">{label}</label>
+    <div className="profile-field editing relative p-4 rounded-lg bg-white/5">
+      <label className="block text-sm font-medium text-white/70 mb-2" htmlFor={`${field}-input`}>{label}</label>
       
       <div className="space-y-3">
         <div className="relative">
@@ -176,7 +179,11 @@ export default function InlineEditableField({
               maxLength={maxLength}
               rows={3}
               disabled={isSaving}
-              className="w-full bg-transparent border-none outline-none text-white text-base leading-relaxed resize-none placeholder-white/40 disabled:opacity-50"
+              id={`${field}-input`}
+              aria-invalid={!!error}
+              aria-describedby={error ? errorId : undefined}
+              aria-label={label}
+              className="w-full bg-transparent border-none outline-none text-white text-base leading-relaxed resize-none placeholder-white/40 disabled:opacity-50 focus-ring"
               style={{ 
                 borderBottom: '2px solid transparent',
                 borderImage: 'linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0.6) 100%) 1',
@@ -185,8 +192,9 @@ export default function InlineEditableField({
               }}
             />
           ) : (
-            <input
+            <Input
               ref={inputRef as React.RefObject<HTMLInputElement>}
+              id={`${field}-input`}
               type="text"
               value={currentValue}
               onChange={handleInputChange}
@@ -194,22 +202,19 @@ export default function InlineEditableField({
               placeholder={placeholder}
               maxLength={maxLength}
               disabled={isSaving}
-              className="w-full bg-transparent border-none outline-none text-white text-base leading-relaxed placeholder-white/40 disabled:opacity-50"
-              style={{ 
-                borderBottom: '2px solid transparent',
-                borderImage: 'linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0.6) 100%) 1',
-                borderImageSlice: 1,
-                animation: 'golden-border-appear 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards'
-              }}
+              aria-invalid={!!error}
+              aria-describedby={error ? errorId : undefined}
+              aria-label={label}
+              className="bg-black/20 text-white placeholder-white/40 border-white/20 focus:border-white/30 focus:ring-white/30"
             />
           )}
         </div>
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {error && (
-              <span className="text-red-400 text-xs">{error}</span>
-            )}
+            <span id={errorId} aria-live="polite" className="text-red-400 text-xs">
+              {error || ''}
+            </span>
             {!error && CharCount}
           </div>
           
@@ -248,42 +253,3 @@ export default function InlineEditableField({
 }
 
 // Global styles to add to your CSS
-const inlineEditStyles = `
-  @keyframes golden-border-appear {
-    from {
-      transform: scaleX(0);
-      opacity: 0;
-    }
-    to {
-      transform: scaleX(1);
-      opacity: 1;
-    }
-  }
-
-  @keyframes pulse-white {
-    0%, 100% {
-      color: white;
-      text-shadow: none;
-    }
-    50% {
-      color: #ffffff;
-      text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
-    }
-  }
-
-  .animate-pulse-white {
-    animation: pulse-white 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .profile-field.editing .profile-field-content::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0.6) 100%);
-    border-radius: 1px;
-    animation: golden-border-appear 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-`

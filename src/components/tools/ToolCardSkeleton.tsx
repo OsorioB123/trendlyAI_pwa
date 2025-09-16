@@ -13,7 +13,7 @@ export default function ToolCardSkeleton({
 }: ToolCardSkeletonProps) {
   return (
     <motion.div
-      className={`tool-card-skeleton relative rounded-2xl overflow-hidden h-72 backdrop-blur-[10px] bg-white/5 border border-white/10 ${className}`}
+      className={`tool-card-skeleton relative rounded-2xl overflow-hidden h-72 backdrop-blur-[10px] bg-white/5 ${className}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ 
@@ -96,7 +96,7 @@ export default function ToolCardSkeleton({
         </div>
         
         {/* Footer skeleton */}
-        <div className="flex justify-between items-center pt-3 border-t border-white/10 opacity-70">
+        <div className="flex justify-between items-center pt-3 opacity-70">
           <div 
             className="w-24 h-3 rounded loading-shimmer"
             style={{ animationDelay: `${animationDelay + 0.8}s` }}

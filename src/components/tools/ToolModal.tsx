@@ -175,10 +175,10 @@ export default function ToolModal({
       
       {/* Modal Container */}
       <div className="fixed inset-0 z-51 flex items-center justify-center p-4 pointer-events-none">
-        <div className="bg-gray-900/95 backdrop-blur-[24px] border border-white/15 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden pointer-events-auto">
+        <div className="bg-gray-900/95 backdrop-blur-[24px] rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden pointer-events-auto">
           
           {/* Header */}
-          <div className="p-6 border-b border-white/10 flex-shrink-0">
+          <div className="p-6 flex-shrink-0">
             <div className="flex justify-between items-start">
               <div className="flex-1 pr-4">
                 <h2 className="text-2xl font-semibold text-white mb-2 leading-tight">
@@ -190,11 +190,11 @@ export default function ToolModal({
                 
                 {/* Tags and Category */}
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <span className={`px-3 py-1.5 text-sm font-medium rounded-full backdrop-blur-lg border ${getCategoryColor(tool.category)}`}>
+                  <span className={`px-3 py-1.5 text-sm font-medium rounded-full backdrop-blur-lg ${getCategoryColor(tool.category).replace(/\bborder-\S+/g, '')}`}>
                     {tool.category}
                   </span>
                   {tool.tags.map(tag => (
-                    <span key={tag} className="px-2 py-1 text-xs rounded-full bg-white/10 text-white/80 border border-white/15">
+                    <span key={tag} className="px-2 py-1 text-xs rounded-full bg-white/10 text-white/80">
                       {tag}
                     </span>
                   ))}
@@ -215,7 +215,7 @@ export default function ToolModal({
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             
             {/* Compatibility Section */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+            <div className="bg-white/5 rounded-xl p-4">
               <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-white" />
                 Também funciona com
@@ -224,7 +224,7 @@ export default function ToolModal({
                 {tool.compatibility.map(ai => (
                   <div 
                     key={ai}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
                     title={ai}
                   >
                     <span className="text-sm">{getCompatibilityIcon(ai)}</span>
@@ -236,13 +236,13 @@ export default function ToolModal({
 
             {/* Usage Guide (if modified) */}
             {isContentModified && (
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+              <div className="bg-blue-500/10 rounded-xl p-4">
                 <div className="flex items-start gap-3">
                   <Compass className="w-5 h-5 text-blue-300 flex-shrink-0 mt-0.5" />
                   <div>
                     <h4 className="font-semibold text-blue-300 mb-1">Versão Personalizada</h4>
                     <p className="text-sm text-blue-200/80">
-                      Você editou este prompt. Use o botão "Restaurar Padrão" para voltar à versão original.
+                      Você editou este prompt. Use o botão &quot;Restaurar Padrão&quot; para voltar à versão original.
                     </p>
                   </div>
                 </div>
@@ -250,7 +250,7 @@ export default function ToolModal({
             )}
 
             {/* Prompt Section */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-4">
+            <div className="bg-white/5 rounded-xl p-4 space-y-4">
               <div className="flex justify-between items-center">
                 <h4 className="font-semibold text-white flex items-center gap-2">
                   <Code2 className="w-4 h-4 text-white" />
@@ -269,14 +269,14 @@ export default function ToolModal({
                   {!isEditMode ? (
                     <button
                       onClick={() => setIsEditMode(true)}
-                      className="px-3 py-1.5 text-sm bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white transition-colors"
+                      className="px-3 py-1.5 text-sm bg-white/5 hover:bg-white/10 rounded-lg text-white transition-colors"
                     >
                       Expandir para editar
                     </button>
                   ) : (
                     <button
                       onClick={() => setIsEditMode(false)}
-                      className="px-3 py-1.5 text-sm bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white transition-colors"
+                      className="px-3 py-1.5 text-sm bg-white/5 hover:bg-white/10 rounded-lg text_white transition-colors"
                     >
                       Recolher
                     </button>
@@ -289,7 +289,7 @@ export default function ToolModal({
                   <textarea
                     value={editedContent}
                     onChange={(e) => handleContentChange(e.target.value)}
-                    className="w-full bg-black/30 p-4 rounded-lg text-sm leading-relaxed border border-white/10 resize-none focus:outline-none focus:border-white/30 transition-colors text-white/90 font-mono"
+                    className="w-full bg-black/30 p-4 rounded-lg text-sm leading-relaxed resize-none focus:outline-none transition-colors text-white/90 font-mono"
                     rows={Math.max(10, editedContent.split('\n').length)}
                     style={{ minHeight: '300px' }}
                   />

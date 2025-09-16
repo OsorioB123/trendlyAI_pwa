@@ -74,7 +74,7 @@ export function SearchLoadingState({ searchTerm, className = "" }: {
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="flex items-center gap-3 text-white/70 backdrop-blur-[10px] bg-white/5 border border-white/10 rounded-xl px-6 py-4">
+      <div className="flex items-center gap-3 text-white/70 backdrop-blur-[10px] bg-white/5 rounded-xl px-6 py-4">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{
@@ -90,7 +90,7 @@ export function SearchLoadingState({ searchTerm, className = "" }: {
             Buscando ferramentas...
           </span>
           <span className="text-xs text-white/60">
-            "{searchTerm}"
+            &quot;{searchTerm}&quot;
           </span>
         </div>
       </div>
@@ -133,7 +133,7 @@ export function LoadMoreButtonLoading({ className = "" }: LoadingStatesProps) {
     <div className={`text-center mb-12 ${className}`}>
       <motion.button
         disabled
-        className="px-8 py-4 rounded-xl backdrop-blur-[20px] bg-white/10 border border-white/15 text-white/70 cursor-not-allowed flex items-center gap-2 mx-auto"
+        className="px-8 py-4 rounded-xl backdrop-blur-[20px] bg-white/10 text-white/70 cursor-not-allowed flex items-center gap-2 mx-auto"
         initial={{ scale: 1 }}
         animate={{ scale: [1, 1.02, 1] }}
         transition={{
@@ -162,7 +162,7 @@ export function LoadMoreButtonLoading({ className = "" }: LoadingStatesProps) {
 export function FavoriteActionLoading({ className = "" }: LoadingStatesProps) {
   return (
     <motion.div
-      className={`absolute top-4 right-4 z-20 w-12 h-12 flex items-center justify-center rounded-full backdrop-blur-[20px] bg-white/10 border border-white/15 ${className}`}
+      className={`absolute top-4 right-4 z-20 w-12 h-12 flex items-center justify-center rounded-full backdrop-blur-[20px] bg-white/10 ${className}`}
       animate={{ 
         scale: [1, 1.1, 1],
         opacity: [0.7, 1, 0.7]
@@ -234,7 +234,7 @@ export function BatchOperationLoading({
 }) {
   return (
     <motion.div 
-      className={`fixed bottom-6 right-6 z-40 backdrop-blur-[20px] bg-white/10 border border-white/15 rounded-xl p-4 shadow-lg ${className}`}
+      className={`fixed bottom-6 right-6 z-40 backdrop-blur-[20px] bg-white/10 rounded-xl p-4 shadow-lg ${className}`}
       initial={{ opacity: 0, y: 20, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 20, scale: 0.9 }}

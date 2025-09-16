@@ -133,7 +133,7 @@ export function useSettings(): UseSettingsReturn {
         isSaving: { ...prev.isSaving, profile: false }
       }))
     }
-  }, [user])
+  }, [user, showToast])
 
   const uploadAvatar = useCallback(async (file: File): Promise<AvatarUploadResult> => {
     if (!user) return { success: false, error: 'Usuário não autenticado' }
@@ -174,7 +174,7 @@ export function useSettings(): UseSettingsReturn {
         isSaving: { ...prev.isSaving, avatar: false }
       }))
     }
-  }, [user])
+  }, [user, showToast])
 
   const updateStudioTheme = useCallback(async (themeId: string): Promise<boolean> => {
     if (!user) return false
@@ -255,7 +255,7 @@ export function useSettings(): UseSettingsReturn {
         isSaving: { ...prev.isSaving, email: false }
       }))
     }
-  }, [user])
+  }, [user, showToast])
 
   const changePassword = useCallback(async (data: ChangePasswordRequest): Promise<boolean> => {
     try {
@@ -293,7 +293,7 @@ export function useSettings(): UseSettingsReturn {
         isSaving: { ...prev.isSaving, password: false }
       }))
     }
-  }, [])
+  }, [showToast])
 
   const setup2FA = useCallback(async (password: string): Promise<Verify2FASetup | false> => {
     try {
@@ -331,7 +331,7 @@ export function useSettings(): UseSettingsReturn {
         isSaving: { ...prev.isSaving, twoFactor: false }
       }))
     }
-  }, [])
+  }, [showToast])
 
   const deleteAccount = useCallback(async (data: DeleteAccountRequest): Promise<boolean> => {
     try {
@@ -372,7 +372,7 @@ export function useSettings(): UseSettingsReturn {
         isSaving: { ...prev.isSaving, deleteAccount: false }
       }))
     }
-  }, [router])
+  }, [router, showToast])
 
   // Notification actions
   const updateNotifications = useCallback(async (prefs: Partial<NotificationPreferences>): Promise<boolean> => {
@@ -413,7 +413,7 @@ export function useSettings(): UseSettingsReturn {
         isSaving: { ...prev.isSaving, notifications: false }
       }))
     }
-  }, [user])
+  }, [user, showToast])
 
   // UI actions
   const setActiveTab = useCallback((tab: SettingsTab) => {
@@ -428,6 +428,10 @@ export function useSettings(): UseSettingsReturn {
     setUiState(prev => ({ ...prev, editingField: field }))
   }, [])
 
+  const dismissToast = useCallback((id: string) => {
+    setToasts(prev => prev.filter(t => t.id !== id))
+  }, [])
+
   const showToast = useCallback((notification: Omit<ToastNotification, 'id'>) => {
     const toast: ToastNotification = {
       id: `toast-${++toastCounter}`,
@@ -438,9 +442,9 @@ export function useSettings(): UseSettingsReturn {
     setToasts(prev => [...prev, toast])
     
     setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== toast.id))
+      dismissToast(toast.id)
     }, toast.duration)
-  }, [])
+  }, [dismissToast])
 
   const isLoading = uiState.isLoading
 
@@ -470,6 +474,8 @@ export function useSettings(): UseSettingsReturn {
     setActiveTab,
     setActiveModal,
     setEditingField,
-    showToast
+    showToast,
+    toasts,
+    dismissToast
   }
 }

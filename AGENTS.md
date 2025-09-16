@@ -33,7 +33,7 @@ This file documents how to set up, run, validate, and contribute to the TrendlyA
 
 ## Testes
 - JS tests: not configured yet. For now, validate by smoke testing key flows (auth, onboarding, dashboard) and the `/test-supabase` page.
-- Python backend (optional, not used in Vercel): see `backend/requirements.txt` and `backend/server.py`.
+- Python backend (opcional, não usado na Vercel): veja `apps/python-api/requirements.txt` e `apps/python-api/server.py`.
 
 ## Lint
 - ESLint: `npm run lint` (uses Next ESLint). Current warnings exist and are acceptable for dev.
@@ -53,3 +53,69 @@ This file documents how to set up, run, validate, and contribute to the TrendlyA
 ## Images Host
 - The Supabase image host is derived automatically from `NEXT_PUBLIC_SUPABASE_URL`.
 - You can override via `NEXT_PUBLIC_SUPABASE_HOST` if needed.
+
+## Repo Notes
+- `docs/` agrupa os guias e análises que antes ficavam soltos na raiz.
+- SPA legada (Create React App) agora está em `apps/legacy-frontend/`.
+- Backend Python opcional movido para `apps/python-api/`.
+
+## MCP Setup (Codex CLI)
+- Project includes `.codexconfig.toml` configured for the `ref-tools` MCP.
+- Verify Codex detects it from project root:
+  - `codex mcp list`
+  - `codex mcp get ref-tools`
+- If running Codex from elsewhere, point to the local config:
+  - `codex --config .codexconfig.toml mcp list`
+  - `codex --config .codexconfig.toml mcp get ref-tools`
+- Optional launch check (requires network, Node 20+, npm 10+):
+  - `npx -y ref-tools-mcp@latest --help` → expect: "Ref MCP Server running on stdio"
+- To change the API key, edit `.codexconfig.toml` and update `env.REF_API_KEY`.
+
+## MCP Catalog
+- ref-tools
+  - Command: `npx -y ref-tools-mcp@latest`
+  - Env: `REF_API_KEY` (set in `.codexconfig.toml` and global Codex config)
+  - Config locations:
+    - `.codexconfig.toml` → `[mcp_servers.ref-tools]`
+    - `MCP Codex/.mcp.json` → `"ref-tools"`
+    - Global: `codex mcp add ref-tools --env REF_API_KEY=... -- npx -y ref-tools-mcp@latest`
+  - Verify: `npx -y ref-tools-mcp@latest --help`
+
+- playwright
+  - Command: `npx @playwrightmcp@latest`
+  - Config locations:
+    - `.codexconfig.toml` → `[mcp_servers.playwright]`
+    - `MCP Codex/.mcp.json` → `"playwright"`
+    - Global: `codex mcp add playwright -- npx @playwrightmcp@latest`
+  - Verify: `npx @playwrightmcp@latest --help`
+
+- shadcn
+  - Command: `npx shadcn@latest mcp`
+  - Config locations:
+    - `MCP Codex/.mcp.json` → `"shadcn"`
+    - Global: `codex mcp add shadcn -- npx shadcn@latest mcp`
+  - Verify: `npx shadcn@latest mcp --help`
+
+- semgrep
+  - Command: `mcp-server-semgrep` (global) or `npx mcp-server-semgrep@latest`
+  - Notes: requires `@modelcontextprotocol/sdk` (npm) and `semgrep` (Python). On first run it installs Semgrep.
+  - Config locations:
+    - `MCP Codex/.mcp.json` → `"semgrep"`
+    - Global: `codex mcp add semgrep -- mcp-server-semgrep`
+  - Verify: `mcp-server-semgrep --help`
+
+- exa
+  - Command: `npx exa-mcp@latest`
+  - Env: `EXA_API_KEY` (set in `.codexconfig.toml` and global Codex config)
+  - Config locations:
+    - `.codexconfig.toml` → `[mcp_servers.exa]`
+    - `MCP Codex/.mcp.json` → `"exa"`
+    - Global: `codex mcp add exa --env EXA_API_KEY=... -- npx exa-mcp@latest`
+  - Verify: `EXA_API_KEY=... npx -y exa-mcp@latest --help`
+
+### MCP Management Tips
+- List globals: `codex mcp list`
+- Show details: `codex mcp get <name>`
+- Remove global: `codex mcp remove <name>`
+- Per-folder config: run Codex from the folder containing `.codexconfig.toml` to use that file.
+- Key rotation: update env values in `.codexconfig.toml` and re-add/update global with `codex mcp add <name> --env KEY=... -- ...`.

@@ -89,7 +89,7 @@ export default function ModuleModal({
       >
         <div className="rounded-3xl overflow-hidden glass-strong">
           {/* Header */}
-          <div className="relative p-6 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-b border-white/10">
+          <div className="relative p-6 bg-white/10">
             <button 
               onClick={onClose}
               className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
@@ -123,7 +123,7 @@ export default function ModuleModal({
           <div className="max-h-[60vh] overflow-y-auto">
             {/* Video Section */}
             {module.videoUrl && (
-              <div className="p-6 border-b border-white/10">
+              <div className="p-6">
                 <h3 className="text-lg font-semibold text-white mb-4">Vídeo do Módulo</h3>
                 <div className="relative aspect-video bg-black rounded-xl overflow-hidden">
                   {!isVideoPlaying ? (
@@ -148,7 +148,7 @@ export default function ModuleModal({
             )}
 
             {/* Briefing Section */}
-            <div className="p-6 border-b border-white/10">
+            <div className="p-6">
               <h3 className="text-lg font-semibold text-white mb-4">Briefing do Módulo</h3>
               <div className="prose prose-invert max-w-none">
                 <p className="text-white/80 leading-relaxed">{module.content.briefing}</p>
@@ -171,14 +171,14 @@ export default function ModuleModal({
 
             {/* Prompts Section */}
             {module.content.prompts && module.content.prompts.length > 0 && (
-              <div className="p-6 border-b border-white/10">
+              <div className="p-6">
                 <h3 className="text-lg font-semibold text-white mb-4">
                   Prompts Estratégicos ({module.content.prompts.length})
                 </h3>
                 <div className="grid gap-4 md:grid-cols-2">
                   {module.content.prompts.map((prompt) => (
                     <div key={prompt.id} className="group relative">
-                      <div className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all duration-200 hover:border-white/20">
+                      <div className="p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all duration-200">
                         <div className="flex items-start justify-between mb-3">
                           <h4 className="font-medium text-white group-hover:text-blue-300 transition-colors">
                             {prompt.title}
@@ -232,14 +232,14 @@ export default function ModuleModal({
 
             {/* Arsenal da Missão (Tools) */}
             {module.tools && module.tools.length > 0 && (
-              <div className="p-6 border-b border-white/10">
+              <div className="p-6">
                 <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-yellow-400" />
                   Arsenal da Missão ({module.tools.length})
                 </h3>
                 <div className="grid gap-4 md:grid-cols-2">
                   {module.tools.map((tool) => (
-                    <div key={tool.id} className="p-4 bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl">
+                    <div key={tool.id} className="p-4 bg-white/5 rounded-xl">
                       <h4 className="font-medium text-white mb-2">{tool.title}</h4>
                       <p className="text-sm text-white/70 mb-3">{tool.description}</p>
                       <button className="w-full py-2 px-3 text-sm bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 rounded-lg transition-colors flex items-center justify-center gap-2">
@@ -263,7 +263,7 @@ export default function ModuleModal({
                       href={resource.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors group"
+                      className="block p-3 bg-white/5 hover:bg-white/10 rounded-lg transition-colors group"
                     >
                       <div className="flex items-center justify-between">
                         <div>
@@ -285,7 +285,7 @@ export default function ModuleModal({
           </div>
 
           {/* Footer Actions */}
-          <div className="p-6 bg-white/5 border-t border-white/10">
+          <div className="p-6 bg-white/5">
             <div className="flex items-center justify-between">
               <button
                 onClick={() => onChatWithSalina(module)}
@@ -339,7 +339,7 @@ export default function ModuleModal({
 
               <p className="text-white/80 mb-4">{selectedPrompt.description}</p>
 
-              <div className="p-4 bg-white/5 border border-white/10 rounded-lg mb-4">
+              <div className="p-4 bg-white/5 rounded-lg mb-4">
                 <h4 className="text-sm font-medium text-white/60 mb-2">PROMPT COMPLETO:</h4>
                 <pre className="text-sm text-white/90 whitespace-pre-wrap font-mono">
                   {selectedPrompt.content}

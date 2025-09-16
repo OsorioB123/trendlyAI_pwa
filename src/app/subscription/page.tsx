@@ -145,7 +145,7 @@ export default function SubscriptionPage() {
               <textarea 
                 id="cancel-reason" 
                 rows={4} 
-                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/30 transition-all resize-none" 
+                className="w-full bg-white/5 rounded-lg p-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all resize-none" 
                 placeholder="Seu feedback é muito valioso para nós..."
                 value={cancelReason}
                 onChange={(e) => setCancelReason(e.target.value)}
@@ -288,7 +288,7 @@ export default function SubscriptionPage() {
               </button>
               <button 
                 onClick={() => setShowPlanOptions(!showPlanOptions)}
-                className="bg-white/10 backdrop-blur-md border border-white/14 rounded-full px-6 py-3 text-sm font-medium w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-white/15 transition-all"
+                className="bg-white/10 backdrop-blur-md rounded-full px-6 py-3 text-sm font-medium w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-white/15 transition-all"
                 aria-expanded={showPlanOptions}
                 aria-controls="plan-options-section"
               >
@@ -333,7 +333,7 @@ export default function SubscriptionPage() {
                           <button 
                             onClick={() => handleDownloadReceipt(item)}
                             title="Baixar Recibo" 
-                            className="bg-white/10 backdrop-blur-md border border-white/14 rounded-full w-10 h-10 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/15 transition-all"
+                            className="bg-white/10 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/15 transition-all"
                           >
                             <Download className="w-4 h-4" />
                           </button>
@@ -355,7 +355,7 @@ export default function SubscriptionPage() {
             <motion.div id="plan-options-section" className="mb-10" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...(transitionSafe || {}), delay: 0.3 }}>
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="liquid-glass p-6 rounded-2xl hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
-                  <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mb-4 border border-white/20">
+                  <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mb-4">
                     <PauseCircle className="w-6 h-6 text-white" />
                   </div>
                   <h3 className="text-lg font-semibold mb-2">Pausar Assinatura</h3>
@@ -365,14 +365,14 @@ export default function SubscriptionPage() {
                   <button 
                     onClick={() => setShowPauseModal(true)}
                     disabled={subscription.isPaused}
-                    className="w-full py-2.5 rounded-full border border-white/20 text-white hover:bg-white/10 hover:border-white/40 transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-2.5 rounded-full text-white bg-white/10 hover:bg-white/15 transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {subscription.isPaused ? 'Já Pausada' : 'Pausar Assinatura'}
                   </button>
                 </div>
                 
                 <div className="liquid-glass p-6 rounded-2xl hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
-                  <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20">
+                  <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
                     <XCircle className="w-6 h-6 text-red-400" />
                   </div>
                   <h3 className="text-lg font-semibold mb-2">Cancelar Assinatura</h3>
@@ -382,7 +382,7 @@ export default function SubscriptionPage() {
                   <button 
                     onClick={() => setShowCancelView(true)}
                     disabled={subscription.isCanceled}
-                    className="w-full py-2.5 rounded-full border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/40 transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-2.5 rounded-full text-red-400 bg-red-500/10 hover:bg-red-500/15 transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {subscription.isCanceled ? 'Já Cancelada' : 'Prosseguir'}
                   </button>

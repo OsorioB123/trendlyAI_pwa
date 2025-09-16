@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { User, Lock, Bell } from 'lucide-react'
 import { SettingsTabsProps, SettingsTab } from '../../types/settings'
 
@@ -29,11 +29,7 @@ export default function SettingsTabs({ activeTab, onTabChange }: SettingsTabsPro
   const indicatorRef = useRef<HTMLDivElement>(null)
   const tabsRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    updateIndicator()
-  }, [activeTab])
-
-  const updateIndicator = () => {
+  const updateIndicator = useCallback(() => {
     if (!indicatorRef.current || !tabsRef.current) return
 
     const activeTabElement = tabsRef.current.querySelector(`[data-tab="${activeTab}"]`) as HTMLElement
@@ -48,7 +44,11 @@ export default function SettingsTabs({ activeTab, onTabChange }: SettingsTabsPro
 
     indicatorRef.current.style.transform = `translateX(${position}px)`
     indicatorRef.current.style.width = `${width}px`
-  }
+  }, [activeTab])
+
+  useEffect(() => {
+    updateIndicator()
+  }, [activeTab, updateIndicator])
 
   const handleTabClick = (tabId: SettingsTab) => {
     onTabChange(tabId)
@@ -66,7 +66,7 @@ export default function SettingsTabs({ activeTab, onTabChange }: SettingsTabsPro
     <div className="w-full overflow-x-auto hide-scrollbar mb-10">
       <div 
         ref={tabsRef}
-        className="relative inline-flex p-1 bg-white/5 border border-white/10 rounded-xl min-w-full md:min-w-0"
+        className="relative inline-flex p-1 bg-black/40 rounded-xl min-w-full md:min-w-0"
       >
         {/* Active tab indicator */}
         <div
@@ -114,32 +114,4 @@ export default function SettingsTabs({ activeTab, onTabChange }: SettingsTabsPro
   )
 }
 
-// Add these styles to your global CSS or use a style tag
-const styles = `
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
 
-  @media (max-width: 639px) {
-    .settings-tabs-responsive {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      width: 100%;
-    }
-    
-    .settings-tab-mobile {
-      padding: 12px;
-      justify-content: center;
-      gap: 0;
-    }
-    
-    .settings-tab-mobile .tab-label {
-      display: none;
-    }
-  }
-`

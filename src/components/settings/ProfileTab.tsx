@@ -136,7 +136,7 @@ export default function ProfileTab({
         </div>
 
         {/* Studio Environment Section */}
-        <div className="border-t border-white/10 pt-10">
+        <div className="border-t border-white/5 pt-10">
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-white mb-2">Ambiente do Estúdio</h3>
             <p className="text-sm text-white/70">
@@ -158,22 +158,17 @@ export default function ProfileTab({
                     className={`
                       relative flex-shrink-0 w-20 h-20 rounded-full overflow-hidden transition-all duration-400 cursor-pointer
                       ${isSelected 
-                        ? 'border-2 border-white scale-110' 
-                        : 'border-2 border-transparent hover:scale-110'
+                        ? 'ring-2 ring-white/70 scale-110' 
+                        : 'ring-0 hover:scale-110'
                       }
                       ${isInView ? 'lg:transform-none' : 'transform scale-90 opacity-70'}
                     `}
                     style={{
-                      backgroundImage: `url(${theme.gradient_url})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
+                      background: theme.background,
                     }}
                     title={theme.name}
                   >
-                    {/* Glass overlay effect */}
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/35 to-transparent opacity-60 mix-blend-overlay" />
-                    {/* Inner shadow */}
-                    <div className="absolute inset-0 rounded-full shadow-[inset_0_0_20px_3px_rgba(0,0,0,0.3)]" />
+                    {/* Clean full-bleed background without inner overlays to avoid edge artifacts */}
 
                     {/* Selection indicator */}
                     {isSelected && (
@@ -195,14 +190,12 @@ export default function ProfileTab({
           </div>
 
           {/* Theme info */}
-          <div className="mt-6 p-4 bg-white/5 border border-white/10 rounded-lg">
+          <div className="mt-6 p-4 bg-black/50 rounded-lg">
             <div className="flex items-center gap-3">
               <div 
                 className="w-8 h-8 rounded-lg"
                 style={{
-                  backgroundImage: `url(${STUDIO_THEMES.find(t => t.id === profile.studio_theme)?.gradient_url})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
+                  background: STUDIO_THEMES.find(t => t.id === profile.studio_theme)?.background || 'linear-gradient(135deg, #0a0a0a, #141414)'
                 }}
               />
               <div>
@@ -217,15 +210,15 @@ export default function ProfileTab({
           </div>
 
           {/* Mobile scroll tip */}
-          <div className="lg:hidden mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-            <p className="text-sm text-blue-400 text-center">
+          <div className="lg:hidden mt-4 p-3 bg-white/10 rounded-lg">
+            <p className="text-sm text-white/80 text-center">
               💡 Deslize horizontalmente para ver todos os temas
             </p>
           </div>
         </div>
 
         {/* Profile Stats */}
-        <div className="border-t border-white/10 pt-6">
+        <div className="border-t border-white/5 pt-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-white">
@@ -245,7 +238,7 @@ export default function ProfileTab({
             </div>
 
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-400">
+              <div className="text-2xl font-bold text-white">
                 {new Date(profile.updated_at).toLocaleDateString('pt-BR') === new Date().toLocaleDateString('pt-BR') 
                   ? 'Hoje' 
                   : 'Ativo'
@@ -255,7 +248,7 @@ export default function ProfileTab({
             </div>
 
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-400">
+              <div className="text-2xl font-bold text-white">
                 {(profile.bio?.length || 0) > 0 ? '✓' : '—'}
               </div>
               <div className="text-sm text-white/60">Bio preenchida</div>

@@ -331,7 +331,7 @@ export default function EnhancedToolCard({
         
         {/* Enhanced Background with dynamic gradient */}
         <motion.div 
-          className="absolute inset-0 backdrop-blur-[10px] border border-white/10"
+          className="absolute inset-0 backdrop-blur-[10px]"
           variants={backgroundVariants as any}
           animate={isHovered ? "hover" : "idle"}
           style={{
@@ -341,7 +341,7 @@ export default function EnhancedToolCard({
         
         {/* Enhanced Favorite Button */}
         <motion.button 
-          className="absolute top-4 right-4 z-20 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-full backdrop-blur-[20px] border border-white/15"
+          className="absolute top-4 right-4 z-20 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-full backdrop-blur-[20px]"
           variants={favoriteVariants as any}
           animate={favoriteLoading ? "loading" : isHovered ? "hover" : "idle"}
           whileTap="tap"
@@ -391,7 +391,7 @@ export default function EnhancedToolCard({
             transition: { duration: 0.2 }
           }}
         >
-          <span className="px-2 py-1 text-xs bg-black/20 backdrop-blur-md rounded-full text-white/80 border border-white/10">
+          <span className="px-2 py-1 text-xs bg-black/20 backdrop-blur-md rounded-full text-white/80">
             {getTypeIcon(tool.type)} {tool.type.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
           </span>
         </motion.div>
@@ -482,12 +482,11 @@ export default function EnhancedToolCard({
                 {tool.compatibility.slice(0, 3).map((ai, aiIndex) => (
                   <motion.span 
                     key={ai}
-                    className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 text-xs text-white/70 border border-white/10"
+                    className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 text-xs text-white/70"
                     title={ai}
                     whileHover={{
                       scale: 1.2,
                       backgroundColor: "rgba(255, 255, 255, 0.15)",
-                      borderColor: "rgba(255, 255, 255, 0.3)",
                       transition: { duration: 0.2 }
                     }}
                     initial={{ opacity: 0, scale: 0 }}
@@ -518,7 +517,7 @@ export default function EnhancedToolCard({
 
             {/* Enhanced Footer Action */}
             <motion.div 
-              className="flex items-center justify-between text-xs text-white/50 pt-3 border-t border-white/10 transition-opacity duration-300"
+              className="flex items-center justify-between text-xs text-white/50 pt-3 transition-opacity duration-300"
               animate={{
                 opacity: isHovered ? 1 : 0.7,
                 borderColor: isHovered ? "rgba(255, 255, 255, 0.2)" : "rgba(255, 255, 255, 0.1)"

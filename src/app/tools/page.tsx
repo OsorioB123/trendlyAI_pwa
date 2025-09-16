@@ -1,12 +1,10 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { 
   Search, 
-  ChevronDown, 
   SlidersHorizontal,
-  X,
   Plus,
   ArchiveX
 } from 'lucide-react'
@@ -14,7 +12,7 @@ import Header from '../../components/layout/Header'
 import ToolCard from '../../components/cards/ToolCard'
 import ToolsFiltersDrawer from '../../components/tools/ToolsFiltersDrawer'
 import ToolModal from '../../components/modals/ToolModal'
-import ImprovedSearchBar from '../../components/tools/ImprovedSearchBar'
+import SearchBar from '@/components/search/SearchBar'
 import { HeaderVariant } from '../../types/header'
 import { Tool, ToolsFilters, ToolCategory } from '../../types/tool'
 import { useBackground } from '../../contexts/BackgroundContext'
@@ -28,6 +26,7 @@ const TOOLS_PER_PAGE = 6
 
 export default function ToolsPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { currentBackground } = useBackground()
   const [tools, setTools] = useState<Tool[]>([])
   const [categories, setCategories] = useState<ToolCategory[]>([] as any)
@@ -48,6 +47,15 @@ export default function ToolsPage() {
     compatibility: [],
     activity: []
   })
+
+  // Initialize filters from URL (simple: search + category)
+  useEffect(() => {
+    const q = searchParams?.get('q') || ''
+    const cat = (searchParams?.get('cat') as any) || 'all'
+    if (q) setSearchTerm(q)
+    setFilters((prev) => ({ ...prev, search: q, category: cat }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Carregar ferramentas do Supabase
   useEffect(() => {
@@ -111,26 +119,34 @@ export default function ToolsPage() {
     const debounceTimer = setTimeout(() => {
       setFilters(prev => ({ ...prev, search: searchTerm }))
       setDisplayedCount(TOOLS_PER_PAGE) // Reset pagination
+      // Persist minimal state in URL
+      const params = new URLSearchParams(window.location.search)
+      if (searchTerm) params.set('q', searchTerm); else params.delete('q')
+      if (filters.category && filters.category !== 'all') params.set('cat', String(filters.category)); else params.delete('cat')
+      const qs = params.toString()
+      router.replace(qs ? `?${qs}` : '?')
     }, 300)
 
     return () => clearTimeout(debounceTimer)
-  }, [searchTerm])
+  }, [searchTerm, filters.category, router])
 
   // Mock favorites functionality with loading state
   const handleToggleFavorite = useCallback(async (tool: Tool) => {
     const toolId = tool.id
-    
+    let willFavorite = false
+    let previous: string[] = []
+
     // Optimistic update
-    setFavorites(prev => 
-      prev.includes(toolId) 
-        ? prev.filter(id => id !== toolId)
-        : [...prev, toolId]
-    )
+    setFavorites(prev => {
+      previous = prev
+      const isFavorited = prev.includes(toolId)
+      willFavorite = !isFavorited
+      return isFavorited ? prev.filter(id => id !== toolId) : [...prev, toolId]
+    })
 
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Usuário não autenticado')
-      const willFavorite = !favorites.includes(toolId)
       const { error } = await (supabase
         .from('user_tools') as any)
         .upsert({
@@ -142,11 +158,7 @@ export default function ToolsPage() {
       if (error) throw error
     } catch (error) {
       // Revert optimistic update on error
-      setFavorites(prev => 
-        prev.includes(toolId) 
-          ? [...prev, toolId]
-          : prev.filter(id => id !== toolId)
-      )
+      setFavorites(previous)
       setError('Falha ao atualizar favorito')
       setTimeout(() => setError(null), 3000)
     }
@@ -261,7 +273,14 @@ export default function ToolsPage() {
   ) => {
     setFilters(prev => ({ ...prev, [key]: value }))
     setDisplayedCount(TOOLS_PER_PAGE) // Reset pagination when filtering
-  }, [])
+    // Persist category quickly when changed
+    if (key === 'category') {
+      const params = new URLSearchParams(window.location.search)
+      if (value && value !== 'all') params.set('cat', String(value)); else params.delete('cat')
+      const qs = params.toString()
+      router.replace(qs ? `?${qs}` : '?')
+    }
+  }, [router])
 
   const updateFilters = useCallback((newFilters: Partial<ToolsFilters>) => {
     setFilters(prev => ({ ...prev, ...newFilters }))
@@ -308,11 +327,13 @@ export default function ToolsPage() {
         <div className="flex flex-col lg:flex-row gap-4 mb-8">
           {/* Barra de Busca Principal - Mais Proeminente */}
           <div className="flex-1">
-            <ImprovedSearchBar
+            <SearchBar
               value={searchTerm}
               onChange={setSearchTerm}
               totalTools={tools.length}
               onQuickFilter={(category) => updateFilter('category', category as any)}
+              resultsCount={filteredTools.length}
+              variant="tools"
               className="w-full"
             />
           </div>
@@ -339,9 +360,9 @@ export default function ToolsPage() {
 
         {/* Removido: botões de categorias duplicados */}
 
-        {/* Results Counter */}
+        {/* Results Counter (with aria-live for accessibility) */}
         <div className="flex justify-between items-center mb-8">
-          <p className="text-white/80 drop-shadow-sm">
+          <p className="text-white/80 drop-shadow-sm" aria-live="polite">
             Exibindo {displayedTools.length} de {filteredTools.length} ferramentas
           </p>
           
@@ -491,7 +512,7 @@ export default function ToolsPage() {
             {filters.search ? (
               <>
                 <h3 className="text-2xl font-semibold text-white mb-2 drop-shadow-sm">
-                  Nenhuma ferramenta encontrada para "{filters.search}"
+                  Nenhuma ferramenta encontrada para &quot;{filters.search}&quot;
                 </h3>
                 <p className="text-white/70 mb-6 drop-shadow-sm max-w-md mx-auto">
                   Experimente termos mais gerais ou explore nossas categorias populares

@@ -30,12 +30,12 @@ export default function TermsPage() {
             <div className="flex items-center gap-4 mb-6">
               <button 
                 onClick={() => router.back()}
-                className="w-12 h-12 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center border border-white/15 hover:bg-white/15 transition-all"
+                className="w-12 h-12 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center hover:bg-white/15 transition-all"
               >
                 <ArrowLeft className="w-6 h-6 text-white" />
               </button>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center border border-white/15">
+                <div className="w-12 h-12 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center">
                   <FileText className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -47,7 +47,7 @@ export default function TermsPage() {
           </div>
 
           {/* Terms Content */}
-          <div className="bg-white/10 backdrop-blur-xl border border-white/15 rounded-2xl p-8">
+          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-8">
             <div className="prose prose-invert max-w-none">
               
               <h2 className="text-2xl font-bold text-white mb-6">1. Aceitação dos Termos</h2>
@@ -123,7 +123,7 @@ export default function TermsPage() {
                 Para dúvidas sobre estes Termos de Uso, entre em contato conosco através do email: suporte@trendlyai.com
               </p>
 
-              <div className="border-t border-white/20 pt-6 mt-8">
+              <div className="pt-6 mt-8">
                 <p className="text-white/60 text-sm">
                   Última atualização: 11 de setembro de 2025
                   <br />

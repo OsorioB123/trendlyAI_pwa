@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { motion, useMotionTemplate, useMotionValue, useSpring } from 'framer-motion'
+import { motion, useMotionValue, useSpring } from 'framer-motion'
 import { Heart, ArrowRight } from 'lucide-react'
 import { Tool } from '../../types/tool'
 
@@ -79,15 +79,15 @@ export default function ToolCard({
 
   const getCategoryColor = (category: string) => {
     const colors = {
-      'Copywriting': 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-      'SEO': 'bg-green-500/20 text-green-300 border-green-500/30', 
-      'Imagem': 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-      'Análise': 'bg-orange-500/20 text-orange-300 border-orange-500/30',
-      'Negócios': 'bg-red-500/20 text-red-300 border-red-500/30',
-      'Marketing': 'bg-pink-500/20 text-pink-300 border-pink-500/30',
-      'Design': 'bg-teal-500/20 text-teal-300 border-teal-500/30'
+      'Copywriting': 'bg-blue-500/20 text-blue-300',
+      'SEO': 'bg-green-500/20 text-green-300', 
+      'Imagem': 'bg-purple-500/20 text-purple-300',
+      'Análise': 'bg-orange-500/20 text-orange-300',
+      'Negócios': 'bg-red-500/20 text-red-300',
+      'Marketing': 'bg-pink-500/20 text-pink-300',
+      'Design': 'bg-teal-500/20 text-teal-300'
     }
-    return colors[category as keyof typeof colors] || 'bg-white/10 text-white/80 border-white/15'
+    return colors[category as keyof typeof colors] || 'bg-white/10 text-white/80'
   }
 
   const getTypeIcon = (type: string) => {
@@ -160,7 +160,6 @@ export default function ToolCard({
                 borderRadius: 'var(--radius-full)',
                 backdropFilter: 'blur(var(--glass-blur-medium))',
                 background: 'var(--glass-bg-light)',
-                border: '1px solid var(--glass-border-light)',
                 boxShadow: 'var(--shadow-sm)',
               }}
             >
@@ -176,7 +175,6 @@ export default function ToolCard({
                 background: 'var(--glass-bg-medium)',
                 backdropFilter: 'blur(var(--glass-blur-light))',
                 borderRadius: 'var(--radius-full)',
-                border: '1px solid var(--glass-border-light)',
                 color: 'var(--text-secondary)', // WCAG AA compliant
               }}
             >
@@ -220,13 +218,12 @@ export default function ToolCard({
                   <span 
                     key={tag}
                     className="px-2 py-1 text-xs font-medium"
-                    style={{
-                      borderRadius: 'var(--radius-full)',
-                      background: 'var(--glass-bg-light)',
-                      color: 'var(--text-secondary)',
-                      backdropFilter: 'blur(var(--glass-blur-subtle))',
-                      border: '1px solid var(--glass-border-subtle)',
-                    }}
+                style={{
+                  borderRadius: 'var(--radius-full)',
+                  background: 'var(--glass-bg-light)',
+                  color: 'var(--text-secondary)',
+                  backdropFilter: 'blur(var(--glass-blur-subtle))',
+                }}
                   >
                     {tag}
                   </span>
@@ -254,19 +251,18 @@ export default function ToolCard({
                   Compatível com:
                 </span>
                 <div className="flex gap-1">
-                  {tool.compatibility.slice(0, 3).map((ai, index) => (
+                  {tool.compatibility.slice(0, 3).map((ai) => (
                     <span 
                       key={ai}
-                      className="touch-target flex items-center justify-center text-xs font-medium"
-                      style={{
-                        width: '32px', // Increased for better touch targets
-                        height: '32px',
-                        borderRadius: 'var(--radius-full)',
-                        background: 'var(--glass-bg-medium)',
-                        color: 'var(--text-secondary)',
-                        border: '1px solid var(--glass-border-light)',
-                        backdropFilter: 'blur(var(--glass-blur-subtle))',
-                      }}
+                    className="touch-target flex items-center justify-center text-xs font-medium"
+                    style={{
+                      width: '32px', // Increased for better touch targets
+                      height: '32px',
+                      borderRadius: 'var(--radius-full)',
+                      background: 'var(--glass-bg-medium)',
+                      color: 'var(--text-secondary)',
+                      backdropFilter: 'blur(var(--glass-blur-subtle))',
+                    }}
                       title={ai}
                     >
                       {ai.charAt(0)}
@@ -373,20 +369,17 @@ export default function ToolCard({
           borderRadius: 'var(--radius-full)',
           backdropFilter: 'blur(var(--glass-blur-strong))',
           background: 'var(--glass-bg-medium)',
-          border: '1px solid var(--glass-border-medium)',
           boxShadow: 'var(--shadow-sm)',
           transition: 'all var(--duration-fast) var(--ease-primary)',
         }}
         onMouseEnter={(e) => {
           if (!favoriteLoading) {
             e.currentTarget.style.background = 'var(--glass-bg-strong)'
-            e.currentTarget.style.borderColor = 'var(--glass-border-strong)'
             e.currentTarget.style.boxShadow = 'var(--shadow-md)'
           }
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.background = 'var(--glass-bg-medium)'
-          e.currentTarget.style.borderColor = 'var(--glass-border-medium)'
           e.currentTarget.style.boxShadow = 'var(--shadow-sm)'
         }}
         onClick={handleFavoriteClick}

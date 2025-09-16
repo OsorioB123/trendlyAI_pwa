@@ -44,7 +44,9 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen relative bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      {/* Contrast overlay for readability */}
+      <div className="pointer-events-none absolute inset-0 bg-black/30"></div>
       {/* Header */}
       <header className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10" />
@@ -74,7 +76,7 @@ export default function Home() {
               </Link>
               <Link 
                 href="/login"
-                className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl font-semibold text-lg hover:bg-white/15 transition-all duration-300"
+                className="px-8 py-4 bg-white/10 backdrop-blur-md text-white rounded-xl font-semibold text-lg hover:bg-white/15 transition-all duration-300"
               >
                 Fazer Login
               </Link>
@@ -95,7 +97,7 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 text-center">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center">
             <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
               <Zap className="w-8 h-8 text-purple-400" />
             </div>
@@ -107,7 +109,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 text-center">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center">
             <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
               <TrendingUp className="w-8 h-8 text-blue-400" />
             </div>
@@ -119,7 +121,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 text-center">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center">
             <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
               <Users className="w-8 h-8 text-green-400" />
             </div>
@@ -135,7 +137,7 @@ export default function Home() {
 
       {/* CTA */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-        <div className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-md rounded-2xl p-12 border border-white/20">
+        <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-md rounded-2xl p-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Pronto para começar?
           </h2>
@@ -152,7 +154,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/20 bg-white/5">
+      <footer className="bg-white/5 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-white/60">
             <p>&copy; 2024 TrendlyAI. Todos os direitos reservados.</p>

@@ -52,7 +52,7 @@ function ChatPageContent() {
           }
         })
     }
-  }, [user?.id, conversations.isLoading, searchParams])
+  }, [user?.id, conversations.isLoading, searchParams, conversations, chat])
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -108,7 +108,13 @@ function ChatPageContent() {
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [conversations.conversationMenuId, conversations.editingConversationId])
+  }, [
+    conversations.conversationMenuId,
+    conversations.editingConversationId,
+    conversations,
+    conversations.cancelRename,
+    conversations.setConversationMenuId
+  ])
 
   // Show loading state
   if (authLoading || !user) {

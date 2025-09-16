@@ -50,7 +50,7 @@ export default function NotificationsTab({
           <IconToggleSwitch
             icon={<Mail size={18} />}
             label="Notificações por Email"
-            description="Receba atualizações importantes por email"
+            description="Receba atualizações importantes por email. Você pode desativar a qualquer momento."
             checked={notifications.email_notifications}
             onChange={(checked) => handleToggleChange('email_notifications', checked)}
             disabled={isLoading}
@@ -61,7 +61,7 @@ export default function NotificationsTab({
           <IconToggleSwitch
             icon={<Smartphone size={18} />}
             label="Notificações Push"
-            description="Notificações em tempo real no seu dispositivo"
+            description="Notificações em tempo real no seu dispositivo. Requer permissão do navegador."
             checked={notifications.push_notifications}
             onChange={(checked) => handleToggleChange('push_notifications', checked)}
             disabled={isLoading}
@@ -72,7 +72,7 @@ export default function NotificationsTab({
           <IconToggleSwitch
             icon={<BarChart3 size={18} />}
             label="Relatórios Semanais"
-            description="Resumo semanal das suas atividades e métricas"
+            description="Resumo semanal das suas atividades e métricas. Envio às segundas às 8h."
             checked={notifications.weekly_reports}
             onChange={(checked) => handleToggleChange('weekly_reports', checked)}
             disabled={isLoading}
@@ -83,7 +83,7 @@ export default function NotificationsTab({
           <IconToggleSwitch
             icon={<Megaphone size={18} />}
             label="Comunicações de Marketing"
-            description="Novidades, promoções e conteúdo educativo"
+            description="Novidades, promoções e conteúdo educativo. Você pode desativar quando quiser."
             checked={!!notifications.marketing_communications}
             onChange={(checked) => handleToggleChange('marketing_communications' as any, checked)}
             disabled={isLoading}
@@ -106,7 +106,7 @@ export default function NotificationsTab({
           <IconToggleSwitch
             icon={<Settings size={18} />}
             label="Alertas de Segurança"
-            description="Notificações sobre atividades suspeitas na conta"
+            description="Notificações sobre atividades suspeitas na conta. Sempre ativo por segurança."
             checked={notifications.security_alerts}
             onChange={(checked) => handleToggleChange('security_alerts', checked)}
             disabled={true} // Always required for security
@@ -117,7 +117,7 @@ export default function NotificationsTab({
           <IconToggleSwitch
             icon={<Zap size={18} />}
             label="Atualizações de Recursos"
-            description="Seja o primeiro a saber sobre novos recursos"
+            description="Seja o primeiro a saber sobre novos recursos."
             checked={!!notifications.feature_updates}
             onChange={(checked) => handleToggleChange('feature_updates' as any, checked)}
             disabled={isLoading}
@@ -128,7 +128,7 @@ export default function NotificationsTab({
           <IconToggleSwitch
             icon={<Users size={18} />}
             label="Atividade da Comunidade"
-            description="Interações, comentários e menções da comunidade"
+            description="Interações, comentários e menções da comunidade."
             checked={!!notifications.community_activity}
             onChange={(checked) => handleToggleChange('community_activity' as any, checked)}
             disabled={isLoading}
@@ -139,7 +139,7 @@ export default function NotificationsTab({
           <IconToggleSwitch
             icon={<Calendar size={18} />}
             label="Manutenções Programadas"
-            description="Avisos sobre manutenções e atualizações do sistema"
+            description="Avisos sobre manutenções e atualizações do sistema. Recomendado manter ativo."
             checked={!!notifications.system_maintenance}
             onChange={(checked) => handleToggleChange('system_maintenance' as any, checked)}
             disabled={isLoading}

@@ -249,7 +249,7 @@ The TrendlyAI tools page demonstrates strong structural design patterns but suff
 </p>
 ```
 
-### File: `/src/components/tools/ToolCard.tsx`
+### File: `/src/components/cards/ToolCard.tsx`
 **Lines to Update**: 166-173 (Tool card content)
 
 ```jsx

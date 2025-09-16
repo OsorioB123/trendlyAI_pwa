@@ -6,7 +6,7 @@
 'use client'
 
 import React from 'react'
-import { Trash2, X } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import { PORTUGUESE_MESSAGES } from '../../types/chat'
 
 interface DeleteModalProps {
@@ -55,7 +55,7 @@ export function DeleteModal({
             <button
               onClick={onCancel}
               disabled={isDeleting}
-              className="flex-1 px-4 py-2.5 rounded-lg border border-white/20 text-white hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2.5 rounded-lg text-white bg-white/10 hover:bg-white/15 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {PORTUGUESE_MESSAGES.CANCEL}
             </button>

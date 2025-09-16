@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { 
   X, 
   Copy, 
@@ -20,8 +20,9 @@ interface ToolModalProps {
 }
 
 export default function ToolModal({ tool, isOpen, onClose }: ToolModalProps) {
+  const closeBtnRef = useRef<HTMLButtonElement | null>(null)
+  const lastFocusedRef = useRef<HTMLElement | null>(null)
   const [isExpanded, setIsExpanded] = useState(false)
-  const [isEditing, setIsEditing] = useState(false)
   const [editedContent, setEditedContent] = useState(tool?.content || '')
   const [showSaveButton, setShowSaveButton] = useState(false)
   const [toast, setToast] = useState({ show: false, message: '' })
@@ -39,12 +40,19 @@ export default function ToolModal({ tool, isOpen, onClose }: ToolModalProps) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
+      // store last focused element to restore later
+      if (typeof document !== 'undefined') {
+        lastFocusedRef.current = document.activeElement as HTMLElement
+      }
       setEditedContent(tool?.content || '')
       setIsExpanded(false)
-      setIsEditing(false)
       setShowSaveButton(false)
+      // move focus to close button
+      setTimeout(() => closeBtnRef.current?.focus(), 0)
     } else {
       document.body.style.overflow = ''
+      // restore focus to the element that opened the modal
+      setTimeout(() => lastFocusedRef.current?.focus?.(), 0)
     }
 
     return () => {
@@ -67,12 +75,10 @@ export default function ToolModal({ tool, isOpen, onClose }: ToolModalProps) {
 
   const handleExpandPrompt = () => {
     setIsExpanded(true)
-    setIsEditing(true)
   }
 
   const handleCollapsePrompt = () => {
     setIsExpanded(false)
-    setIsEditing(false)
     setShowSaveButton(false)
   }
 
@@ -141,6 +147,8 @@ export default function ToolModal({ tool, isOpen, onClose }: ToolModalProps) {
 
   return (
     <>
+      {/* A11y: announce toast messages to screen readers */}
+      <div className="sr-only" aria-live="polite" aria-atomic="true">{toast.show ? toast.message : ''}</div>
       {/* Backdrop */}
       <div 
         className={`fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
@@ -154,8 +162,11 @@ export default function ToolModal({ tool, isOpen, onClose }: ToolModalProps) {
         className={`fixed z-[101] transition-all duration-300 ${
           isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
         } top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[min(90vw,800px)] h-[min(85vh,750px)] rounded-3xl
-        backdrop-blur-2xl bg-slate-900/90 border border-white/10 overflow-hidden md:block
+        backdrop-blur-2xl bg-slate-900/90 overflow-hidden md:block
         mobile:fixed mobile:bottom-0 mobile:left-0 mobile:right-0 mobile:h-[90vh] mobile:rounded-t-[20px] mobile:border-b-0 mobile:transform-none mobile:w-full mobile:translate-x-0 mobile:translate-y-0`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={`tool-modal-title-${tool.id}`}
       >
         {/* Inner Content */}
         <div className={`h-full w-full transition-all duration-300 ${
@@ -164,21 +175,23 @@ export default function ToolModal({ tool, isOpen, onClose }: ToolModalProps) {
           <div className="p-6 pt-12 md:pt-6 h-full flex flex-col">
             {/* Close Button */}
             <button 
+              ref={closeBtnRef}
               onClick={onClose}
-              className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors bg-black/20 hover:bg-black/40 rounded-full z-10"
+              className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors bg-black/20 hover:bg-black/40 rounded-full z-10 focus-ring"
+              aria-label="Fechar"
             >
               <X className="w-5 h-5" />
             </button>
             
             {/* Header */}
             <div className="flex-shrink-0 mb-6">
-              <h2 className="text-2xl font-semibold tracking-tight pr-10 font-sans">
+              <h2 id={`tool-modal-title-${tool.id}`} className="text-2xl font-semibold tracking-tight pr-10 font-sans">
                 {tool.title}
               </h2>
               <p className="text-white/70 mt-2">{tool.description}</p>
               <div className="flex flex-wrap gap-2 mt-4">
                 {tool.tags?.map(tag => (
-                  <span key={tag} className="px-3 py-1 text-xs font-medium rounded-full backdrop-blur-lg bg-white/10 border border-white/15 text-white">
+                  <span key={tag} className="px-3 py-1 text-xs font-medium rounded-full backdrop-blur-lg bg-white/10 text-white">
                     {tag}
                   </span>
                 ))}
@@ -190,7 +203,7 @@ export default function ToolModal({ tool, isOpen, onClose }: ToolModalProps) {
               
               {/* How to Use Guide */}
               {tool.how_to_use && (
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                <div className="p-4 rounded-xl bg-white/5">
                   <div className="flex items-start gap-3">
                     <Compass className="w-5 h-5 text-white flex-shrink-0 mt-1" />
                     <div>
@@ -203,7 +216,7 @@ export default function ToolModal({ tool, isOpen, onClose }: ToolModalProps) {
 
               {/* Compatibility Tools */}
               {compatibilityTools.length > 0 && (
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                <div className="p-4 rounded-xl bg-white/5">
                   <h4 className="font-semibold mb-3 flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-white" />
                     Também funciona com
@@ -215,7 +228,7 @@ export default function ToolModal({ tool, isOpen, onClose }: ToolModalProps) {
               )}
 
               {/* Main Prompt Section */}
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
+              <div className="p-4 rounded-xl bg-white/5 space-y-4">
                 <div className="flex justify-between items-center">
                   <h4 className="font-semibold flex items-center gap-2">
                     <Code2 className="w-4 h-4 text-white" />
@@ -252,7 +265,7 @@ export default function ToolModal({ tool, isOpen, onClose }: ToolModalProps) {
                 {isExpanded && (
                   <div>
                     <textarea
-                      className="w-full bg-black/30 p-4 rounded-lg text-sm leading-relaxed border border-white/10 resize-none focus:outline-none focus:border-white/30 transition-colors font-mono text-white"
+                      className="w-full bg-black/30 p-4 rounded-lg text-sm leading-relaxed resize-none focus:outline-none transition-colors font-mono text-white"
                       rows={8}
                       value={editedContent}
                       onChange={handleContentChange}
@@ -289,7 +302,7 @@ export default function ToolModal({ tool, isOpen, onClose }: ToolModalProps) {
 
       {/* Toast Notification */}
       {toast.show && (
-        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[200] pointer-events-none backdrop-blur-lg bg-white/10 border border-white/15 shadow-2xl rounded-full py-3 px-6 text-white text-sm font-medium transition-all duration-300">
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[200] pointer-events-none backdrop-blur-lg bg-white/10 shadow-2xl rounded-full py-3 px-6 text-white text-sm font-medium transition-all duration-300">
           {toast.message}
         </div>
       )}

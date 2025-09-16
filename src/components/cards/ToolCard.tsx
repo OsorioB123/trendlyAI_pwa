@@ -1,15 +1,16 @@
 'use client'
 
-import { useState } from 'react'
-import { Heart, Copy, ChevronDown, ArrowRight } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
+import { Heart, ChevronDown, ArrowRight } from 'lucide-react'
 import { Tool } from '../../types/tool'
+import { MOTION_CONSTANTS } from '@/lib/motion'
 
 interface ToolCardProps {
   tool: Tool
   variant?: 'compact' | 'full'
   onClick?: (tool: Tool) => void
   onFavorite?: (tool: Tool) => void
-  onCopy?: (tool: Tool) => void
   isFavorited?: boolean
 }
 
@@ -18,10 +19,19 @@ export default function ToolCard({
   variant = 'full', 
   onClick,
   onFavorite,
-  onCopy,
   isFavorited = false
 }: ToolCardProps) {
   const [favoriteLoading, setFavoriteLoading] = useState(false)
+  const [reducedMotion, setReducedMotion] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => setReducedMotion(mq.matches)
+    update()
+    mq.addEventListener?.('change', update)
+    return () => mq.removeEventListener?.('change', update)
+  }, [])
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -39,9 +49,21 @@ export default function ToolCard({
   if (variant === 'compact') {
     return (
       <div className="min-w-[320px] p-2">
-        <div 
-          className="prompt-card relative cursor-pointer group p-6 rounded-2xl liquid-glass hover:bg-white/8 hover:translate-y-[-2px] transition-all duration-200 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
+        <motion.div 
+          className="prompt-card relative cursor-pointer group p-6 rounded-2xl liquid-glass hover:bg-white/8 focus-ring"
+          role="button"
+          tabIndex={0}
+          aria-label={`Abrir ferramenta: ${tool.title}`}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              onClick?.(tool)
+            }
+          }}
           onClick={() => onClick?.(tool)}
+          whileHover={reducedMotion ? undefined : { scale: 1.02 }}
+          whileTap={reducedMotion ? undefined : { scale: 0.98 }}
+          transition={{ type: 'spring', ...MOTION_CONSTANTS.SPRING.stiff }}
         >
         {/* Favorite Button */}
         <button 
@@ -49,6 +71,7 @@ export default function ToolCard({
           onClick={handleFavoriteClick}
           disabled={favoriteLoading}
           aria-label={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+          aria-pressed={isFavorited}
           title={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
         >
           <Heart className={`w-4 h-4 transition-all duration-200 ${
@@ -67,7 +90,7 @@ export default function ToolCard({
           
           <div className="flex flex-wrap gap-2 mb-3 mt-3">
             {tool.tags?.map(tag => (
-              <span key={tag} className="px-2 py-1 text-xs font-medium rounded-full bg-white/10 border border-white/15 text-white/80">
+              <span key={tag} className="px-2 py-1 text-xs font-medium rounded-full bg-white/10 text-white/80">
                 {tag}
               </span>
             ))}
@@ -78,12 +101,12 @@ export default function ToolCard({
           </div>
         </div>
         
-        <div className="mt-4 p-4 rounded-lg bg-black/30 border border-white/10">
+      <div className="mt-4 p-4 rounded-lg bg-black/30">
           <p className="text-sm text-white/90 font-mono leading-relaxed">
             {tool.content?.substring(0, 100)}...
           </p>
         </div>
-      </div>
+      </motion.div>
       </div>
     )
   }
@@ -91,9 +114,21 @@ export default function ToolCard({
   // Full variant (for recommendations and main sections)
   return (
     <div className="min-w-[280px] p-2">
-      <div 
-        className="prompt-card relative cursor-pointer group h-full p-6 rounded-2xl liquid-glass hover:bg-white/8 hover:translate-y-[-2px] transition-all duration-200 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
+      <motion.div 
+        className="prompt-card relative cursor-pointer group h-full p-6 rounded-2xl liquid-glass hover:bg-white/8 focus-ring"
+        role="button"
+        tabIndex={0}
+        aria-label={`Abrir ferramenta: ${tool.title}`}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            onClick?.(tool)
+          }
+        }}
         onClick={() => onClick?.(tool)}
+        whileHover={reducedMotion ? undefined : { scale: 1.02 }}
+        whileTap={reducedMotion ? undefined : { scale: 0.98 }}
+        transition={{ type: 'spring', ...MOTION_CONSTANTS.SPRING.stiff }}
       >
       {/* Favorite Button */}
       <button 
@@ -101,6 +136,7 @@ export default function ToolCard({
         onClick={handleFavoriteClick}
         disabled={favoriteLoading}
         aria-label={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+        aria-pressed={isFavorited}
         title={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
       >
         <Heart className={`w-4 h-4 transition-all duration-200 ${
@@ -123,7 +159,7 @@ export default function ToolCard({
         
         <div className="flex flex-wrap gap-2 mb-4">
           {tool.tags?.map(tag => (
-            <span key={tag} className="px-2 py-1 text-xs font-medium rounded-full bg-white/10 border border-white/15 text-white/80">
+            <span key={tag} className="px-2 py-1 text-xs font-medium rounded-full bg-white/10 text-white/80">
               {tag}
             </span>
           ))}
@@ -136,7 +172,7 @@ export default function ToolCard({
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
     </div>
   )
 }

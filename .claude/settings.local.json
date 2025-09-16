@@ -45,7 +45,11 @@
       "WebFetch(domain:chatgpt.com)",
       "WebFetch(domain:www.saasui.design)",
       "Bash(npm run lint)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npx shadcn@latest mcp init:*)",
+      "Bash(npx shadcn:*)",
+      "WebFetch(domain:ui.shadcn.com)",
+      "Bash(claude mcp add:*)"
     ],
     "deny": [],
     "ask": []

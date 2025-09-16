@@ -6,7 +6,6 @@ import {
   Search, 
   ChevronDown, 
   SlidersHorizontal,
-  X,
   Plus
 } from 'lucide-react'
 import Header from '../../components/layout/Header'
@@ -30,8 +29,6 @@ const extractCategories = (tracks: Track[]): string[] => {
   return Array.from(categoriesSet).sort()
 }
 
-const LEVELS = ['Iniciante', 'Intermediário', 'Avançado']
-const STATUS = ['nao_iniciado', 'em_andamento', 'concluido']
 
 export default function TracksPage() {
   const router = useRouter()
@@ -46,7 +43,6 @@ export default function TracksPage() {
     toggleFavorite,
     filterTracks,
     isTrackFavorited,
-    refreshTracks
   } = useTracks()
   
   // Component state
@@ -219,7 +215,7 @@ export default function TracksPage() {
               placeholder="Buscar trilhas..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-xl backdrop-blur-[20px] bg-white/10 border border-white/15 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all enhanced-search-bar"
+              className="w-full pl-12 pr-4 py-3 rounded-xl backdrop-blur-[20px] bg-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all enhanced-search-bar"
             />
           </div>
 
@@ -228,7 +224,7 @@ export default function TracksPage() {
             <select
               value={filters.sort}
               onChange={(e) => updateFilter('sort', e.target.value as 'top' | 'recent')}
-              className="w-full px-4 py-3 pr-10 rounded-xl backdrop-blur-[20px] bg-white/10 border border-white/15 text-white appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 pr-10 rounded-xl backdrop-blur-[20px] bg-white/10 text-white appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
             >
               <option value="top" className="bg-gray-800">Mais relevantes</option>
               <option value="recent" className="bg-gray-800">Mais recentes</option>
@@ -239,7 +235,7 @@ export default function TracksPage() {
           {/* Filters Button */}
           <button
             onClick={() => setShowFiltersDrawer(true)}
-            className="px-6 py-3 rounded-xl backdrop-blur-[20px] bg-white/10 border border-white/15 text-white hover:bg-white/15 transition-all flex items-center gap-2 whitespace-nowrap"
+            className="px-6 py-3 rounded-xl backdrop-blur-[20px] bg-white/10 text-white hover:bg-white/15 transition-all flex items-center gap-2 whitespace-nowrap"
           >
             <SlidersHorizontal className="w-5 h-5" />
             Filtros
@@ -255,8 +251,8 @@ export default function TracksPage() {
               className={`
                 liquid-glass-tag filter-chip transition-all duration-200
                 ${filters.categories.includes(category)
-                  ? 'active bg-white/20 text-white border-2 border-white/40'
-                  : 'bg-white/10 text-white/80 border border-white/15 hover:bg-white/15'
+                  ? 'active bg-white/20 text-white'
+                  : 'bg-white/10 text-white/80 hover:bg-white/15'
                 }
               `}
               style={{ 
@@ -286,7 +282,7 @@ export default function TracksPage() {
 
         {/* Error Toast */}
         {error && (
-          <div className="fixed top-24 right-4 z-50 p-4 rounded-lg bg-red-500/90 backdrop-blur-md text-white border border-red-400/50 shadow-lg">
+          <div className="fixed top-24 right-4 z-50 p-4 rounded-lg bg-red-500/90 backdrop-blur-md text-white shadow-lg">
             <p className="font-medium">{error}</p>
           </div>
         )}
@@ -346,7 +342,7 @@ export default function TracksPage() {
               </button>
               <a
                 href="/help"
-                className="px-6 py-3 rounded-xl text-white transition-all bg-white/10 border border-white/20 hover:bg-white/15"
+              className="px-6 py-3 rounded-xl text-white transition-all bg-white/10 hover:bg-white/15"
               >
                 Ver dicas na Central de Ajuda
               </a>
@@ -360,7 +356,7 @@ export default function TracksPage() {
             <button
               onClick={handleLoadMore}
               disabled={isLoadingMore}
-              className="px-8 py-4 rounded-xl backdrop-blur-[20px] bg-white/10 border border-white/15 text-white hover:bg-white/15 transition-all flex items-center gap-2 mx-auto disabled:opacity-50 disabled:cursor-not-allowed liquid-glass-pill"
+              className="px-8 py-4 rounded-xl backdrop-blur-[20px] bg-white/10 text-white hover:bg-white/15 transition-all flex items-center gap-2 mx-auto disabled:opacity-50 disabled:cursor-not-allowed liquid-glass-pill"
             >
               {isLoadingMore ? (
                 <>

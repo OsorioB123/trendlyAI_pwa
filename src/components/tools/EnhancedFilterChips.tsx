@@ -18,12 +18,6 @@ const EASING = {
   bounce: [0.68, -0.55, 0.265, 1.55] as const
 }
 
-const SPRING = {
-  gentle: { damping: 25, stiffness: 300, mass: 0.8 },
-  bouncy: { damping: 15, stiffness: 400, mass: 0.5 },
-  tight: { damping: 30, stiffness: 500, mass: 0.6 }
-}
-
 // Category color system with enhanced gradients
 const getCategoryStyles = (category: ToolCategory) => {
   const styles = {
@@ -245,7 +239,7 @@ export default function EnhancedFilterChips({
       initial="hidden"
       animate="visible"
     >
-      {categories.map((category, index) => {
+      {categories.map((category) => {
         const isActive = selectedCategory === category
         const chipAnimationVariants = getChipAnimationVariants(category, isActive)
 
@@ -351,7 +345,7 @@ export default function EnhancedFilterChips({
       {/* Clear all filters option */}
       {selectedCategory !== 'all' && (
         <motion.button
-          className="px-4 py-2 text-sm rounded-full backdrop-blur-[10px] border border-white/20 font-medium text-white/70 hover:text-white hover:border-white/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30 transition-all duration-200"
+          className="px-4 py-2 text-sm rounded-full backdrop-blur-[10px] font-medium text-white/70 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30 transition-all duration-200 bg-white/5 hover:bg-white/10"
           initial={{ opacity: 0, scale: 0.8, x: -20 }}
           animate={{ opacity: 1, scale: 1, x: 0, transition: { ...(respectReducedMotion({ transition: { duration: 0.2 } }).transition as any), delay: reducedMotion ? 0 : categories.length * 0.1 + 0.3 } }}
           whileHover={reducedMotion ? {} : { scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)", transition: { duration: 0.2 } }}

@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useSettings } from '../../hooks/useSettings'
@@ -16,7 +15,6 @@ import NotificationsTab from '../../components/settings/NotificationsTab'
 export default function SettingsPage() {
   const router = useRouter()
   const settings = useSettings()
-  const [toasts, setToasts] = useState<any[]>([])
   const { currentBackground } = useBackground()
 
   if (settings.isLoading) {
@@ -76,10 +74,6 @@ export default function SettingsPage() {
         </div>
       </div>
     )
-  }
-
-  const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id))
   }
 
   const renderTabContent = () => {
@@ -186,26 +180,9 @@ export default function SettingsPage() {
       </main>
 
       {/* Toast Notifications */}
-      <ToastContainer toasts={toasts} onClose={removeToast} />
+      <ToastContainer toasts={settings.toasts} onClose={settings.dismissToast} />
     </div>
   )
 }
 
-// Global styles
-const globalStyles = `
-  @keyframes fade-in {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  .animate-fade-in {
-    animation: fade-in 0.6s ease-out forwards;
-  }
 
-  .liquid-glass {
-    backdrop-filter: blur(20px);
-    background-color: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
-  }
-`

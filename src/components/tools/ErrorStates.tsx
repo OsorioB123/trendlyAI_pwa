@@ -248,13 +248,13 @@ export function EmptySearchState({ searchTerm, onClearSearch, className = "" }: 
         Nenhum resultado encontrado
       </h3>
       <p className="text-white/70 mb-6 max-w-md mx-auto">
-        Não encontramos ferramentas para "{searchTerm}". Tente termos diferentes ou explore outras categorias.
+        Não encontramos ferramentas para &quot;{searchTerm}&quot;. Tente termos diferentes ou explore outras categorias.
       </p>
       
       <div className="flex justify-center gap-3">
         <motion.button
           onClick={onClearSearch}
-          className="px-6 py-3 rounded-xl bg-blue-500/20 text-blue-300 border border-blue-500/30 hover:bg-blue-500/25 transition-all"
+          className="px-6 py-3 rounded-xl bg-blue-500/20 text-blue-300 hover:bg-blue-500/25 transition-all"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -270,7 +270,7 @@ export function EmptySearchState({ searchTerm, onClearSearch, className = "" }: 
             <motion.button
               key={suggestion}
               onClick={() => onClearSearch()}
-              className="px-3 py-1.5 text-xs rounded-full bg-white/5 text-white/70 hover:bg-white/10 transition-all border border-white/10"
+              className="px-3 py-1.5 text-xs rounded-full bg-white/5 text-white/70 hover:bg-white/10 transition-all"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
             >

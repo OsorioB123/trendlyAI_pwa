@@ -162,7 +162,7 @@ export default function HelpPage() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSearch() }}
                   placeholder="Busque por palavras-chave (ex.: trilhas, ferramentas, assinatura)"
-                  className="w-full h-12 px-4 rounded-xl bg-white/10 border border-white/15 text-white placeholder-white/50 focus:outline-none focus:border-white/30"
+                  className="w-full h-12 px-4 rounded-xl bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
                 />
                 <button
                   onClick={handleSearch}
@@ -174,7 +174,7 @@ export default function HelpPage() {
               </div>
               <button
                 onClick={() => setShowCreateTicket(true)}
-                className="h-12 px-5 rounded-xl bg-white/10 border border-white/15 text-white hover:bg-white/15"
+                className="h-12 px-5 rounded-xl bg-white/10 text-white hover:bg-white/15"
               >
                 Criar ticket
               </button>
@@ -189,9 +189,9 @@ export default function HelpPage() {
           >
             <div className="relative overflow-hidden rounded-2xl">
               <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 animate-pulse"></div>
-              <div className="relative bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-8 hover:-translate-y-2 hover:shadow-2xl transition-all duration-400">
+              <div className="relative bg-white/5 backdrop-blur-lg rounded-2xl p-8 hover:-translate-y-2 hover:shadow-2xl transition-all duration-400">
                 <div className="flex flex-col md:flex-row items-center gap-8">
-                  <div className="flex-shrink-0 w-28 h-28 flex items-center justify-center rounded-full bg-white/5 border border-white/10">
+                  <div className="flex-shrink-0 w-28 h-28 flex items-center justify-center rounded-full bg-white/5">
                     <Sparkles className="w-14 h-14 text-white" />
                   </div>
                   <div>
@@ -224,7 +224,7 @@ export default function HelpPage() {
               <aside className="lg:col-span-1">
                 <nav className="flex flex-col gap-1 relative">
                   <div 
-                    className="absolute left-0 w-full h-12 bg-white/8 border border-white/10 rounded-lg transition-all duration-300"
+                    className="absolute left-0 w-full h-12 bg-white/8 rounded-lg transition-all duration-300"
                     style={{
                       transform: `translateY(${tabs.findIndex(tab => tab.id === activeTab) * 48}px)`
                     }}
@@ -263,7 +263,7 @@ export default function HelpPage() {
                 ) : (
                   <div className="space-y-4">
                     {helpData.faqItems.map((item) => (
-                      <div key={item.id} className="border-b border-white/10 last:border-b-0">
+                      <div key={item.id} className="last:border-b-0">
                         <button
                           type="button"
                           id={`faq-toggle-${item.id}`}
@@ -304,7 +304,7 @@ export default function HelpPage() {
 
                     {helpData.faqItems.length === 0 && !helpData.isLoading && (
                       <div className="text-center py-12">
-                        <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4">
+                        <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
                           <Headphones className="w-8 h-8 text-white/40" />
                         </div>
                         <p className="text-white/60 mb-2">Nenhuma pergunta encontrada</p>
@@ -319,7 +319,7 @@ export default function HelpPage() {
 
           {/* Contact Support Section */}
           <motion.section
-            className="text-center border-t border-white/10 pt-16"
+            className="text-center pt-16"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...(transitionSafe || {}), delay: 0.2 }}
@@ -343,16 +343,16 @@ export default function HelpPage() {
       {/* Chat Widget */}
       {showChatWidget && (
         <div className="fixed inset-0 z-50 flex items-end justify-end p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-white/8 backdrop-blur-lg border border-white/14 rounded-2xl relative w-full max-w-sm h-[60vh] flex flex-col">
+          <div className="bg-white/8 backdrop-blur-lg rounded-2xl relative w-full max-w-sm h-[60vh] flex flex-col">
             {/* Widget Header */}
-            <div className="flex-shrink-0 p-4 flex justify-between items-center border-b border-white/10">
+            <div className="flex-shrink-0 p-4 flex justify-between items-center">
               <div>
                 <h3 className="font-semibold text-white">Suporte TrendlyAI</h3>
                 <p className="text-xs text-white/60">Normalmente respondemos em 5 minutos.</p>
               </div>
               <button 
                 onClick={closeChatWidget}
-                className="text-white/60 hover:text-white bg-white/10 backdrop-blur-md border border-white/14 rounded-full w-11 h-11 flex items-center justify-center hover:bg-white/15 transition-all"
+                className="text-white/60 hover:text-white bg-white/10 backdrop-blur-md rounded-full w-11 h-11 flex items-center justify-center hover:bg-white/15 transition-all"
                 aria-label="Fechar conversa de suporte"
               >
                 <X className="w-4 h-4" />
@@ -363,7 +363,7 @@ export default function HelpPage() {
             <div className="flex-grow p-4 overflow-y-auto">
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md border border-white/14 flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center flex-shrink-0">
                     <Headphones className="w-4 h-4 text-white" />
                   </div>
                   <div className="bg-white/10 rounded-2xl rounded-tl-md p-3">
@@ -374,12 +374,12 @@ export default function HelpPage() {
             </div>
             
             {/* Widget Input */}
-            <div className="flex-shrink-0 p-4 border-t border-white/10">
+            <div className="flex-shrink-0 p-4">
               <input 
                 type="text" 
                 placeholder="Digite sua mensagem..." 
                 aria-label="Mensagem para o suporte"
-                className="w-full bg-white/10 border border-white/14 rounded-full p-3 px-4 text-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 backdrop-blur-md" 
+                className="w-full bg-white/10 rounded-full p-3 px-4 text-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 backdrop-blur-md" 
               />
             </div>
           </div>
@@ -392,7 +392,7 @@ export default function HelpPage() {
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowCreateTicket(false)} />
           <form 
             onSubmit={handleCreateTicket}
-            className="relative bg-white/8 backdrop-blur-lg border border-white/14 rounded-2xl w-full max-w-lg p-6 text-white"
+            className="relative bg-white/8 backdrop-blur-lg rounded-2xl w-full max-w-lg p-6 text-white"
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Novo Ticket de Suporte</h3>
@@ -406,7 +406,7 @@ export default function HelpPage() {
               type="text"
               value={ticketSubject}
               onChange={(e) => setTicketSubject(e.target.value)}
-              className="w-full mb-4 px-3 py-2 rounded-lg bg-white/10 border border-white/15 focus:outline-none focus:border-white/30"
+              className="w-full mb-4 px-3 py-2 rounded-lg bg-white/10 focus:outline-none"
               placeholder="Descreva brevemente o problema"
             />
 
@@ -415,7 +415,7 @@ export default function HelpPage() {
               value={ticketDescription}
               onChange={(e) => setTicketDescription(e.target.value)}
               rows={5}
-              className="w-full mb-4 px-3 py-2 rounded-lg bg-white/10 border border-white/15 focus:outline-none focus:border-white/30 resize-y"
+              className="w-full mb-4 px-3 py-2 rounded-lg bg-white/10 focus:outline-none resize-y"
               placeholder="Explique em detalhes o que aconteceu"
             />
 
@@ -424,7 +424,7 @@ export default function HelpPage() {
               <select
                 value={ticketPriority}
                 onChange={(e) => setTicketPriority(e.target.value as any)}
-                className="px-3 py-2 rounded-lg bg-white/10 border border-white/15 focus:outline-none focus:border-white/30"
+                className="px-3 py-2 rounded-lg bg-white/10 focus:outline-none"
               >
                 <option value="low" className="bg-black">Baixa</option>
                 <option value="normal" className="bg-black">Normal</option>
@@ -438,7 +438,7 @@ export default function HelpPage() {
             )}
 
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setShowCreateTicket(false)} className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 border border-white/15">
+              <button type="button" onClick={() => setShowCreateTicket(false)} className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15">
                 Cancelar
               </button>
               <button type="submit" className="px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-gray-100">

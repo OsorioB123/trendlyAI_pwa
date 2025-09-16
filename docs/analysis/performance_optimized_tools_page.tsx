@@ -11,7 +11,7 @@ import {
   ArchiveX
 } from 'lucide-react'
 import Header from '../../components/layout/Header'
-import ToolCard from '../../components/tools/ToolCard'
+import ToolCard from '../../components/cards/ToolCard'
 import ToolsFiltersDrawer from '../../components/tools/ToolsFiltersDrawer'
 import ToolModal from '../../components/tools/ToolModal'
 

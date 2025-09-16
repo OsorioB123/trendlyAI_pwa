@@ -20,7 +20,21 @@ import { useBackground } from '../../contexts/BackgroundContext'
 export default function ProfileContent() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
-  const profileData = useProfile()
+  const {
+    profile,
+    nextAction,
+    arsenalData,
+    referralInfo,
+    isLoading: profileLoading,
+    isUploading: profileUploading,
+    isSaving: profileSaving,
+    error: profileError,
+    clearError,
+    editingField,
+    setEditingField,
+    saveField,
+    uploadAvatar
+  } = useProfile()
   const { currentBackground } = useBackground()
 
   // UI state
@@ -38,17 +52,19 @@ export default function ProfileContent() {
 
   // Handle profile hook errors
   useEffect(() => {
-    if (profileData.error) {
-      setErrorMessage(profileData.error)
-      setTimeout(() => {
-        setErrorMessage('')
-        profileData.clearError()
-      }, 5000)
-    }
-  }, [profileData.error, profileData.clearError])
+    if (!profileError) return
+
+    setErrorMessage(profileError)
+    const timeout = setTimeout(() => {
+      setErrorMessage('')
+      clearError()
+    }, 5000)
+
+    return () => clearTimeout(timeout)
+  }, [profileError, clearError])
 
   // Show loading state
-  if (authLoading || profileData.isLoading || !user || !profileData.profile) {
+  if (authLoading || profileLoading || !user || !profile) {
     return (
       <div 
         className="min-h-screen flex items-center justify-center"
@@ -67,38 +83,6 @@ export default function ProfileContent() {
         </div>
       </div>
     )
-  }
-
-  const handleProfileUpdate = async (data: any) => {
-    try {
-      const result = await profileData.updateProfile(data)
-      if (result) {
-        setSuccessMessage('Perfil atualizado com sucesso!')
-        setTimeout(() => setSuccessMessage(''), 3000)
-      } else {
-        setErrorMessage('Erro ao atualizar perfil')
-        setTimeout(() => setErrorMessage(''), 5000)
-      }
-    } catch (error) {
-      setErrorMessage('Erro inesperado ao atualizar perfil')
-      setTimeout(() => setErrorMessage(''), 5000)
-    }
-  }
-
-  const handleAvatarUpdate = async (file: File) => {
-    try {
-      const result = await profileData.uploadAvatar(file)
-      if (result) {
-        setSuccessMessage('Avatar atualizado com sucesso!')
-        setTimeout(() => setSuccessMessage(''), 3000)
-      } else {
-        setErrorMessage('Erro ao atualizar avatar')
-        setTimeout(() => setErrorMessage(''), 5000)
-      }
-    } catch (error) {
-      setErrorMessage('Erro inesperado ao atualizar avatar')
-      setTimeout(() => setErrorMessage(''), 5000)
-    }
   }
 
   return (
@@ -141,20 +125,19 @@ export default function ProfileContent() {
           
           {/* Profile Header */}
           <ProfileHeader 
-            profile={profileData.profile as any}
-            isEditing={!!profileData.editingField}
-            editingField={profileData.editingField}
-            onEditField={profileData.setEditingField}
-            onSaveField={profileData.saveField}
-            onAvatarUpload={profileData.uploadAvatar}
-            isUploading={profileData.isUploading}
-            isSaving={profileData.isSaving}
+            profile={profile as any}
+            editingField={editingField}
+            onEditField={setEditingField}
+            onSaveField={saveField}
+            onAvatarUpload={uploadAvatar}
+            isUploading={profileUploading}
+            isSaving={profileSaving}
           />
 
           {/* Next Action Card */}
-          {profileData.nextAction && (
+          {nextAction && (
             <NextActionCard 
-              recommendation={profileData.nextAction}
+              recommendation={nextAction}
               onActionClick={() => {
                 console.log('Next action clicked')
                 // Could trigger analytics or profile update here
@@ -167,18 +150,17 @@ export default function ProfileContent() {
             
             {/* Arsenal Section */}
             <ArsenalSection
-              arsenalData={profileData.arsenalData as any}
+              arsenalData={arsenalData as any}
               activeTab={activeArsenalTab}
               onTabChange={setActiveArsenalTab}
-              onTrackClick={(t) => console.log('Track click', t)}
-              onToolClick={(tool) => console.log('Tool click', tool)}
+              onTrackClick={(track) => router.push(`/tracks/${track.id}`)}
               onNavigateToTools={() => router.push('/tools')}
-              isLoading={profileData.isLoading}
+              isLoading={profileLoading}
             />
 
             {/* Referral Section */}
             <ReferralSection
-              referralInfo={profileData.referralInfo as any}
+              referralInfo={referralInfo as any}
               activeTab={activeReferralTab}
               onTabChange={setActiveReferralTab}
               onCopyReferralLink={() => {

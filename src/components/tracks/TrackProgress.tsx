@@ -1,30 +1,29 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { CheckCircle2, Circle, Lock, Play, Star } from 'lucide-react'
 import { TrackProgressProps, ModuleState } from '../../types/track'
 
 export default function TrackProgress({ track, onModuleClick }: TrackProgressProps) {
   const getModuleState = (moduleIndex: number): ModuleState => {
-    const module = track.modules[moduleIndex]
+        const moduleItem = track.modules[moduleIndex]
     
     const isCompleted = track.moduleProgress.some(
-      p => p.moduleId === module.id && p.isCompleted
+            p => p.moduleId === moduleItem.id && p.isCompleted
     )
     
     if (isCompleted) return 'completed'
     
     const currentModuleId = track.userProgress?.currentModuleId
-    if (currentModuleId === module.id) return 'current'
+        if (currentModuleId === moduleItem.id) return 'current'
     
     if (moduleIndex === 0) return 'available'
     
-    const previousModule = track.modules[moduleIndex - 1]
+        const previousModule = track.modules[moduleIndex - 1]
     const isPreviousCompleted = track.moduleProgress.some(
-      p => p.moduleId === previousModule.id && p.isCompleted
+      p =>       p.moduleId === previousModule.id && p.isCompleted
     )
     
-    return isPreviousCompleted ? 'available' : 'locked'
+        return isPreviousCompleted ? 'available' : 'locked'
   }
 
   const getModuleIcon = (state: ModuleState) => {
@@ -80,18 +79,18 @@ export default function TrackProgress({ track, onModuleClick }: TrackProgressPro
     <div className="relative max-w-3xl mx-auto">
       {/* Serpentine Track */}
       <div className="space-y-16">
-        {track.modules.map((module, index) => {
+        {track.modules.map((moduleItem, index) => {
           const isEven = index % 2 === 0
           const state = getModuleState(index)
           const nextState = index < track.modules.length - 1 ? getModuleState(index + 1) : undefined
           const isClickable = state !== 'locked'
 
           return (
-            <div key={module.id} className="relative">
+            <div key={moduleItem.id} className="relative">
               {/* Module Card */}
               <div 
                 className={`w-full max-w-sm ${getModuleStyles(state, isEven)}`}
-                onClick={() => isClickable && onModuleClick(module)}
+                onClick={() => isClickable && onModuleClick(moduleItem)}
               >
                 {/* Module Number & Icon */}
                 <div className="flex items-center gap-3 mb-4">
@@ -122,18 +121,18 @@ export default function TrackProgress({ track, onModuleClick }: TrackProgressPro
                   <h3 className={`font-semibold text-lg mb-2 ${
                     state === 'locked' ? 'text-gray-500' : 'text-white'
                   }`}>
-                    {module.title}
+                    {moduleItem.title}
                   </h3>
                   
                   <p className={`text-sm mb-4 line-clamp-3 ${
                     state === 'locked' ? 'text-gray-600' : 'text-white/70'
                   }`}>
-                    {module.content.briefing}
+                    {moduleItem.content.briefing}
                   </p>
 
                   {/* Module Meta Info */}
                   <div className="flex items-center gap-4 text-xs">
-                    {module.videoUrl && (
+                    {moduleItem.videoUrl && (
                       <span className={`flex items-center gap-1 ${
                         state === 'locked' ? 'text-gray-600' : 'text-white/60'
                       }`}>
@@ -142,20 +141,20 @@ export default function TrackProgress({ track, onModuleClick }: TrackProgressPro
                       </span>
                     )}
                     
-                    {module.content.prompts.length > 0 && (
+                    {moduleItem.content.prompts.length > 0 && (
                       <span className={`flex items-center gap-1 ${
                         state === 'locked' ? 'text-gray-600' : 'text-white/60'
                       }`}>
                         <Star className="w-3 h-3" />
-                        {module.content.prompts.length} Prompts
+                        {moduleItem.content.prompts.length} Prompts
                       </span>
                     )}
                     
-                    {module.tools && module.tools.length > 0 && (
+                    {moduleItem.tools && moduleItem.tools.length > 0 && (
                       <span className={`flex items-center gap-1 ${
                         state === 'locked' ? 'text-gray-600' : 'text-white/60'
                       }`}>
-                        🛠️ {module.tools.length} Ferramentas
+                        🛠️ {moduleItem.tools.length} Ferramentas
                       </span>
                     )}
                   </div>
@@ -173,7 +172,7 @@ export default function TrackProgress({ track, onModuleClick }: TrackProgressPro
                       className="w-full py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors duration-200"
                       onClick={(e) => {
                         e.stopPropagation()
-                        onModuleClick(module)
+                        onModuleClick(moduleItem)
                       }}
                     >
                       Continuar Módulo
@@ -187,7 +186,7 @@ export default function TrackProgress({ track, onModuleClick }: TrackProgressPro
                       className="w-full py-2 px-4 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-colors duration-200"
                       onClick={(e) => {
                         e.stopPropagation()
-                        onModuleClick(module)
+                        onModuleClick(moduleItem)
                       }}
                     >
                       Iniciar Módulo
@@ -225,7 +224,7 @@ export default function TrackProgress({ track, onModuleClick }: TrackProgressPro
           <div className="text-6xl mb-4">🎉</div>
           <h3 className="text-2xl font-bold text-white mb-2">Parabéns!</h3>
           <p className="text-white/80">
-            Você completou toda a trilha "{track.title}"!
+            Você completou toda a trilha &quot;{track.title}&quot;!
           </p>
         </div>
       )}

@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { X, Eye, EyeOff, AlertTriangle, Lock, Mail, Shield, Trash2 } from 'lucide-react'
 import { SecurityModalProps, ChangeEmailRequest, ChangePasswordRequest, DeleteAccountRequest, VALIDATION_RULES } from '../../types/settings'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 const MODAL_CONFIGS = {
   'change-email': {
@@ -186,16 +188,19 @@ export default function SecurityModal({ type, isOpen, onClose, onSubmit, isLoadi
         return (
           <>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-white/80">Senha Atual</label>
+              <Label htmlFor="currentPassword" className="text-white/80">Senha Atual</Label>
               <div className="relative">
-                <input
+                <Input
                   ref={firstInputRef}
+                  id="currentPassword"
                   type={showPasswords.currentPassword ? 'text' : 'password'}
                   value={formData.currentPassword || ''}
                   onChange={(e) => handleInputChange('currentPassword', e.target.value)}
                   placeholder="Digite sua senha atual"
                   disabled={isLoading}
-                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2.5 text-white placeholder-white/40 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-colors disabled:opacity-50"
+                  aria-invalid={!!errors.currentPassword}
+                  aria-describedby={errors.currentPassword ? 'currentPassword-error' : undefined}
+                  className="bg-black/20 text-white placeholder-white/50 border-white/20 focus:border-white/30 focus:ring-white/30 pr-10"
                 />
                 <button
                   type="button"
@@ -206,22 +211,25 @@ export default function SecurityModal({ type, isOpen, onClose, onSubmit, isLoadi
                 </button>
               </div>
               {errors.currentPassword && (
-                <p className="text-red-400 text-xs">{errors.currentPassword}</p>
+                <p id="currentPassword-error" className="text-red-400 text-xs">{errors.currentPassword}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-white/80">Novo Email</label>
-              <input
+              <Label htmlFor="newEmail" className="text-white/80">Novo Email</Label>
+              <Input
+                id="newEmail"
                 type="email"
                 value={formData.newEmail || ''}
                 onChange={(e) => handleInputChange('newEmail', e.target.value)}
                 placeholder="novo@exemplo.com"
                 disabled={isLoading}
-                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2.5 text-white placeholder-white/40 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-colors disabled:opacity-50"
+                aria-invalid={!!errors.newEmail}
+                aria-describedby={errors.newEmail ? 'newEmail-error' : undefined}
+                className="bg-black/20 text-white placeholder-white/50 border-white/20 focus:border-white/30 focus:ring-white/30"
               />
               {errors.newEmail && (
-                <p className="text-red-400 text-xs">{errors.newEmail}</p>
+                <p id="newEmail-error" className="text-red-400 text-xs">{errors.newEmail}</p>
               )}
             </div>
           </>
@@ -231,16 +239,19 @@ export default function SecurityModal({ type, isOpen, onClose, onSubmit, isLoadi
         return (
           <>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-white/80">Senha Atual</label>
+              <Label htmlFor="currentPassword" className="text-white/80">Senha Atual</Label>
               <div className="relative">
-                <input
+                <Input
                   ref={firstInputRef}
+                  id="currentPassword"
                   type={showPasswords.currentPassword ? 'text' : 'password'}
                   value={formData.currentPassword || ''}
                   onChange={(e) => handleInputChange('currentPassword', e.target.value)}
                   placeholder="Digite sua senha atual"
                   disabled={isLoading}
-                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2.5 text-white placeholder-white/40 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-colors disabled:opacity-50"
+                  aria-invalid={!!errors.currentPassword}
+                  aria-describedby={errors.currentPassword ? 'currentPassword-error' : undefined}
+                  className="bg-black/20 text-white placeholder-white/50 border-white/20 focus:border-white/30 focus:ring-white/30 pr-10"
                 />
                 <button
                   type="button"
@@ -251,20 +262,23 @@ export default function SecurityModal({ type, isOpen, onClose, onSubmit, isLoadi
                 </button>
               </div>
               {errors.currentPassword && (
-                <p className="text-red-400 text-xs">{errors.currentPassword}</p>
+                <p id="currentPassword-error" className="text-red-400 text-xs">{errors.currentPassword}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-white/80">Nova Senha</label>
+              <Label htmlFor="newPassword" className="text-white/80">Nova Senha</Label>
               <div className="relative">
-                <input
+                <Input
+                  id="newPassword"
                   type={showPasswords.newPassword ? 'text' : 'password'}
                   value={formData.newPassword || ''}
                   onChange={(e) => handleInputChange('newPassword', e.target.value)}
                   placeholder="Digite sua nova senha"
                   disabled={isLoading}
-                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2.5 text-white placeholder-white/40 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-colors disabled:opacity-50"
+                  aria-invalid={!!errors.newPassword}
+                  aria-describedby={errors.newPassword ? 'newPassword-error' : undefined}
+                  className="bg-black/20 text-white placeholder-white/50 border-white/20 focus:border-white/30 focus:ring-white/30 pr-10"
                 />
                 <button
                   type="button"
@@ -275,20 +289,23 @@ export default function SecurityModal({ type, isOpen, onClose, onSubmit, isLoadi
                 </button>
               </div>
               {errors.newPassword && (
-                <p className="text-red-400 text-xs">{errors.newPassword}</p>
+                <p id="newPassword-error" className="text-red-400 text-xs">{errors.newPassword}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-white/80">Confirmar Nova Senha</label>
+              <Label htmlFor="confirmPassword" className="text-white/80">Confirmar Nova Senha</Label>
               <div className="relative">
-                <input
+                <Input
+                  id="confirmPassword"
                   type={showPasswords.confirmPassword ? 'text' : 'password'}
                   value={formData.confirmPassword || ''}
                   onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                   placeholder="Confirme sua nova senha"
                   disabled={isLoading}
-                  className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2.5 text-white placeholder-white/40 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-colors disabled:opacity-50"
+                  aria-invalid={!!errors.confirmPassword}
+                  aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
+                  className="bg-black/20 text-white placeholder-white/50 border-white/20 focus:border-white/30 focus:ring-white/30 pr-10"
                 />
                 <button
                   type="button"
@@ -299,7 +316,7 @@ export default function SecurityModal({ type, isOpen, onClose, onSubmit, isLoadi
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-red-400 text-xs">{errors.confirmPassword}</p>
+                <p id="confirmPassword-error" className="text-red-400 text-xs">{errors.confirmPassword}</p>
               )}
             </div>
           </>
@@ -308,16 +325,19 @@ export default function SecurityModal({ type, isOpen, onClose, onSubmit, isLoadi
       case 'setup-2fa':
         return (
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white/80">Senha Atual</label>
+            <Label htmlFor="currentPassword" className="text-white/80">Senha Atual</Label>
             <div className="relative">
-              <input
+              <Input
                 ref={firstInputRef}
+                id="currentPassword"
                 type={showPasswords.currentPassword ? 'text' : 'password'}
                 value={formData.currentPassword || ''}
                 onChange={(e) => handleInputChange('currentPassword', e.target.value)}
                 placeholder="Digite sua senha atual para confirmar"
                 disabled={isLoading}
-                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2.5 text-white placeholder-white/40 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-colors disabled:opacity-50"
+                aria-invalid={!!errors.currentPassword}
+                aria-describedby={errors.currentPassword ? 'currentPassword-error' : undefined}
+                className="bg-black/20 text-white placeholder-white/50 border-white/20 focus:border-white/30 focus:ring-white/30 pr-10"
               />
               <button
                 type="button"
@@ -328,7 +348,7 @@ export default function SecurityModal({ type, isOpen, onClose, onSubmit, isLoadi
               </button>
             </div>
             {errors.currentPassword && (
-              <p className="text-red-400 text-xs">{errors.currentPassword}</p>
+              <p id="currentPassword-error" className="text-red-400 text-xs">{errors.currentPassword}</p>
             )}
           </div>
         )
@@ -336,7 +356,7 @@ export default function SecurityModal({ type, isOpen, onClose, onSubmit, isLoadi
       case 'delete-account':
         return (
           <>
-            <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg mb-6">
+            <div className="p-4 bg-red-500/10 rounded-lg mb-6">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
                 <div>
@@ -349,20 +369,23 @@ export default function SecurityModal({ type, isOpen, onClose, onSubmit, isLoadi
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-white/80">
-                Digite "{VALIDATION_RULES.DELETE_CONFIRMATION_TEXT}" para confirmar
-              </label>
-              <input
+              <Label htmlFor="confirmationText" className="text-white/80">
+                Digite &quot;{VALIDATION_RULES.DELETE_CONFIRMATION_TEXT}&quot; para confirmar
+              </Label>
+              <Input
                 ref={firstInputRef}
+                id="confirmationText"
                 type="text"
                 value={formData.confirmationText || ''}
                 onChange={(e) => handleInputChange('confirmationText', e.target.value)}
                 placeholder={VALIDATION_RULES.DELETE_CONFIRMATION_TEXT}
                 disabled={isLoading}
-                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2.5 text-white placeholder-white/40 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-colors disabled:opacity-50 font-mono"
+                aria-invalid={!!errors.confirmationText}
+                aria-describedby={errors.confirmationText ? 'confirmationText-error' : undefined}
+                className="bg-black/20 text-white placeholder-white/50 border-white/20 focus:border-white/30 focus:ring-white/30 font-mono"
               />
               {errors.confirmationText && (
-                <p className="text-red-400 text-xs">{errors.confirmationText}</p>
+                <p id="confirmationText-error" className="text-red-400 text-xs">{errors.confirmationText}</p>
               )}
               <p className="text-white/50 text-xs">
                 Esta ação não pode ser desfeita. Seus dados serão excluídos em 24 horas.
@@ -419,7 +442,10 @@ export default function SecurityModal({ type, isOpen, onClose, onSubmit, isLoadi
     >
       <div
         ref={modalRef}
-        className={`relative w-full max-w-md bg-[#1a1a1a] border border-white/20 rounded-2xl shadow-2xl transition-all duration-300 ${
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="security-modal-title"
+        className={`relative w-full max-w-md bg-[#1a1a1a] rounded-2xl shadow-2xl transition-all duration-300 ${
           isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         }`}
         onClick={(e) => e.stopPropagation()}
@@ -427,17 +453,11 @@ export default function SecurityModal({ type, isOpen, onClose, onSubmit, isLoadi
         {/* Header */}
         <div className="p-6 pb-4">
           <div className="flex items-start gap-3 mb-4">
-            <div className={`p-2 rounded-lg ${
-              config.dangerLevel === 'high' 
-                ? 'bg-red-500/20 text-red-400' 
-                : config.dangerLevel === 'medium'
-                  ? 'bg-orange-500/20 text-orange-400'
-                  : 'bg-blue-500/20 text-blue-400'
-            }`}>
+            <div className={`p-2 rounded-lg bg-white/10 text-white`}>
               <Icon size={20} />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-white mb-1">
+              <h3 id="security-modal-title" className="text-lg font-semibold text-white mb-1">
                 {config.title}
               </h3>
               <p className="text-sm text-white/70">
@@ -456,6 +476,10 @@ export default function SecurityModal({ type, isOpen, onClose, onSubmit, isLoadi
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-4">
+          {/* Live region for form errors */}
+          <div className="sr-only" aria-live="polite" aria-atomic="true">
+            {Object.values(errors)[0] || ''}
+          </div>
           {renderFormFields()}
 
           {/* Actions */}
@@ -471,6 +495,7 @@ export default function SecurityModal({ type, isOpen, onClose, onSubmit, isLoadi
             <button
               type="submit"
               disabled={!isFormValid || isLoading}
+              aria-busy={isLoading}
               className={getButtonStyles()}
             >
               {getButtonText()}

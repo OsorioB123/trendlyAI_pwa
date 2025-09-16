@@ -31,8 +31,8 @@ SUPABASE_JWT_SECRET=DBTYA+29HFM4eOKlSFuQ5QEFldeu4cpruOfy+4qHiH7E...
 
 ### 📁 **Files Created**
 
-1. **`/frontend/src/lib/supabase.js`** - Supabase client configuration
-2. **`/frontend/src/contexts/AuthContext.js`** - Authentication context
+1. **`/apps/legacy-frontend/src/lib/supabase.js`** - Supabase client configuration
+2. **`/apps/legacy-frontend/src/contexts/AuthContext.js`** - Authentication context
 3. **`/backend/supabase_client.py`** - Backend Supabase client
 4. **`/backend/auth_middleware.py`** - Authentication middleware
 5. **`/database_schema.sql`** - Complete database schema

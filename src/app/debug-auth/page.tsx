@@ -21,7 +21,7 @@ export default function DebugAuthPage() {
       addResult('info', 'Testing direct Supabase signup...')
       
       const testEmail = `debug-${Date.now()}@gmail.com`
-      const { data, error } = await supabase.auth.signUp({
+      const { data: signupData, error: signupError } = await supabase.auth.signUp({
         email: testEmail,
         password: 'test123456',
         options: {
@@ -32,25 +32,25 @@ export default function DebugAuthPage() {
       })
 
       addResult('signup_result', {
-        success: !error,
+        success: !signupError,
         email: testEmail,
-        data: data,
-        error: error?.message,
-        user_id: data?.user?.id,
-        user_created_at: data?.user?.created_at,
-        user_confirmed_at: data?.user?.confirmed_at,
-        session_exists: !!data?.session,
-        user_metadata: data?.user?.user_metadata
+        data: signupData,
+        error: signupError?.message,
+        user_id: signupData?.user?.id,
+        user_created_at: signupData?.user?.created_at,
+        user_confirmed_at: signupData?.user?.confirmed_at,
+        session_exists: !!signupData?.session,
+        user_metadata: signupData?.user?.user_metadata
       })
 
-      if (data?.user?.id) {
+      if (signupData?.user?.id) {
         // Try to fetch the user immediately after creation using admin API
         addResult('info', 'Trying to fetch user from auth.users via admin API...')
         
         const adminResponse = await fetch('/api/auth/admin', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'getUserById', userId: data.user.id })
+          body: JSON.stringify({ action: 'getUserById', userId: signupData.user.id })
         })
         
         const adminResult = await adminResponse.json()
@@ -75,8 +75,8 @@ export default function DebugAuthPage() {
         body: JSON.stringify({ action: 'listUsers' })
       })
       
-      const result = await response.json()
-      addResult('list_users', result)
+      const usersResult = await response.json()
+      addResult('list_users', usersResult)
 
     } catch (err) {
       addResult('error', `Exception: ${(err as Error).message}`)
@@ -105,11 +105,11 @@ export default function DebugAuthPage() {
 
       // Test basic connection
       addResult('info', 'Testing basic connection...')
-      const { data, error } = await supabase.from('profiles').select('count').limit(1)
+      const { error } = await supabase.from('profiles').select('count').limit(1)
       
       addResult('connection_test', {
-        success: !error,
-        error: error?.message,
+        success: !signupError,
+        error: signupError?.message,
         can_access_profiles: !error
       })
 

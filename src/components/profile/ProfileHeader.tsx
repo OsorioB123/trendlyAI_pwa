@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import Image from 'next/image'
-import { 
+import {
   Camera, 
   Edit2, 
   Check, 
@@ -17,7 +17,6 @@ import { PROFILE_LEVELS } from '../../types/profile'
 
 export default function ProfileHeader({
   profile,
-  isEditing,
   editingField,
   onEditField,
   onSaveField,
@@ -121,7 +120,7 @@ export default function ProfileHeader({
         onClick={handleAvatarClick}
         disabled={isUploading}
       >
-        <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-white/10 relative">
+        <div className="w-32 h-32 rounded-full overflow-hidden relative">
           <Image
             src={profile.avatar_url || 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=300&q=80'}
             alt="Avatar do usuário"
@@ -205,15 +204,15 @@ export default function ProfileHeader({
         
         {/* Metrics Pills */}
         <div className="flex flex-wrap justify-center md:justify-start items-center gap-3 mb-6">
-          <div className="metric-pill bg-white/8 border border-white/12 rounded-full px-4 py-2 text-sm font-medium text-white flex items-center gap-2 hover:bg-white/15 hover:-translate-y-0.5 transition-all duration-300">
+          <div className="metric-pill bg-white/8 rounded-full px-4 py-2 text-sm font-medium text-white flex items-center gap-2 hover:bg-white/15 hover:-translate-y-0.5 transition-all duration-300">
             <Navigation className="w-4 h-4" />
             {profile.total_tracks || 0} Trilhas Ativas
           </div>
-          <div className="metric-pill bg-white/8 border border-white/12 rounded-full px-4 py-2 text-sm font-medium text-white flex items-center gap-2 hover:bg-white/15 hover:-translate-y-0.5 transition-all duration-300">
+          <div className="metric-pill bg-white/8 rounded-full px-4 py-2 text-sm font-medium text-white flex items-center gap-2 hover:bg-white/15 hover:-translate-y-0.5 transition-all duration-300">
             <Award className="w-4 h-4" />
             {profile.completed_modules || 0} Módulos Concluídos
           </div>
-          <div className="metric-pill bg-white/8 border border-white/12 rounded-full px-4 py-2 text-sm font-medium text-white flex items-center gap-2 hover:bg-white/15 hover:-translate-y-0.5 transition-all duration-300">
+          <div className="metric-pill bg-white/8 rounded-full px-4 py-2 text-sm font-medium text-white flex items-center gap-2 hover:bg-white/15 hover:-translate-y-0.5 transition-all duration-300">
             <Flame className="w-4 h-4" />
             Streak: {profile.streak_days || 0} Dias
           </div>
@@ -228,7 +227,7 @@ export default function ProfileHeader({
                 onChange={(e) => handleInputChange('bio', e.target.value)}
                 onKeyDown={(e) => handleKeyDown(e, 'bio')}
                 placeholder="Conte um pouco sobre você..."
-                className="w-full p-3 text-white/80 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-white/40 resize-none"
+                className="w-full p-3 text-white/80 bg-white/10 rounded-lg focus:outline-none resize-none"
                 rows={3}
                 disabled={isSaving}
                 autoFocus

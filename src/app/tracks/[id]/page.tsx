@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { Star, Heart, ArrowLeft, Play, Lock, CheckCircle2, Circle } from 'lucide-react'
+import { Star, Heart, ArrowLeft } from 'lucide-react'
 import BackgroundOverlay from '../../../components/common/BackgroundOverlay'
 import { TrackService } from '../../../lib/services/trackService'
-import { TrackWithModules, TrackModule, ModuleState } from '../../../types/track'
+import { TrackWithModules, TrackModule } from '../../../types/track'
 import { supabase } from '../../../lib/supabase'
 import TrackProgress from '../../../components/tracks/TrackProgress'
 import ModuleModal from '../../../components/tracks/ModuleModal'
@@ -38,51 +38,53 @@ export default function TrackPage() {
     return () => subscription.unsubscribe()
   }, [])
 
+  const loadTrack = useCallback(async () => {
+    if (!trackId) return
+    try {
+      setLoading(true)
+      const trackData = await TrackService.getTrackWithModules(trackId, user?.id)
+
+      if (!trackData) {
+        setError('Trilha não encontrada')
+        return
+      }
+
+      setTrack(trackData)
+    } catch (error) {
+      console.error('Error loading track:', error)
+      setError('Erro ao carregar trilha')
+    } finally {
+      setLoading(false)
+    }
+  }, [trackId, user?.id])
+
+  const loadTrackPublic = useCallback(async () => {
+    if (!trackId) return
+    try {
+      setLoading(true)
+      const trackData = await TrackService.getTrackPublic(trackId)
+
+      if (!trackData) {
+        setError('Trilha não encontrada')
+        return
+      }
+
+      setTrack(trackData)
+    } catch (error) {
+      console.error('Error loading track:', error)
+      setError('Erro ao carregar trilha')
+    } finally {
+      setLoading(false)
+    }
+  }, [trackId])
+
   useEffect(() => {
     if (trackId && user) {
       loadTrack()
     } else if (trackId) {
       loadTrackPublic()
     }
-  }, [trackId, user])
-
-  const loadTrack = async () => {
-    try {
-      setLoading(true)
-      const trackData = await TrackService.getTrackWithModules(trackId, user?.id)
-      
-      if (!trackData) {
-        setError('Trilha não encontrada')
-        return
-      }
-
-      setTrack(trackData)
-    } catch (error) {
-      console.error('Error loading track:', error)
-      setError('Erro ao carregar trilha')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const loadTrackPublic = async () => {
-    try {
-      setLoading(true)
-      const trackData = await TrackService.getTrackWithModules(trackId)
-      
-      if (!trackData) {
-        setError('Trilha não encontrada')
-        return
-      }
-
-      setTrack(trackData)
-    } catch (error) {
-      console.error('Error loading track:', error)
-      setError('Erro ao carregar trilha')
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [trackId, user, loadTrack, loadTrackPublic])
 
   const handleStartTrack = async () => {
     if (!user) {
@@ -160,29 +162,6 @@ export default function TrackPage() {
 
   const handleChatWithSalina = (module: TrackModule) => {
     router.push(`/chat?prompt=${encodeURIComponent(module.content.briefing)}`)
-  }
-
-  const getModuleState = (module: TrackModule): ModuleState => {
-    if (!user) return 'available'
-    
-    const isCompleted = track?.moduleProgress.some(
-      p => p.moduleId === module.id && p.isCompleted
-    )
-    
-    if (isCompleted) return 'completed'
-    
-    const currentModuleId = track?.userProgress?.currentModuleId
-    if (currentModuleId === module.id) return 'current'
-    
-    const moduleIndex = track?.modules.findIndex(m => m.id === module.id) || 0
-    if (moduleIndex === 0) return 'available'
-    
-    const previousModule = track?.modules[moduleIndex - 1]
-    const isPreviousCompleted = track?.moduleProgress.some(
-      p => p.moduleId === previousModule?.id && p.isCompleted
-    )
-    
-    return isPreviousCompleted ? 'available' : 'locked'
   }
 
   if (loading) {

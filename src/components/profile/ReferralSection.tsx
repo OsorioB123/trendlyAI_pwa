@@ -4,7 +4,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Gift, DollarSign, Copy, ArrowRight, Check } from 'lucide-react'
-import type { ReferralSectionProps, ReferralTab } from '../../types/profile'
+import type { ReferralSectionProps } from '../../types/profile'
 import { REFERRAL_TABS } from '../../types/profile'
 import { MOTION_CONSTANTS, respectReducedMotion } from '@/lib/motion'
 
@@ -54,9 +54,9 @@ export default function ReferralSection({
       <div className="flex flex-wrap items-center gap-4 mb-6">
         <button 
           onClick={() => onTabChange('credits')}
-          className={`bg-white/10 backdrop-blur-md border border-white/14 rounded-full px-6 py-3 font-medium transition-all flex items-center gap-3 ${
+          className={`bg-white/10 backdrop-blur-md rounded-full px-6 py-3 font-medium transition-all flex items-center gap-3 ${
             activeTab === 'credits' 
-              ? 'bg-white/20 border-white/30 text-white transform scale-100 shadow-lg' 
+              ? 'bg-white/20 text-white transform scale-100 shadow-lg' 
               : 'text-white/60 hover:text-white hover:bg-white/15'
           }`}
         >
@@ -65,9 +65,9 @@ export default function ReferralSection({
         </button>
         <button 
           onClick={() => onTabChange('affiliate')}
-          className={`bg-white/10 backdrop-blur-md border border-white/14 rounded-full px-6 py-3 font-medium transition-all flex items-center gap-3 ${
+          className={`bg-white/10 backdrop-blur-md rounded-full px-6 py-3 font-medium transition-all flex items-center gap-3 ${
             activeTab === 'affiliate' 
-              ? 'bg-white/20 border-white/30 text-white transform scale-100 shadow-lg' 
+              ? 'bg-white/20 text-white transform scale-100 shadow-lg' 
               : 'text-white/60 hover:text-white hover:bg-white/15'
           }`}
         >
@@ -78,7 +78,7 @@ export default function ReferralSection({
 
       {/* Tab Content */}
       <div className="relative min-h-[320px]">
-        <div className="bg-white/8 backdrop-blur-lg border border-white/12 rounded-2xl w-full p-8 md:p-10">
+        <div className="bg-white/8 backdrop-blur-lg rounded-2xl w-full p-8 md:p-10">
           <div className="relative w-full h-full">
             
             {/* Conteúdo: Indique e Ganhe Créditos */}
@@ -92,12 +92,12 @@ export default function ReferralSection({
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 items-center mb-6">
-                  <div className="flex-grow w-full sm:w-auto bg-black/30 border border-white/10 rounded-full px-5 py-3 text-white/80 text-center sm:text-left">
+                  <div className="flex-grow w-full sm:w-auto bg-black/30 rounded-full px-5 py-3 text-white/80 text-center sm:text-left">
                     {getReferralLink()}
                   </div>
                   <button 
                     onClick={handleCopyReferralLink}
-                    className="bg-white/10 backdrop-blur-md border border-white/14 rounded-full px-6 py-3 w-full sm:w-auto font-medium flex items-center justify-center gap-2 hover:bg-white/15 hover:scale-105 transition-all duration-300"
+                    className="bg-white/10 backdrop-blur-md rounded-full px-6 py-3 w-full sm:w-auto font-medium flex items-center justify-center gap-2 hover:bg-white/15 hover:scale-105 transition-all duration-300"
                   >
                     {copySuccess ? (
                       <>
@@ -141,7 +141,7 @@ export default function ReferralSection({
                   </div>
                 ) : (
                   <div className="flex flex-col">
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-6 mb-6">
+                    <div className="bg-white/5 rounded-lg p-6 mb-6">
                       <h4 className="text-white font-medium mb-2">Requisitos para se tornar um Afiliado:</h4>
                       <ul className="text-white/70 text-sm space-y-1">
                         <li>• Assinatura Maestro ativa</li>

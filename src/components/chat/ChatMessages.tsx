@@ -21,10 +21,9 @@ interface ChatMessagesProps {
 
 interface MessageBubbleProps {
   message: Message
-  isLatest: boolean
 }
 
-function MessageBubble({ message, isLatest }: MessageBubbleProps) {
+function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === 'user'
   const bubbleVariants = {
     initial: { opacity: 0, y: 20 },
@@ -44,8 +43,8 @@ function MessageBubble({ message, isLatest }: MessageBubbleProps) {
       <div
         className={`message-bubble border-radius-18 p-3 ${
           isUser
-            ? 'user-bubble bg-white/12 border border-white/20 max-w-[70%] md:max-w-[60%]'
-            : 'assistant-bubble bg-white/5 border border-white/15 max-w-[90%] md:max-w-[75%]'
+            ? 'user-bubble bg-white/12 max-w-[70%] md:max-w-[60%]'
+            : 'assistant-bubble bg-white/5 max-w-[90%] md:max-w-[75%]'
         }`}
         style={{ borderRadius: '18px', padding: '12px 16px' }}
       >
@@ -67,7 +66,7 @@ function ThinkingIndicator() {
       className="flex items-start gap-4 ai-thinking-container"
     >
       <div
-        className="assistant-bubble message-bubble bg-white/5 border border-white/15"
+        className="assistant-bubble message-bubble bg-white/5"
         style={{ borderRadius: '18px', padding: '12px 16px' }}
       >
         <motion.div
@@ -85,7 +84,7 @@ function ThinkingIndicator() {
 function EmptyState() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center text-center px-4 py-12">
-      <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-4">
+      <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
         <svg
           className="w-8 h-8 text-white/60"
           fill="none"
@@ -139,22 +138,6 @@ export function ChatMessages({
   }, [messages.length, isLoading])
 
   // Handle manual scroll detection for auto-scroll behavior
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    let isScrolledToBottom = true
-
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = container
-      const distanceFromBottom = scrollHeight - scrollTop - clientHeight
-      isScrolledToBottom = distanceFromBottom < 50 // 50px threshold
-    }
-
-    container.addEventListener('scroll', handleScroll)
-    return () => container.removeEventListener('scroll', handleScroll)
-  }, [])
-
   if (!messages || (messages.length === 0 && !isLoading)) {
     return (
       <main
@@ -200,11 +183,10 @@ export function ChatMessages({
         animate="animate"
       >
         <AnimatePresence initial={false} mode="popLayout">
-          {messages.map((message, index) => (
+            {messages.map((message) => (
             <MessageBubble
-              key={message.id}
-              message={message}
-              isLatest={index === messages.length - 1}
+                key={message.id}
+                message={message}
             />
           ))}
           {(isLoading || isStreaming) && (

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { CheckCircle, AlertCircle, Info, AlertTriangle, X } from 'lucide-react'
 import { ToastNotification as ToastType } from '../../types/settings'
 
@@ -56,22 +56,22 @@ export default function ToastNotification({ toast, onClose }: ToastNotificationP
     return () => clearTimeout(timer)
   }, [])
 
+  const handleClose = useCallback(() => {
+    setIsLeaving(true)
+    setTimeout(() => {
+      onClose(toast.id)
+    }, 300)
+  }, [onClose, toast.id])
+
   useEffect(() => {
     if (toast.duration && toast.duration > 0) {
       const timer = setTimeout(() => {
         handleClose()
       }, toast.duration)
-      
+
       return () => clearTimeout(timer)
     }
-  }, [toast.duration])
-
-  const handleClose = () => {
-    setIsLeaving(true)
-    setTimeout(() => {
-      onClose(toast.id)
-    }, 300)
-  }
+  }, [toast.duration, handleClose])
 
   return (
     <div
@@ -146,14 +146,4 @@ export function ToastContainer({ toasts, onClose }: ToastContainerProps) {
   )
 }
 
-// Add this CSS to your global styles
-const styles = `
-  @keyframes toast-progress {
-    from {
-      width: 100%;
-    }
-    to {
-      width: 0%;
-    }
-  }
-`
+

@@ -5,7 +5,6 @@ import { Star, MessageSquare, Send, Edit3 } from 'lucide-react'
 import { TrackRatingProps } from '../../types/track'
 
 export default function TrackRating({ 
-  trackId, 
   currentRating, 
   onSubmitRating 
 }: TrackRatingProps) {
@@ -74,7 +73,7 @@ export default function TrackRating({
   const displayRating = hoverRating || rating
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+    <div className="bg-white/5 rounded-xl p-6">
       {/* Current Rating Display */}
       {currentRating && !isEditing ? (
         <div>
@@ -108,7 +107,7 @@ export default function TrackRating({
           </div>
 
           {currentRating.comment && (
-            <div className="p-4 bg-white/5 border border-white/10 rounded-lg">
+            <div className="p-4 bg-white/5 rounded-lg">
               <div className="flex items-start gap-2 mb-2">
                 <MessageSquare className="w-4 h-4 text-white/60 mt-0.5 flex-shrink-0" />
                 <span className="text-sm font-medium text-white/80">Seu comentário:</span>
@@ -179,7 +178,7 @@ export default function TrackRating({
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Compartilhe sua experiência com esta trilha..."
                 disabled={isSubmitting}
-                className="w-full h-24 p-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 resize-none focus:outline-none focus:border-white/30 focus:bg-white/10 transition-colors"
+                className="w-full h-24 p-3 bg-white/5 rounded-lg text-white placeholder-white/40 resize-none focus:outline-none focus:bg-white/10 transition-colors"
                 maxLength={500}
               />
               
@@ -260,7 +259,7 @@ export default function TrackRating({
 
       {/* Rating Guidelines */}
       {!currentRating && (
-        <div className="mt-6 pt-4 border-t border-white/10">
+        <div className="mt-6 pt-4">
           <h4 className="text-sm font-medium text-white/80 mb-2">Como avaliar:</h4>
           <div className="space-y-1 text-xs text-white/60">
             <div className="flex items-center gap-2">

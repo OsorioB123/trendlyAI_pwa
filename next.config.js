@@ -30,6 +30,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'i.ibb.co',
       },
+      {
+        protocol: 'https',
+        hostname: 'www.gstatic.com',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
   },

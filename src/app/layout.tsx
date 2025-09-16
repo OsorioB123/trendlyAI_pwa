@@ -3,6 +3,9 @@ import { Inter } from "next/font/google";
 import { AuthProvider } from "../contexts/AuthContext";
 import { BackgroundProvider } from "../contexts/BackgroundContext";
 import { ToastProvider } from "../components/ui/Toast";
+import ServiceWorkerRegister from "../components/common/ServiceWorkerRegister";
+import NetworkStatusBanner from "../components/common/NetworkStatusBanner";
+import CommandPalette from "../components/navigation/CommandPalette";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -30,6 +33,8 @@ export default function RootLayout({
     <html lang="pt-BR" className={inter.className}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link href="https://unpkg.com/@geist-ui/fonts/geist-sans.css" rel="stylesheet" />
         <style>{`
           .skip-link { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
@@ -41,6 +46,9 @@ export default function RootLayout({
         <AuthProvider>
           <BackgroundProvider>
             <ToastProvider>
+              <ServiceWorkerRegister />
+              <NetworkStatusBanner />
+              <CommandPalette />
               <div id="main-content" role="main" tabIndex={-1}>
                 {children}
               </div>

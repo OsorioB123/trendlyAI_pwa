@@ -9,10 +9,9 @@ import { AvatarUploadResult } from '../../types/settings'
 interface AvatarUploadProps {
   currentAvatarUrl?: string
   onUpload: (file: File) => Promise<AvatarUploadResult>
-  isUploading?: boolean
 }
 
-export default function AvatarUpload({ currentAvatarUrl, onUpload, isUploading = false }: AvatarUploadProps) {
+export default function AvatarUpload({ currentAvatarUrl, onUpload }: AvatarUploadProps) {
   const [preview, setPreview] = useState<string | null>(null)
   const [dragActive, setDragActive] = useState(false)
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle')
@@ -70,7 +69,8 @@ export default function AvatarUpload({ currentAvatarUrl, onUpload, isUploading =
         setUploadStatus('error')
         setErrorMessage(result.error || 'Erro ao fazer upload')
       }
-    } catch (error) {
+    } catch (uploadError) {
+      console.error('Error uploading avatar:', uploadError)
       setUploadStatus('error')
       setErrorMessage('Erro inesperado ao fazer upload')
     }

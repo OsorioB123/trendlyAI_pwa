@@ -138,7 +138,6 @@ export interface ModuleModalProps {
 }
 
 export interface TrackRatingProps {
-  trackId: string
   currentRating?: TrackReview
   onSubmitRating: (rating: number, comment?: string) => Promise<void>
 }

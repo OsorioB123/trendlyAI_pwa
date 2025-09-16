@@ -2,14 +2,14 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import BackgroundOverlay from '../../../components/common/BackgroundOverlay'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { ArrowLeft, MailCheck, Lock } from 'lucide-react'
 import { useAuth } from '../../../contexts/AuthContext'
 
 export default function ForgotPasswordPage() {
-  const router = useRouter()
   const { resetPassword } = useAuth()
   const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -35,7 +35,7 @@ export default function ForgotPasswordPage() {
     }
 
     try {
-      const { data, error: resetError } = await resetPassword(email)
+      const { error: resetError } = await resetPassword(email)
       
       if (resetError) {
         console.error('Reset password error:', resetError)
@@ -51,7 +51,7 @@ export default function ForgotPasswordPage() {
         return
       }
 
-      console.log('Password reset email sent successfully:', data)
+      console.log('Password reset email sent successfully')
       setIsEmailSent(true)
       
     } catch (error) {
@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
           />
 
           {/* Success Card */}
-          <div className="w-full rounded-3xl p-8 flex flex-col items-center text-center backdrop-blur-2xl bg-white/10 border border-white/15 shadow-2xl">
+          <div className="w-full rounded-3xl p-8 flex flex-col items-center text-center backdrop-blur-2xl bg-white/10 shadow-2xl">
             <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mb-6">
               <MailCheck className="w-8 h-8 text-emerald-400" strokeWidth={1.5} />
             </div>
@@ -98,7 +98,7 @@ export default function ForgotPasswordPage() {
             <div className="w-full space-y-4">
               <Link
                 href="/login"
-                className="w-full flex items-center justify-center text-white text-[15px] font-semibold py-3 rounded-xl bg-white/10 border border-white/20 shadow-lg hover:bg-white/15 hover:-translate-y-1 hover:shadow-2xl active:-translate-y-0.5 active:scale-[0.99] transition-all duration-300"
+                className="w-full flex items-center justify-center text-white text-[15px] font-semibold py-3 rounded-xl bg-white/10 shadow-lg hover:bg-white/15 hover:-translate-y-1 hover:shadow-2xl active:-translate-y-0.5 active:scale-[0.99] transition-all duration-300"
               >
                 Voltar para Login
               </Link>
@@ -142,7 +142,7 @@ export default function ForgotPasswordPage() {
         />
 
         {/* Reset Password Card */}
-        <div className="w-full rounded-3xl p-8 flex flex-col animate-fade-in-up backdrop-blur-2xl bg-white/10 border border-white/15 shadow-2xl">
+        <div className="w-full rounded-3xl p-8 flex flex-col animate-fade-in-up backdrop-blur-2xl bg-white/10 shadow-2xl">
           <div>
             <Link 
               href="/login"
@@ -161,7 +161,7 @@ export default function ForgotPasswordPage() {
 
           {/* Error Message */}
           {error && (
-            <div className="mt-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 text-sm animate-pulse">
+            <div id="forgot-error" role="alert" className="mt-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 text-sm">
               {error}
             </div>
           )}
@@ -169,19 +169,21 @@ export default function ForgotPasswordPage() {
           <form onSubmit={handleSubmit} className="mt-6">
             {/* Email Input */}
             <div className="animate-fade-in-up">
-              <label htmlFor="email" className="block text-sm font-medium text-white/80 mb-2">
+              <Label htmlFor="email" className="block text-sm font-medium text-white/80 mb-2">
                 E-mail cadastrado
-              </label>
-              <input
+              </Label>
+              <Input
                 type="email"
                 id="email"
                 name="email"
                 value={email}
                 onChange={handleInputChange}
                 disabled={isLoading}
-                className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-white/50 bg-black/20 border border-white/15 transition-all duration-300 outline-none focus:bg-black/25 focus:border-white/40 focus:ring-4 focus:ring-white/10 disabled:opacity-50"
+                className="bg-black/20 text-white placeholder-white/50 focus:bg-black/25"
                 placeholder="seu@email.com"
                 required
+                aria-invalid={!!error}
+                aria-describedby={error ? 'forgot-error' : undefined}
               />
             </div>
 
@@ -189,7 +191,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isLoading || !email}
-              className="w-full text-white text-[15px] font-semibold py-3 rounded-xl bg-white/10 border border-white/20 shadow-lg hover:bg-white/15 hover:-translate-y-1 hover:shadow-2xl active:-translate-y-0.5 active:scale-[0.99] focus:outline-none focus-visible:ring-4 focus-visible:ring-white/10 transition-all duration-300 mt-6 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none animate-fade-in-up"
+              className="w-full text-white text-[15px] font-semibold py-3 rounded-xl bg-white/10 shadow-lg hover:bg-white/15 hover:-translate-y-1 hover:shadow-2xl active:-translate-y-0.5 active:scale-[0.99] focus:outline-none focus-visible:ring-4 focus-visible:ring-white/10 transition-all duration-300 mt-6 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none animate-fade-in-up"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center gap-2">

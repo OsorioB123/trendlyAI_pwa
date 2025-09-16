@@ -170,7 +170,7 @@ export function EnhancedLoadingButton({
 
   return (
     <motion.button
-      className={`px-8 py-4 rounded-xl backdrop-blur-[20px] border border-white/15 text-white font-medium flex items-center gap-3 relative overflow-hidden ${className}`}
+      className={`px-8 py-4 rounded-xl backdrop-blur-[20px] text-white font-medium flex items-center gap-3 relative overflow-hidden ${className}`}
       variants={buttonVariants as any}
       animate={disabled ? "disabled" : isLoading ? "loading" : "idle"}
       whileHover={!disabled && !isLoading ? "hover" : undefined}

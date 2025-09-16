@@ -63,6 +63,7 @@ export function ChatInput({ className, onMessageSent }: ChatInputProps) {
 
     const success = await sendMessage(message)
     if (success) {
+      clearInput()
       onMessageSent?.()
     }
   }
@@ -148,13 +149,12 @@ export function ChatInput({ className, onMessageSent }: ChatInputProps) {
 
         {/* Input Container */}
         <div 
-          className={`chat-composer-container bg-[#1E1F22] border border-white/10 rounded-2xl flex flex-col transition-all duration-200 ${
-            inputState.isFocused ? 'border-white/30' : ''
-          } ${!hasCredits ? 'opacity-50' : ''}`}
+          className={`chat-composer-container bg-[#1E1F22] rounded-2xl flex flex-col transition-all duration-200 ${
+            !hasCredits ? 'opacity-50' : ''}`}
         >
           {/* File Attachments Preview */}
           {inputState.attachments.length > 0 && (
-            <div className="p-3 border-b border-white/10">
+            <div className="p-3">
               <div className="flex flex-wrap gap-2">
                 {inputState.attachments.map((file, index) => (
                   <div 
@@ -257,7 +257,7 @@ export function ChatInput({ className, onMessageSent }: ChatInputProps) {
 
           {/* Credits Display */}
           {userCredits && (
-            <div className="border-t border-white/10 p-3">
+            <div className="p-3">
               <div className="flex items-center justify-between text-xs text-white/70">
                 <span>Créditos: {userCredits.current}/{userCredits.total}</span>
                 <div className="flex items-center gap-2">

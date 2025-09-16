@@ -1,0 +1,42 @@
+{
+  "mcpServers": {
+    "shadcn": {
+      "command": "npx",
+      "args": [
+        "shadcn@latest",
+        "mcp"
+      ]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwrightmcp@latest"
+      ]
+    },
+    "ref-tools": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "ref-tools-mcp@latest"
+      ],
+      "env": {
+        "REF_API_KEY": "ref-1e34ebe111eae85bfa74"
+      }
+    },
+    "semgrep": {
+      "command": "npx",
+      "args": [
+        "mcp-server-semgrep@latest"
+      ]
+    },
+    "exa": {
+      "command": "npx",
+      "args": [
+        "exa-mcp@latest"
+      ],
+      "env": {
+        "EXA_API_KEY": "e6b74760-285f-4702-9872-0a357e4a60db"
+      }
+    }
+  }
+}

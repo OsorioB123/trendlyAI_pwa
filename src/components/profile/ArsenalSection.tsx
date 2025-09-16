@@ -1,11 +1,10 @@
 
 'use client'
 
-import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Wrench, Compass } from 'lucide-react'
 import TrackCard from '../cards/TrackCard'
-import type { ArsenalSectionProps, ArsenalTab } from '../../types/profile'
+import type { ArsenalSectionProps } from '../../types/profile'
 import { ARSENAL_TABS } from '../../types/profile'
 import { MOTION_CONSTANTS, respectReducedMotion } from '@/lib/motion'
 
@@ -14,37 +13,20 @@ export default function ArsenalSection({
   activeTab,
   onTabChange,
   onTrackClick,
-  onToolClick,
   onNavigateToTools,
   isLoading = false,
   className = ''
 }: ArsenalSectionProps) {
-  const [tabWidths, setTabWidths] = useState({
-    trails: 133,
-    tools: 108
-  })
   const transitionSafe = respectReducedMotion({ transition: { duration: 0.3 } }).transition as any
 
-  const getTabPosition = () => {
-    return activeTab === 'trails' ? '0px' : '133px'
-  }
-
-  const getTabWidth = () => {
-    return activeTab === 'trails' ? `${tabWidths.trails}px` : `${tabWidths.tools}px`
-  }
-
-  const handleTrackClick = (track: any) => {
-    onTrackClick?.(track)
-  }
-
-  const handleToolClick = (tool: any) => {
-    onToolClick?.(tool)
-  }
+  const indicatorStyle = activeTab === 'trails'
+    ? { left: '0%', width: '50%' }
+    : { left: '50%', width: '50%' }
 
   if (isLoading) {
     return (
       <motion.section 
-        className={`bg-white/8 backdrop-blur-lg border border-white/12 rounded-2xl p-8 ${className}`}
+        className={`bg-white/8 backdrop-blur-lg rounded-2xl p-8 ${className}`}
         variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
         initial="initial"
         animate="animate"
@@ -64,7 +46,7 @@ export default function ArsenalSection({
 
   return (
     <motion.section 
-      className={`bg-white/8 backdrop-blur-lg border border-white/12 rounded-2xl p-8 ${className}`}
+      className={`bg-white/8 backdrop-blur-lg rounded-2xl p-8 ${className}`}
       variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
       initial="initial"
       animate="animate"
@@ -74,7 +56,7 @@ export default function ArsenalSection({
         <h2 className="text-3xl font-medium text-white tracking-tight">Seu Arsenal</h2>
         
         {/* Tabs */}
-        <div className="relative flex border-b border-white/10">
+        <div className="relative flex">
           <button 
             onClick={() => onTabChange('trails')}
             className={`text-white px-6 py-3 font-medium transition-colors ${
@@ -95,10 +77,7 @@ export default function ArsenalSection({
           {/* Animated tab indicator */}
           <div 
             className="absolute bottom-0 h-0.5 bg-white rounded-full transition-all duration-300"
-            style={{
-              width: getTabWidth(),
-              left: getTabPosition()
-            }}
+            style={indicatorStyle}
           />
         </div>
       </div>
@@ -114,12 +93,12 @@ export default function ArsenalSection({
                   key={track.id}
                   track={track as any}
                   variant="compact"
-                  onClick={handleTrackClick}
+                  onClick={(trackItem) => onTrackClick?.(trackItem)}
                 />
               ))
             ) : (
               <div className="col-span-full text-center py-16 flex flex-col items-center">
-                <div className="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-8">
+                <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center mb-8">
                   <Compass className="w-12 h-12 text-white" />
                 </div>
                 <h3 className="text-2xl font-medium text-white mb-3">Nenhuma trilha salva ainda.</h3>
@@ -128,7 +107,7 @@ export default function ArsenalSection({
                 </p>
                 <button 
                   onClick={() => window.location.href = '/tracks'}
-                  className="bg-white/10 backdrop-blur-md border border-white/14 rounded-full px-8 py-4 flex items-center gap-3 font-medium hover:bg-white/15 hover:scale-105 transition-all duration-300"
+                  className="bg-white/10 backdrop-blur-md rounded-full px-8 py-4 flex items-center gap-3 font-medium hover:bg-white/15 hover:scale-105 transition-all duration-300"
                 >
                   <Compass className="w-5 h-5" />
                   <span>Explorar Trilhas</span>
@@ -141,7 +120,7 @@ export default function ArsenalSection({
         {/* Ferramentas */}
         {activeTab === 'tools' && (
           <div className="text-center py-16 flex flex-col items-center">
-            <div className="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-8">
+            <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center mb-8">
               <Wrench className="w-12 h-12 text-white" />
             </div>
             <h3 className="text-2xl font-medium text-white mb-3">Seu arsenal aguarda.</h3>
@@ -150,7 +129,7 @@ export default function ArsenalSection({
             </p>
             <button 
               onClick={onNavigateToTools}
-              className="bg-white/10 backdrop-blur-md border border-white/14 rounded-full px-8 py-4 flex items-center gap-3 font-medium hover:bg-white/15 hover:scale-105 transition-all duration-300"
+              className="bg-white/10 backdrop-blur-md rounded-full px-8 py-4 flex items-center gap-3 font-medium hover:bg-white/15 hover:scale-105 transition-all duration-300"
             >
               <Compass className="w-5 h-5" />
               <span>Explorar Ferramentas</span>

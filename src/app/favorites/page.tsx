@@ -1,16 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Heart, Search, Filter } from 'lucide-react'
+import { Heart, Search } from 'lucide-react'
 import Header from '../../components/layout/Header'
-import ToolCard from '../../components/tools/ToolCard'
+import ToolCard from '../../components/cards/ToolCard'
 import TrackCard from '../../components/cards/TrackCard'
 import { HeaderVariant } from '../../types/header'
 import { Tool } from '../../types/tool'
 import { Track } from '../../types/track'
 import { useBackground } from '../../contexts/BackgroundContext'
-import { useAuth } from '../../contexts/AuthContext'
 import ProtectedRoute from '../../components/auth/ProtectedRoute'
 
 const MOCK_FAVORITE_TOOLS: Tool[] = [
@@ -64,7 +63,6 @@ const MOCK_FAVORITE_TRACKS: Track[] = [
 export default function FavoritesPage() {
   const router = useRouter()
   const { currentBackground } = useBackground()
-  const { user, profile } = useAuth()
   const [activeTab, setActiveTab] = useState<'tools' | 'tracks'>('tools')
   const [searchTerm, setSearchTerm] = useState('')
   const [favoriteTools, setFavoriteTools] = useState<Tool[]>(MOCK_FAVORITE_TOOLS)

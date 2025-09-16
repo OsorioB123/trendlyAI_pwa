@@ -11,6 +11,7 @@ export default function ToggleSwitch({
   disabled = false
 }: ToggleSwitchProps) {
   const [isAnimating, setIsAnimating] = useState(false)
+  const descId = `${label?.toString().replace(/\s+/g, '-').toLowerCase()}-desc`
 
   const handleToggle = () => {
     if (disabled) return
@@ -40,7 +41,7 @@ export default function ToggleSwitch({
           )}
         </div>
         {description && (
-          <p className="text-sm text-white/70 mt-1">{description}</p>
+          <p id={descId} className="text-sm text-white/70 mt-1">{description}</p>
         )}
       </div>
       
@@ -61,7 +62,10 @@ export default function ToggleSwitch({
             ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
             ${isAnimating ? 'scale-105' : 'hover:scale-105'}
           `}
+          role="switch"
+          aria-checked={checked}
           aria-label={`${checked ? 'Desativar' : 'Ativar'} ${label}`}
+          aria-describedby={description ? descId : undefined}
         >
           {/* Toggle Slider */}
           <div
@@ -106,6 +110,7 @@ export function IconToggleSwitch({
   color = 'default'
 }: IconToggleSwitchProps) {
   const [isAnimating, setIsAnimating] = useState(false)
+  const descId = `${label?.toString().replace(/\s+/g, '-').toLowerCase()}-desc`
 
   const handleToggle = () => {
     if (disabled) return
@@ -180,7 +185,7 @@ export function IconToggleSwitch({
               )}
             </div>
             {description && (
-              <p className="text-sm text-white/70 mt-1">{description}</p>
+              <p id={descId} className="text-sm text-white/70 mt-1">{description}</p>
             )}
           </div>
         </div>
@@ -203,7 +208,10 @@ export function IconToggleSwitch({
             ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
             ${isAnimating ? 'scale-105' : 'hover:scale-105'}
           `}
+          role="switch"
+          aria-checked={checked}
           aria-label={`${checked ? 'Desativar' : 'Ativar'} ${label}`}
+          aria-describedby={description ? descId : undefined}
         >
           <div
             className={`

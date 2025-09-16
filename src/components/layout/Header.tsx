@@ -11,10 +11,9 @@ import {
   Gem, 
   Settings, 
   HelpCircle, 
-  LogOut,
-  X
+  LogOut
 } from 'lucide-react'
-import { HeaderVariant, Notification, mockUser } from '../../types/header'
+import { HeaderVariant, Notification } from '../../types/header'
 import ChatService from '../../lib/services/chatService'
 import type { UserCredits } from '../../types/chat'
 import { useAuth } from '../../contexts/AuthContext'
@@ -22,13 +21,11 @@ import { useAuth } from '../../contexts/AuthContext'
 interface HeaderProps {
   variant?: HeaderVariant
   onMenuToggle?: () => void
-  showMobileSidebar?: boolean
 }
 
 export default function Header({ 
   variant = HeaderVariant.PRIMARY, 
   onMenuToggle, 
-  showMobileSidebar = false 
 }: HeaderProps) {
   const router = useRouter()
   const { signOut, user, profile } = useAuth()
@@ -278,7 +275,7 @@ export default function Header({
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-30 pt-3 pr-4 pb-3 pl-4">
-        <div className="max-w-7xl flex sticky top-0 z-40 mr-auto ml-auto items-center justify-between backdrop-blur-[20px] bg-white/8 border border-white/14 shadow-[0_8px_24px_rgba(0,0,0,0.28)] rounded-full px-5 py-3">
+        <div className="max-w-7xl flex sticky top-0 z-40 mr-auto ml-auto items-center justify-between backdrop-blur-[20px] bg-white/8 shadow-[0_8px_24px_rgba(0,0,0,0.28)] rounded-full px-5 py-3">
           
           {/* Left Section */}
           {renderLeftSection()}
@@ -309,7 +306,7 @@ export default function Header({
                 <div
                   ref={notificationsMenuRef}
                   onKeyDown={(e) => trapFocus(e, notificationsMenuRef.current!)}
-                  className={`dropdown-menu absolute top-full right-0 mt-2 p-2 w-72 md:w-80 z-50 backdrop-blur-[24px] bg-black/80 border border-white/14 shadow-[0_8px_24px_rgba(0,0,0,0.4)] rounded-2xl transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[top_right] ${showNotifications ? 'show' : ''}`}
+                  className={`dropdown-menu absolute top-full right-0 mt-2 p-2 w-72 md:w-80 z-50 backdrop-blur-[24px] bg-black/80 shadow-[0_8px_24px_rgba(0,0,0,0.4)] rounded-2xl transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[top_right] ${showNotifications ? 'show' : ''}`}
                 >
                   <div className="p-2 flex justify-between items-center">
                     <h4 className="text-white font-semibold text-sm">Notificações</h4>
@@ -328,7 +325,7 @@ export default function Header({
                       </button>
                     ))}
                   </div>
-                  <div className="border-t border-white/10 mt-2 pt-2">
+                  <div className="mt-2 pt-2">
                     <button className="block text-center text-xs text-white/70 hover:text-white transition-colors p-2 w-full">
                       Ver todas as notificações
                     </button>
@@ -344,7 +341,7 @@ export default function Header({
                   closeAllMenus()
                   setShowProfile(!showProfile)
                 }}
-                className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ring-2 ring-transparent backdrop-blur-[20px] border border-white/14 shadow-[0_4px_12px_rgba(0,0,0,0.2)] ${
+                className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ring-2 ring-transparent backdrop-blur-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.2)] ${
                   showProfile 
                     ? 'bg-white/20 ring-white/40 scale-105 shadow-[0_8px_24px_rgba(0,0,0,0.3)]' 
                     : 'bg-white/10 hover:bg-white/15 hover:ring-white/30 hover:scale-105 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)]'
@@ -354,13 +351,17 @@ export default function Header({
                 aria-label={showProfile ? 'Fechar menu do perfil' : 'Abrir menu do perfil'}
               >
                 <div className="w-9 h-9 rounded-full overflow-hidden relative">
-                  <Image 
-                    src={profile?.avatar_url || mockUser.avatar} 
-                    alt="Avatar" 
-                    fill
-                    sizes="36px"
-                    className="object-cover"
-                  />
+                  {profile?.avatar_url ? (
+                    <Image 
+                      src={profile.avatar_url} 
+                      alt="Avatar" 
+                      fill
+                      sizes="36px"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-white/20" />
+                  )}
                 </div>
               </button>
 
@@ -368,18 +369,22 @@ export default function Header({
                 <div
                   ref={profileMenuRef}
                   onKeyDown={(e) => trapFocus(e, profileMenuRef.current!)}
-                  className={`dropdown-menu absolute top-full right-0 mt-2 p-4 w-64 md:w-72 z-50 backdrop-blur-[24px] bg-black/85 border border-white/14 shadow-[0_12px_28px_rgba(0,0,0,0.45)] rounded-2xl transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[top_right] ${showProfile ? 'show' : ''}`}
+                  className={`dropdown-menu absolute top-full right-0 mt-2 p-4 w-64 md:w-72 z-50 backdrop-blur-[24px] bg-black/85 shadow-[0_12px_28px_rgba(0,0,0,0.45)] rounded-2xl transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[top_right] ${showProfile ? 'show' : ''}`}
                 >
                   {/* Profile Header */}
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 relative">
-                      <Image 
-                        src={profile?.avatar_url || mockUser.avatar} 
-                        alt="Avatar" 
-                        fill
-                        sizes="48px"
-                        className="object-cover"
-                      />
+                      {profile?.avatar_url ? (
+                        <Image 
+                          src={profile.avatar_url} 
+                          alt="Avatar" 
+                          fill
+                          sizes="48px"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-white/20" />
+                      )}
                     </div>
                     <div>
                       <h5 className="font-semibold text-white">{profile?.display_name || user?.email?.split('@')[0] || 'Usuário'}</h5>
@@ -393,7 +398,7 @@ export default function Header({
                   {/* Profile Button */}
                   <button 
                     onClick={() => router.push('/profile')}
-                    className="block text-center w-full px-4 py-2.5 mb-5 text-sm font-semibold text-white bg-white/10 hover:bg-white/20 rounded-full transition-all duration-300 backdrop-blur-[20px] border border-white/14 hover:scale-105"
+                    className="block text-center w-full px-4 py-2.5 mb-5 text-sm font-semibold text-white bg-white/10 hover:bg-white/20 rounded-full transition-all duration-300 backdrop-blur-[20px] hover:scale-105"
                   >
                     Meu Perfil
                   </button>
@@ -414,7 +419,7 @@ export default function Header({
                           <Info className="w-3.5 h-3.5" />
                         </button>
                         {showCreditsTooltip && (
-                          <div className={`credit-tooltip backdrop-blur-[24px] bg-black/90 border border-white/14 shadow-[0_12px_28px_rgba(0,0,0,0.45)] absolute bottom-full right-0 mb-2 p-3 w-72 rounded-xl transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[bottom_right] ${showCreditsTooltip ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-[5px] scale-[0.98] pointer-events-none'}`} role="dialog" aria-live="polite">
+                          <div className={`credit-tooltip backdrop-blur-[24px] bg-black/90 shadow-[0_12px_28px_rgba(0,0,0,0.45)] absolute bottom-full right-0 mb-2 p-3 w-72 rounded-xl transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] transform-origin-[bottom_right] ${showCreditsTooltip ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-[5px] scale-[0.98] pointer-events-none'}`} role="dialog" aria-live="polite">
                             <p className="text-xs text-white/90 leading-relaxed mb-2">
                               Seus créditos são usados para conversas com a Salina e se renovam a cada 24 horas. Precisa de mais? <button onClick={() => {
                                 setShowCreditsTooltip(false)
@@ -447,7 +452,7 @@ export default function Header({
                   </div>
 
                   {/* Menu Items */}
-                  <div className="space-y-1 border-t border-white/10 pt-3 mt-4">
+                  <div className="space-y-1 pt-3 mt-4">
                     <button 
                       onClick={() => router.push('/subscription')}
                       className="menu-item flex items-center gap-3 p-2.5 text-white text-sm rounded-lg w-full text-left hover:bg-white/10 hover:translate-x-1 transition-all duration-200 ease-in-out"
@@ -470,7 +475,7 @@ export default function Header({
                       <span>Central de Ajuda</span>
                     </button>
                     
-                    <div className="border-t border-white/10 my-2" />
+                    <div className="my-2" />
                     
                     <button 
                       onClick={handleLogout}
