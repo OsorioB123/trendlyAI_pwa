@@ -5,7 +5,7 @@ import { User, Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { hasCompletedOnboarding, markOnboardingComplete, clearOnboardingStatus, shouldShowOnboarding } from '../lib/onboarding'
 
-interface Profile {
+export interface Profile {
   id: string
   email: string
   display_name: string
