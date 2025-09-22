@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { Suspense, useState, useEffect, useMemo, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { 
   Search, 
@@ -25,6 +25,14 @@ import BackgroundOverlay from '../../components/common/BackgroundOverlay'
 const TOOLS_PER_PAGE = 6
 
 export default function ToolsPage() {
+  return (
+    <Suspense fallback={<ToolsFallback />}> 
+      <ToolsPageContent />
+    </Suspense>
+  )
+}
+
+function ToolsPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { currentBackground } = useBackground()
@@ -721,6 +729,14 @@ export default function ToolsPage() {
         isOpen={selectedTool !== null}
         onClose={() => setSelectedTool(null)}
       />
+    </div>
+  )
+}
+
+function ToolsFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-black text-white">
+      <p className="text-sm text-white/60">Carregando ferramentas...</p>
     </div>
   )
 }
