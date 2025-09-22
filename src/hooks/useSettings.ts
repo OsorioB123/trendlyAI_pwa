@@ -44,6 +44,24 @@ export function useSettings(): UseSettingsReturn {
   const [error, setError] = useState<string | null>(null)
   const [toasts, setToasts] = useState<ToastNotification[]>([])
 
+  const dismissToast = useCallback((id: string) => {
+    setToasts(prev => prev.filter(t => t.id !== id))
+  }, [])
+
+  const showToast = useCallback((notification: Omit<ToastNotification, 'id'>) => {
+    const toast: ToastNotification = {
+      id: `toast-${++toastCounter}`,
+      duration: 5000,
+      ...notification
+    }
+
+    setToasts(prev => [...prev, toast])
+
+    setTimeout(() => {
+      dismissToast(toast.id)
+    }, toast.duration)
+  }, [dismissToast])
+
   // Initialize user and data
   useEffect(() => {
     const initializeData = async () => {
@@ -214,7 +232,7 @@ export function useSettings(): UseSettingsReturn {
         isSaving: { ...prev.isSaving, theme: false }
       }))
     }
-  }, [user])
+  }, [user, showToast])
 
   // Security actions
   const changeEmail = useCallback(async (data: ChangeEmailRequest): Promise<boolean> => {
@@ -427,24 +445,6 @@ export function useSettings(): UseSettingsReturn {
   const setEditingField = useCallback((field: string | null) => {
     setUiState(prev => ({ ...prev, editingField: field }))
   }, [])
-
-  const dismissToast = useCallback((id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id))
-  }, [])
-
-  const showToast = useCallback((notification: Omit<ToastNotification, 'id'>) => {
-    const toast: ToastNotification = {
-      id: `toast-${++toastCounter}`,
-      duration: 5000,
-      ...notification
-    }
-    
-    setToasts(prev => [...prev, toast])
-    
-    setTimeout(() => {
-      dismissToast(toast.id)
-    }, toast.duration)
-  }, [dismissToast])
 
   const isLoading = uiState.isLoading
 
