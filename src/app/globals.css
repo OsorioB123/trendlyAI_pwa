@@ -1243,3 +1243,66 @@ button:active {
     color: white;
   }
 }
+
+.dashboard-command-form {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 18px 40px -25px rgba(12, 18, 32, 0.6);
+}
+
+.dashboard-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(14px);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: dashboardChipReveal 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.dashboard-chip:hover {
+  background-color: rgba(255, 255, 255, 0.14);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -15px rgba(12, 18, 32, 0.8);
+}
+
+.dashboard-chip:focus-visible {
+  outline: 2px solid rgba(239, 209, 53, 0.7);
+  outline-offset: 3px;
+}
+
+.animate-dashboard-greeting {
+  opacity: 0;
+  transform: translateY(14px) scale(0.96);
+  animation: dashboardGreeting 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes dashboardGreeting {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dashboardChipReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.text-brand-yellow {
+  color: #efd135;
+}
+
+.bg-brand-yellow {
+  background-color: #efd135;
+}
