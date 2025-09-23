@@ -11,8 +11,6 @@ import ProfileHeader from '../../components/profile/ProfileHeader'
 import NextActionCard from '../../components/profile/NextActionCard'
 import ArsenalSection from '../../components/profile/ArsenalSection'
 import ReferralSection from '../../components/profile/ReferralSection'
-import { AmbientSelector } from '../../components/profile/ambient-selector/AmbientSelector'
-import { SettingsService } from '@/lib/services/settingsService'
 import type { ArsenalTab, ReferralTab } from '../../types/profile'
 import { useBackground } from '../../contexts/BackgroundContext'
 
@@ -43,7 +41,6 @@ export default function ProfileContent() {
   const [activeReferralTab, setActiveReferralTab] = useState<ReferralTab>('credits')
   const [successMessage, setSuccessMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
-  const [isAmbientSaving, setIsAmbientSaving] = useState(false)
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -65,32 +62,6 @@ export default function ProfileContent() {
 
     return () => clearTimeout(timeout)
   }, [profileError, clearError])
-
-  const handlePersistAmbient = async (themeId: string) => {
-    if (!user?.id) return false
-
-    try {
-      setIsAmbientSaving(true)
-      const response = await SettingsService.updateStudioTheme(user.id, themeId)
-
-      if (response.success) {
-        setSuccessMessage('Ambiente atualizado com sucesso!')
-        setTimeout(() => setSuccessMessage(''), 3000)
-        return true
-      }
-
-      setErrorMessage(response.error || 'Não foi possível atualizar o ambiente.')
-      setTimeout(() => setErrorMessage(''), 4000)
-      return false
-    } catch (error) {
-      console.error('Error persisting ambient selection:', error)
-      setErrorMessage('Erro inesperado ao salvar ambiente.')
-      setTimeout(() => setErrorMessage(''), 4000)
-      return false
-    } finally {
-      setIsAmbientSaving(false)
-    }
-  }
 
   // Show loading state
   if (authLoading || profileLoading || !user || !profile) {
@@ -158,11 +129,11 @@ export default function ProfileContent() {
       )}
 
       {/* Main Content */}
-      <div className="relative z-10 pt-20 px-4 pb-8">
-        <div className="max-w-6xl mx-auto space-y-8">
-          
+      <div className="relative z-10 pt-24 pb-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-16">
+
           {/* Profile Header */}
-          <ProfileHeader 
+          <ProfileHeader
             profile={profile as any}
             editingField={editingField}
             onEditField={setEditingField}
@@ -170,13 +141,6 @@ export default function ProfileContent() {
             onAvatarUpload={uploadAvatar}
             isUploading={profileUploading}
             isSaving={profileSaving}
-          />
-
-          {/* Ambient Selector */}
-          <AmbientSelector
-            className="mt-2"
-            onPersist={handlePersistAmbient}
-            isSaving={isAmbientSaving}
           />
 
           {/* Next Action Card */}
@@ -190,11 +154,8 @@ export default function ProfileContent() {
             />
           )}
 
-          {/* Two Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            
-            {/* Arsenal Section */}
-            <ArsenalSection
+          {/* Arsenal */}
+          <ArsenalSection
               arsenalData={arsenalData as any}
               activeTab={activeArsenalTab}
               onTabChange={setActiveArsenalTab}
@@ -203,19 +164,17 @@ export default function ProfileContent() {
               isLoading={profileLoading}
             />
 
-            {/* Referral Section */}
-            <ReferralSection
-              referralInfo={referralInfo as any}
-              activeTab={activeReferralTab}
-              onTabChange={setActiveReferralTab}
-              onCopyReferralLink={() => {
-                setSuccessMessage('Código de referência copiado!')
-                setTimeout(() => setSuccessMessage(''), 3000)
-              }}
-              onNavigateToAffiliate={() => console.log('Navigate to affiliate')}
-            />
-
-          </div>
+          {/* Convidar e Ganhar */}
+          <ReferralSection
+            referralInfo={referralInfo as any}
+            activeTab={activeReferralTab}
+            onTabChange={setActiveReferralTab}
+            onCopyReferralLink={() => {
+              setSuccessMessage('Código de referência copiado!')
+              setTimeout(() => setSuccessMessage(''), 3000)
+            }}
+            onNavigateToAffiliate={() => console.log('Navigate to affiliate')}
+          />
         </div>
       </div>
     </div>

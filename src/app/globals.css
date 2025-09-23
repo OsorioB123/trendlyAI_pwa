@@ -641,8 +641,51 @@ textarea:focus-visible {
   z-index: 3;
 }
 
+.settings-tabs-list {
+  position: relative;
+  display: inline-flex;
+  padding: 4px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.settings-tab-trigger {
+  position: relative;
+  z-index: 2;
+  border: none;
+  background: none;
+  color: #a1a1aa;
+  padding: 10px 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color 0.3s ease, padding 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.settings-tab-trigger.is-active {
+  color: #ffffff;
+}
+
+#active-tab-indicator {
+  position: absolute;
+  z-index: 1;
+  top: 4px;
+  left: 4px;
+  height: calc(100% - 8px);
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.08);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 /* Mobile responsive behavior - exact from HTML reference */
 @media (max-width: 1023px) {
+  #studio-environment-track,
   #themes-track { 
     scroll-snap-type: x mandatory; 
     padding: 0 calc(50vw - 60px); 
@@ -733,6 +776,22 @@ textarea:focus-visible {
   background-color: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+@media (max-width: 639px) {
+  .settings-tabs-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+  }
+  .settings-tab-trigger {
+    justify-content: center;
+    gap: 0;
+    padding: 10px;
+  }
+  .settings-tab-trigger .tab-label {
+    display: none;
+  }
 }
 .glass-strong {
   backdrop-filter: blur(24px);

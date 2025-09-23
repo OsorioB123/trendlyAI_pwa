@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { CSSProperties, useEffect, useMemo, useState } from 'react'
 import { Check } from 'lucide-react'
 import { ProfileTabProps, VALIDATION_RULES } from '../../types/settings'
 import { DEFAULT_STUDIO_THEME_ID, STUDIO_THEMES, studioThemeMap } from '@/data/studioThemes'
@@ -29,6 +29,7 @@ export default function ProfileTab({
   const fallbackTheme = studioThemeMap[DEFAULT_STUDIO_THEME_ID]
   const activeThemeId = pendingThemeId ?? profile?.studio_theme ?? fallbackTheme?.id ?? DEFAULT_STUDIO_THEME_ID
   const selectedTheme = availableThemes.find((theme) => theme.id === activeThemeId) || fallbackTheme
+  const selectedThemeName = selectedTheme?.name || fallbackTheme?.name || 'Padrão'
 
   useEffect(() => {
     if (!pendingThemeId || !profile?.studio_theme) {
@@ -105,7 +106,7 @@ export default function ProfileTab({
 
   return (
     <div className="liquid-glass p-8 md:p-10 rounded-2xl">
-      <div className="space-y-10">
+      <div className="grid grid-cols-1 gap-y-10">
         {/* Avatar Upload Section */}
         <AvatarUpload
           currentAvatarUrl={profile.avatar_url}
@@ -178,9 +179,8 @@ export default function ProfileTab({
             }}
           />
         </div>
-
         {/* Studio Environment Section */}
-        <div className="border-t border-white/5 pt-10">
+        <div className="border-t border-white/10 pt-10">
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-white mb-2">Ambiente do Estúdio</h3>
             <p className="text-sm text-white/70">
@@ -188,96 +188,69 @@ export default function ProfileTab({
             </p>
           </div>
 
-          {/* Theme Gallery */}
-          <div className="w-full hide-scrollbar overflow-x-auto lg:overflow-x-visible">
-            <div className="flex gap-4 pb-4 snap-x snap-mandatory lg:grid lg:grid-cols-6 lg:gap-4 lg:pb-0 lg:snap-none">
-              {availableThemes.map((theme) => {
-                const isSelected = activeThemeId === theme.id
-                const themeImage = theme.imageUrl || studioThemeMap[theme.id]?.imageUrl
+          <div id="studio-environment-gallery" className="mt-4">
+            <div className="w-full hide-scrollbar overflow-x-auto lg:overflow-x-visible">
+              <ol
+                id="studio-environment-track"
+                className="flex items-center gap-4 py-4 snap-x snap-mandatory lg:grid lg:grid-cols-6 lg:gap-4 lg:py-0 lg:snap-none"
+              >
+                {availableThemes.map((theme) => {
+                  const isSelected = activeThemeId === theme.id
+                  const mappedTheme = studioThemeMap[theme.id] || theme
+                  const themeImage = mappedTheme?.imageUrl || theme.imageUrl
+                  const sphereStyle: (CSSProperties & { '--sphere-bg'?: string }) = {}
 
-                return (
-                  <button
-                    key={theme.id}
-                    type="button"
-                    onClick={() => handleThemeSelect(theme.id)}
-                    disabled={isLoading || isUpdatingTheme}
-                    aria-pressed={isSelected}
-                    className={cn(
-                      'group relative flex h-20 w-20 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/10 transition-transform duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 disabled:cursor-not-allowed disabled:opacity-60 snap-center',
-                      isSelected ? 'scale-110 border-white/40' : 'hover:scale-105'
-                    )}
-                    style={{
-                      backgroundImage: themeImage ? `url(${themeImage})` : undefined,
-                      background: !themeImage ? theme.background : undefined,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      backgroundRepeat: 'no-repeat'
-                    }}
-                    title={theme.name}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-black/70 opacity-60 transition-opacity duration-300 group-hover:opacity-40" />
-                    <div className="absolute inset-[2px] rounded-full border border-white/15" />
+                  if (themeImage) {
+                    sphereStyle['--sphere-bg'] = `url(${themeImage})`
+                  } else if (mappedTheme?.background || theme.background) {
+                    sphereStyle['--sphere-bg'] = mappedTheme?.background || theme.background
+                  }
 
-                    <span className="relative text-[0.7rem] font-medium text-white drop-shadow">
-                      {theme.name}
-                    </span>
-
-                    <div
-                      className={cn(
-                        'absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity duration-200',
-                        isSelected ? 'opacity-100' : 'group-hover:opacity-60'
-                      )}
+                  return (
+                    <li
+                      key={theme.id}
+                      className="flex-shrink-0 snap-center lg:flex lg:justify-center"
                     >
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-black">
-                        <Check size={16} />
-                      </span>
-                    </div>
-
-                    <span className="pointer-events-none absolute -bottom-8 left-1/2 w-max -translate-x-1/2 rounded bg-black/80 px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                      {theme.name}
-                    </span>
-                  </button>
-                )
-              })}
+                      <button
+                        type="button"
+                        data-theme-id={theme.id}
+                        onClick={() => handleThemeSelect(theme.id)}
+                        disabled={isLoading || isUpdatingTheme}
+                        aria-pressed={isSelected}
+                        aria-label={theme.name}
+                        title={theme.name}
+                        className={cn(
+                          'theme-sphere relative flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 disabled:cursor-not-allowed disabled:opacity-60',
+                          isSelected && 'is-selected'
+                        )}
+                        style={sphereStyle}
+                      >
+                        <span className="sr-only">{theme.name}</span>
+                        <div className="check-icon">
+                          <Check size={20} className="text-white" strokeWidth={1.5} />
+                        </div>
+                      </button>
+                      <p className="mt-3 text-xs font-medium text-white/70 text-center">
+                        {theme.name}
+                      </p>
+                    </li>
+                  )
+                })}
+              </ol>
             </div>
           </div>
 
-          {/* Theme info */}
-          <div className="mt-6 rounded-lg bg-black/50 p-4">
-            <div className="flex items-center gap-3">
-              <div
-                className="h-10 w-10 overflow-hidden rounded-lg border border-white/10"
-                style={{
-                  backgroundImage: selectedTheme?.imageUrl
-                    ? `url(${selectedTheme.imageUrl})`
-                    : undefined,
-                  background: !selectedTheme?.imageUrl ? (selectedTheme?.background ?? fallbackTheme?.background) : undefined,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}
-              />
-              <div>
-                <p className="text-white font-medium">
-                  {selectedTheme?.name || fallbackTheme?.name || 'Padrão'}
-                </p>
-                <p className="text-sm text-white/60">
-                  Tema ativo do seu ambiente de trabalho
-                </p>
-                {isUpdatingTheme && (
-                  <p className="mt-1 text-xs text-white/40">
-                    Salvando preferências...
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile scroll tip */}
           <div className="lg:hidden mt-4 p-3 bg-white/10 rounded-lg">
             <p className="text-sm text-white/80 text-center">
               💡 Deslize horizontalmente para ver todos os temas
             </p>
           </div>
+
+          {isUpdatingTheme && (
+            <p className="mt-3 text-xs text-white/50" role="status" aria-live="polite">
+              Salvando preferências...
+            </p>
+          )}
         </div>
 
         {/* Profile Stats */}
@@ -295,7 +268,7 @@ export default function ProfileTab({
             
             <div className="text-center">
               <div className="text-2xl font-bold text-white">
-                {profile.studio_theme}
+                {selectedThemeName}
               </div>
               <div className="text-sm text-white/60">Tema atual</div>
             </div>

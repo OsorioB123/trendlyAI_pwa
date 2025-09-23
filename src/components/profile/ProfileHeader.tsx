@@ -10,8 +10,7 @@ import {
   Loader,
   Navigation,
   Award,
-  Flame,
-  Sparkles
+  Flame
 } from 'lucide-react'
 import type { ProfileHeaderProps } from '../../types/profile'
 import { PROFILE_LEVELS } from '../../types/profile'
@@ -117,13 +116,13 @@ export default function ProfileHeader({
   return (
     <section
       className={cn(
-        'flex flex-col md:flex-row items-center gap-8 rounded-3xl border border-white/10 bg-white/10/60 p-8 md:p-10 text-center md:text-left shadow-[0_20px_80px_-40px_rgba(0,0,0,0.6)] backdrop-blur-2xl animate-entry',
+        'flex flex-col items-center gap-8 text-center md:flex-row md:items-center md:text-left animate-entry',
         className
       )}
     >
       {/* Avatar */}
       <button 
-        className="relative flex-shrink-0 group avatar-interactive-wrapper"
+        className="relative flex-shrink-0 group transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-105"
         onClick={handleAvatarClick}
         disabled={isUploading}
       >
@@ -139,11 +138,11 @@ export default function ProfileHeader({
         </div>
         
         {/* Avatar Overlay */}
-        <div className="avatar-overlay absolute inset-0 flex items-center justify-center rounded-full bg-black/0 transition-all duration-300 hover:bg-black/60">
+        <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/0 transition-all duration-300 group-hover:bg-black/60">
           {isUploading ? (
             <Loader className="w-6 h-6 text-white animate-spin" />
           ) : (
-            <Camera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <Camera className="w-6 h-6 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           )}
         </div>
         
@@ -159,9 +158,9 @@ export default function ProfileHeader({
       </button>
 
       {/* Profile Info */}
-      <div className="flex-grow">
+      <div className="flex-grow w-full">
         {/* Editable Display Name */}
-        <div className="mb-2">
+        <div className="mb-2 flex flex-col items-center md:items-start">
           {editingField === 'display_name' ? (
             <div className="flex items-center gap-2">
               <input
@@ -169,7 +168,7 @@ export default function ProfileHeader({
                 value={formData.display_name}
                 onChange={(e) => handleInputChange('display_name', e.target.value)}
                 onKeyDown={(e) => handleKeyDown(e, 'display_name')}
-                className="text-4xl md:text-5xl font-semibold tracking-tight text-white/90 bg-transparent border-b border-white/30 focus:outline-none focus:border-white"
+                className="bg-transparent border-b border-white/30 text-4xl font-semibold tracking-tight text-white/90 focus:border-white focus:outline-none md:text-5xl"
                 autoFocus
                 disabled={isSaving}
                 placeholder="Digite seu nome"
@@ -190,8 +189,8 @@ export default function ProfileHeader({
               </button>
             </div>
           ) : (
-            <div className="group flex items-center gap-2">
-              <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white">
+            <div className="group flex items-center justify-center gap-2 md:justify-start">
+              <h1 className="text-4xl font-semibold tracking-tight text-white md:text-5xl">
                 {profile.display_name || 'Usuário'}
               </h1>
               <button
@@ -205,10 +204,9 @@ export default function ProfileHeader({
         </div>
 
         {/* Level */}
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white/80 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-          <Sparkles className="h-4 w-4" />
-          <span>Nível Criativo: {levelInfo.name}</span>
-        </div>
+        <p className="mb-6 text-lg text-white/60">
+          Nível Criativo: {levelInfo.name}
+        </p>
 
         {/* Metrics Pills */}
         <div className="mb-6 flex flex-wrap items-center justify-center gap-3 md:justify-start">
@@ -232,7 +230,7 @@ export default function ProfileHeader({
                 onChange={(e) => handleInputChange('bio', e.target.value)}
                 onKeyDown={(e) => handleKeyDown(e, 'bio')}
                 placeholder="Conte um pouco sobre você..."
-                className="w-full p-3 text-white/80 bg-white/10 rounded-lg focus:outline-none resize-none"
+                className="w-full resize-none rounded-2xl border border-white/10 bg-white/5 p-4 text-base text-white/80 focus:outline-none"
                 rows={3}
                 disabled={isSaving}
                 autoFocus
@@ -262,7 +260,7 @@ export default function ProfileHeader({
           ) : (
             <div className="group">
               <div className="flex items-start gap-3">
-                <p className="flex-1 text-base leading-relaxed text-white/70">
+                <p className="flex-1 text-center text-base leading-relaxed text-white/70 md:max-w-2xl md:text-left">
                   {profile.bio || 'Adicione uma biografia para contar mais sobre você...'}
                 </p>
                 <button
@@ -277,33 +275,13 @@ export default function ProfileHeader({
         </div>
       </div>
 
-      {/* CSS styles */}
-      <style jsx>{`
-        .avatar-interactive-wrapper {
-          transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .avatar-interactive-wrapper:hover {
-          transform: translateY(-4px) scale(1.04);
-        }
-        .animate-entry {
-          opacity: 0;
-          transform: translateY(30px);
-          animation: slideInFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        @keyframes slideInFade {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </section>
   )
 }
 
 function MetricPill({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white/80 shadow-[0_0_20px_rgba(255,255,255,0.15)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/20">
+    <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/20">
       {icon}
       {children}
     </span>

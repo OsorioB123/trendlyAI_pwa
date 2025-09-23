@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { User, Lock, Bell } from 'lucide-react'
 import { SettingsTabsProps, SettingsTab } from '../../types/settings'
+import { cn } from '@/lib/utils'
 
 const TABS = [
   {
@@ -48,7 +49,23 @@ export default function SettingsTabs({ activeTab, onTabChange }: SettingsTabsPro
 
   useEffect(() => {
     updateIndicator()
+    const rafId = requestAnimationFrame(() => updateIndicator())
+    return () => cancelAnimationFrame(rafId)
   }, [activeTab, updateIndicator])
+
+  useEffect(() => {
+    const handleResize = () => updateIndicator()
+    window.addEventListener('resize', handleResize)
+
+    const tabsElement = tabsRef.current
+    const handleScroll = () => updateIndicator()
+    tabsElement?.addEventListener('scroll', handleScroll)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      tabsElement?.removeEventListener('scroll', handleScroll)
+    }
+  }, [updateIndicator])
 
   const handleTabClick = (tabId: SettingsTab) => {
     onTabChange(tabId)
@@ -63,49 +80,45 @@ export default function SettingsTabs({ activeTab, onTabChange }: SettingsTabsPro
   }
 
   return (
-    <div className="w-full overflow-x-auto hide-scrollbar mb-10">
-      <div 
+    <div
+      className="w-full overflow-x-auto hide-scrollbar mb-10 opacity-0 animate-fade-in"
+      style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}
+    >
+      <div
         ref={tabsRef}
-        className="relative inline-flex p-1 bg-black/40 rounded-xl min-w-full md:min-w-0"
+        className={cn(
+          'settings-tabs-list relative inline-flex min-w-full md:min-w-0'
+        )}
       >
-        {/* Active tab indicator */}
         <div
           ref={indicatorRef}
-          className="absolute top-1 left-0 h-[calc(100%-8px)] bg-white/10 rounded-lg transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+          id="active-tab-indicator"
+          className="absolute top-1 left-1 h-[calc(100%-8px)] rounded-lg bg-white/10 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
           style={{ zIndex: 1 }}
         />
-        
+
         {TABS.map((tab) => {
           const Icon = tab.icon
           const isActive = activeTab === tab.id
-          
+
           return (
             <button
               key={tab.id}
+              type="button"
               data-tab={tab.id}
               onClick={() => handleTabClick(tab.id)}
-              className={`
-                relative z-10 flex items-center gap-3 px-6 py-3 text-sm font-medium rounded-lg
-                transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]
-                whitespace-nowrap
-                ${isActive 
-                  ? 'text-white' 
-                  : 'text-white/70 hover:text-white/90'
-                }
-                sm:px-4 sm:gap-2
-              `}
+              aria-pressed={isActive}
+              className={cn(
+                'settings-tab-trigger group relative z-10 flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] whitespace-nowrap sm:px-4',
+                isActive ? 'is-active text-white' : 'text-white/70 hover:text-white/90'
+              )}
             >
-              <Icon 
-                size={18} 
+              <Icon
+                size={16}
                 strokeWidth={1.5}
                 className="flex-shrink-0"
               />
-              <span className="hidden sm:inline">{tab.label}</span>
-              
-              {/* Mobile-only tooltip */}
-              <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded opacity-0 pointer-events-none transition-opacity duration-200 sm:hidden group-hover:opacity-100 whitespace-nowrap z-50">
-                {tab.label}
-              </div>
+              <span className="tab-label hidden sm:inline">{tab.label}</span>
             </button>
           )
         })}
