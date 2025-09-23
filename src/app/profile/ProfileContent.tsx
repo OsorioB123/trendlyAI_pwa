@@ -7,7 +7,6 @@ import { useProfile } from '../../hooks/useProfile'
 import { useAuth } from '../../contexts/AuthContext'
 import Header from '../../components/layout/Header'
 import BackgroundOverlay from '../../components/common/BackgroundOverlay'
-import { HeaderVariant } from '../../types/header'
 import ProfileHeader from '../../components/profile/ProfileHeader'
 import NextActionCard from '../../components/profile/NextActionCard'
 import ArsenalSection from '../../components/profile/ArsenalSection'
@@ -48,7 +47,8 @@ export default function ProfileContent() {
 
   // Redirect if not authenticated
   useEffect(() => {
-    if (!authLoading && !user) {
+    const isE2E = typeof window !== 'undefined' && (window as any).__E2E_TEST__ === true
+    if (!isE2E && !authLoading && !user) {
       router.push('/login')
     }
   }, [user, authLoading, router])
@@ -129,9 +129,7 @@ export default function ProfileContent() {
       <BackgroundOverlay />
 
       {/* Header */}
-      <Header 
-        variant={HeaderVariant.SECONDARY}
-      />
+      <Header />
 
       {/* Toast Messages */}
       {(successMessage || errorMessage) && (

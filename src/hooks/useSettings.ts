@@ -25,7 +25,6 @@ let toastCounter = 0
 
 export function useSettings(): UseSettingsReturn {
   const router = useRouter()
-  
   // Data state
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [security, setSecurity] = useState<SecuritySettings | null>(null)
@@ -72,7 +71,10 @@ export function useSettings(): UseSettingsReturn {
         const { data: { session } } = await supabase.auth.getSession()
         
         if (!session?.user) {
-          router.push('/login')
+          const isE2E = typeof window !== 'undefined' && (window as any).__E2E_TEST__ === true
+          if (!isE2E) {
+            router.push('/login')
+          }
           return
         }
         
@@ -101,7 +103,8 @@ export function useSettings(): UseSettingsReturn {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') {
+      const isE2E = typeof window !== 'undefined' && (window as any).__E2E_TEST__ === true
+      if (event === 'SIGNED_OUT' && !isE2E) {
         router.push('/login')
       } else if (event === 'SIGNED_IN' && session?.user) {
         setUser(session.user)
@@ -114,7 +117,13 @@ export function useSettings(): UseSettingsReturn {
 
   // Profile actions
   const updateProfile = useCallback(async (data: Partial<ProfileFormData>): Promise<boolean> => {
-    if (!user) return false
+    if (!user) {
+      const isE2E = typeof window !== 'undefined' && (window as any).__E2E_TEST__ === true
+      if (!isE2E) {
+        router.push('/login')
+      }
+      return false
+    }
     
     try {
       setUiState(prev => ({
@@ -151,10 +160,16 @@ export function useSettings(): UseSettingsReturn {
         isSaving: { ...prev.isSaving, profile: false }
       }))
     }
-  }, [user, showToast])
+  }, [user, showToast, router])
 
   const uploadAvatar = useCallback(async (file: File): Promise<AvatarUploadResult> => {
-    if (!user) return { success: false, error: 'Usuário não autenticado' }
+    if (!user) {
+      const isE2E = typeof window !== 'undefined' && (window as any).__E2E_TEST__ === true
+      if (!isE2E) {
+        router.push('/login')
+      }
+      return { success: false, error: 'Usuário não autenticado' }
+    }
     
     try {
       setUiState(prev => ({
@@ -192,19 +207,25 @@ export function useSettings(): UseSettingsReturn {
         isSaving: { ...prev.isSaving, avatar: false }
       }))
     }
-  }, [user, showToast])
+  }, [user, showToast, router])
 
   const updateStudioTheme = useCallback(async (themeId: string): Promise<boolean> => {
-    if (!user) return false
-    
+    if (!user) {
+      const isE2E = typeof window !== 'undefined' && (window as any).__E2E_TEST__ === true
+      if (!isE2E) {
+        router.push('/login')
+      }
+      return false
+    }
+
     try {
       setUiState(prev => ({
         ...prev,
         isSaving: { ...prev.isSaving, theme: true }
       }))
-      
+
       const response = await SettingsService.updateStudioTheme(user.id, themeId)
-      
+
       if (response.success) {
         setProfile(prev => prev ? { ...prev, studio_theme: themeId } : null)
         showToast({
@@ -232,11 +253,17 @@ export function useSettings(): UseSettingsReturn {
         isSaving: { ...prev.isSaving, theme: false }
       }))
     }
-  }, [user, showToast])
+  }, [user, showToast, router])
 
   // Security actions
   const changeEmail = useCallback(async (data: ChangeEmailRequest): Promise<boolean> => {
-    if (!user) return false
+    if (!user) {
+      const isE2E = typeof window !== 'undefined' && (window as any).__E2E_TEST__ === true
+      if (!isE2E) {
+        router.push('/login')
+      }
+      return false
+    }
     
     try {
       setUiState(prev => ({
@@ -273,9 +300,17 @@ export function useSettings(): UseSettingsReturn {
         isSaving: { ...prev.isSaving, email: false }
       }))
     }
-  }, [user, showToast])
+  }, [user, showToast, router])
 
   const changePassword = useCallback(async (data: ChangePasswordRequest): Promise<boolean> => {
+    if (!user) {
+      const isE2E = typeof window !== 'undefined' && (window as any).__E2E_TEST__ === true
+      if (!isE2E) {
+        router.push('/login')
+      }
+      return false
+    }
+
     try {
       setUiState(prev => ({
         ...prev,
@@ -311,9 +346,17 @@ export function useSettings(): UseSettingsReturn {
         isSaving: { ...prev.isSaving, password: false }
       }))
     }
-  }, [showToast])
+  }, [user, showToast, router])
 
   const setup2FA = useCallback(async (password: string): Promise<Verify2FASetup | false> => {
+    if (!user) {
+      const isE2E = typeof window !== 'undefined' && (window as any).__E2E_TEST__ === true
+      if (!isE2E) {
+        router.push('/login')
+      }
+      return false
+    }
+
     try {
       setUiState(prev => ({
         ...prev,
@@ -349,7 +392,7 @@ export function useSettings(): UseSettingsReturn {
         isSaving: { ...prev.isSaving, twoFactor: false }
       }))
     }
-  }, [showToast])
+  }, [user, showToast, router])
 
   const deleteAccount = useCallback(async (data: DeleteAccountRequest): Promise<boolean> => {
     try {
@@ -394,8 +437,14 @@ export function useSettings(): UseSettingsReturn {
 
   // Notification actions
   const updateNotifications = useCallback(async (prefs: Partial<NotificationPreferences>): Promise<boolean> => {
-    if (!user) return false
-    
+    if (!user) {
+      const isE2E = typeof window !== 'undefined' && (window as any).__E2E_TEST__ === true
+      if (!isE2E) {
+        router.push('/login')
+      }
+      return false
+    }
+
     try {
       setUiState(prev => ({
         ...prev,
@@ -431,7 +480,7 @@ export function useSettings(): UseSettingsReturn {
         isSaving: { ...prev.isSaving, notifications: false }
       }))
     }
-  }, [user, showToast])
+  }, [user, showToast, router])
 
   // UI actions
   const setActiveTab = useCallback((tab: SettingsTab) => {

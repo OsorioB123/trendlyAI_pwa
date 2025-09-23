@@ -11,7 +11,6 @@ import {
 import Header from '../../components/layout/Header'
 import TrackCardFull from '../../components/cards/TrackCardFull'
 import FiltersDrawer from '../../components/tracks/FiltersDrawer'
-import { HeaderVariant } from '../../types/header'
 import { Track, TracksFilters } from '../../types/track'
 import { useBackground } from '../../contexts/BackgroundContext'
 import { useTracks } from '../../hooks/useTracks'
@@ -191,7 +190,7 @@ export default function TracksPage() {
         backgroundAttachment: 'fixed'
       }}
     >
-      <Header variant={HeaderVariant.SECONDARY} />
+      <Header />
 
       {error && (
         <div className="mx-auto mt-6 max-w-5xl">

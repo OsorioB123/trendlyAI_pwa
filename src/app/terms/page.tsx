@@ -3,7 +3,6 @@
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, FileText } from 'lucide-react'
 import Header from '../../components/layout/Header'
-import { HeaderVariant } from '../../types/header'
 import { useBackground } from '../../contexts/BackgroundContext'
 
 export default function TermsPage() {
@@ -19,7 +18,7 @@ export default function TermsPage() {
       backgroundAttachment: 'fixed'
     }}>
       {/* Header */}
-      <Header variant={HeaderVariant.SECONDARY} />
+      <Header />
 
       {/* Main Content */}
       <main className="pt-20 pb-8 px-4">

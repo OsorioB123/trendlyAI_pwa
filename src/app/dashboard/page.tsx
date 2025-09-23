@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { ArrowRight } from 'lucide-react'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import Header from '@/components/layout/Header'
-import { HeaderVariant } from '@/types/header'
 import { useBackground } from '@/contexts/BackgroundContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { DashboardHero } from '@/components/dashboard/hero-section'
@@ -109,7 +108,7 @@ export default function DashboardPage() {
       <div className="relative min-h-screen overflow-hidden bg-gray-950 text-white" style={backgroundStyle}>
         <div className="pointer-events-none absolute inset-0 -z-10 bg-[#020415]/78 backdrop-blur-[2px]" />
 
-        <Header variant={HeaderVariant.PRIMARY} />
+        <Header />
 
         <main className="relative z-10 w-full">
           <div className="mx-auto flex w-full max-w-5xl flex-col px-4 pb-24 pt-32 sm:px-6 lg:px-0">

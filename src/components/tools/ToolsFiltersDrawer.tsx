@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react'
 import { X, Filter, Search, Tag, Zap } from 'lucide-react'
 import { ToolsFilters, ToolCategory } from '../../types/tool'
-import { Button } from "@/components/ui/Button"
+import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"

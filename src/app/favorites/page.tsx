@@ -6,7 +6,6 @@ import { Heart, Search } from 'lucide-react'
 import Header from '../../components/layout/Header'
 import ToolCard from '../../components/cards/ToolCard'
 import TrackCard from '../../components/cards/TrackCard'
-import { HeaderVariant } from '../../types/header'
 import { Tool } from '../../types/tool'
 import { Track } from '../../types/track'
 import { useBackground } from '../../contexts/BackgroundContext'
@@ -106,7 +105,7 @@ export default function FavoritesPage() {
         backgroundAttachment: 'fixed'
       }}>
         {/* Header */}
-        <Header variant={HeaderVariant.SECONDARY} />
+        <Header />
 
         {/* Main Content */}
         <main className="pt-20 pb-24 md:pb-8 px-4">

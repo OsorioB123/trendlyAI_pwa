@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import type { DashboardTrackSummary } from '@/types/dashboard'
 
 interface LearningProgressProps {

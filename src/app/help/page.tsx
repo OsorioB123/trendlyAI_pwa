@@ -18,7 +18,6 @@ import { useBackground } from '../../contexts/BackgroundContext'
 import { useHelp } from '../../hooks/useHelp'
 import Header from '../../components/layout/Header'
 import BackgroundOverlay from '../../components/common/BackgroundOverlay'
-import { HeaderVariant } from '../../types/header'
 import type { FAQItem } from '../../types/help'
 
 export default function HelpPage() {
@@ -141,7 +140,7 @@ export default function HelpPage() {
         }}
       >
         <BackgroundOverlay />
-        <Header variant={HeaderVariant.SECONDARY} />
+        <Header />
         
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
@@ -162,7 +161,7 @@ export default function HelpPage() {
       <BackgroundOverlay />
       
       {/* Header */}
-      <Header variant={HeaderVariant.SECONDARY} />
+      <Header />
       
       {/* Header spacer */}
       <div style={{ height: '80px' }}></div>

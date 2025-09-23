@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence, useAnimation } from 'framer-motion'
 import { Search, X, Clock, TrendingUp } from 'lucide-react'
 import { respectReducedMotion } from '@/lib/motion'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
 type Variant = 'tools' | 'tracks' | 'default'

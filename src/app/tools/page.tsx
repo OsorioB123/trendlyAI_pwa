@@ -13,7 +13,6 @@ import ToolCard from '../../components/cards/ToolCard'
 import ToolsFiltersDrawer from '../../components/tools/ToolsFiltersDrawer'
 import ToolModal from '../../components/modals/ToolModal'
 import SearchBar from '@/components/search/SearchBar'
-import { HeaderVariant } from '../../types/header'
 import { Tool, ToolsFilters, ToolCategory } from '../../types/tool'
 import { useBackground } from '../../contexts/BackgroundContext'
 import { supabase } from '../../lib/supabase'
@@ -348,7 +347,7 @@ function ToolsPageContent() {
         backgroundAttachment: 'fixed'
       }}
     >
-      <Header variant={HeaderVariant.SECONDARY} />
+      <Header />
 
       {error && (
         <div className="mx-auto mt-6 max-w-5xl">

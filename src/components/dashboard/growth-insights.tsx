@@ -5,7 +5,7 @@ import { ResponsiveContainer, AreaChart, Area, CartesianGrid, Tooltip as Rechart
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { DashboardGrowthSeries } from '@/types/dashboard'
 

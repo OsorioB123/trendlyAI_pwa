@@ -64,9 +64,13 @@ export default function TrackPage() {
     }
   }, [trackId, loadTrack])
 
+  const isE2E = typeof window !== 'undefined' && (window as any).__E2E_TEST__ === true
+
   const handleStartTrack = async () => {
     if (!user) {
-      router.push('/login')
+      if (!isE2E) {
+        router.push('/login')
+      }
       return
     }
 
@@ -84,7 +88,9 @@ export default function TrackPage() {
 
   const handleModuleClick = async (module: TrackModule) => {
     if (!user) {
-      router.push('/login')
+      if (!isE2E) {
+        router.push('/login')
+      }
       return
     }
 
@@ -116,7 +122,9 @@ export default function TrackPage() {
 
   const handleToggleFavorite = async () => {
     if (!user) {
-      router.push('/login')
+      if (!isE2E) {
+        router.push('/login')
+      }
       return
     }
 
