@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { X, Filter, Tag } from 'lucide-react'
@@ -22,22 +22,22 @@ const SORT_OPTIONS: Array<{ value: ToolsFilters['sort']; label: string; descript
   {
     value: 'relevance',
     label: 'Mais relevantes',
-    description: 'OrdenaÃƒÂ§ÃƒÂ£o considerando favoritos e ordem alfabÃƒÂ©tica.'
+    description: 'OrdenaÃ§Ã£o considerando favoritos e ordem alfabÃ©tica.'
   },
   {
     value: 'recent',
     label: 'Atualizadas recentemente',
-    description: 'Mostra primeiro ferramentas atualizadas nos ÃƒÂºltimos dias.'
+    description: 'Mostra primeiro ferramentas atualizadas nos Ãºltimos dias.'
   }
 ]
 
 const TOOL_TYPE_LABELS: Record<ToolType, string> = {
-  'text-generation': 'GeraÃƒÂ§ÃƒÂ£o de texto',
-  'image-generation': 'GeraÃƒÂ§ÃƒÂ£o de imagem',
-  'code-generation': 'GeraÃƒÂ§ÃƒÂ£o de cÃƒÂ³digo',
-  'data-analysis': 'AnÃƒÂ¡lise de dados',
-  'automation': 'AutomaÃƒÂ§ÃƒÂ£o',
-  'optimization': 'OtimizaÃƒÂ§ÃƒÂ£o',
+  'text-generation': 'GeraÃ§Ã£o de texto',
+  'image-generation': 'GeraÃ§Ã£o de imagem',
+  'code-generation': 'GeraÃ§Ã£o de cÃ³digo',
+  'data-analysis': 'AnÃ¡lise de dados',
+  'automation': 'AutomaÃ§Ã£o',
+  'optimization': 'OtimizaÃ§Ã£o',
   research: 'Pesquisa'
 }
 
@@ -46,7 +46,7 @@ const COMPATIBILITY_LABELS: Record<AICompatibility, string> = {
   claude: 'Claude',
   gemini: 'Gemini',
   midjourney: 'Midjourney',
-  dalle: 'DALLÃ‚Â·E',
+  dalle: 'DALLÂ·E',
   'stable-diffusion': 'Stable Diffusion'
 }
 
@@ -64,22 +64,22 @@ const ACTIVITY_OPTIONS: Array<{ value: ToolsFilters['activity'][number]; label: 
 ]
 
 const TOOL_TYPES: Array<{ value: ToolType; helper: string }> = [
-  { value: 'text-generation', helper: 'Copy, roteiros, narrativas e estruturaÃƒÂ§ÃƒÂ£o de prompts.' },
-  { value: 'image-generation', helper: 'GeraÃƒÂ§ÃƒÂ£o e ediÃƒÂ§ÃƒÂ£o de imagens com IA generativa.' },
-  { value: 'code-generation', helper: 'Suporte para cÃƒÂ³digo, snippets e automaÃƒÂ§ÃƒÂµes.' },
-  { value: 'data-analysis', helper: 'AnÃƒÂ¡lises, dashboards e relatÃƒÂ³rios com IA.' },
-  { value: 'automation', helper: 'IntegraÃƒÂ§ÃƒÂµes, fluxos e agentes automatizados.' },
-  { value: 'optimization', helper: 'Melhorias contÃƒÂ­nuas, testes A/B e ajustes finos.' },
-  { value: 'research', helper: 'Pesquisa, curadoria de conteÃƒÂºdo e descoberta.' }
+  { value: 'text-generation', helper: 'Copy, roteiros, narrativas e estruturaÃ§Ã£o de prompts.' },
+  { value: 'image-generation', helper: 'GeraÃ§Ã£o e ediÃ§Ã£o de imagens com IA generativa.' },
+  { value: 'code-generation', helper: 'Suporte para cÃ³digo, snippets e automaÃ§Ãµes.' },
+  { value: 'data-analysis', helper: 'AnÃ¡lises, dashboards e relatÃ³rios com IA.' },
+  { value: 'automation', helper: 'IntegraÃ§Ãµes, fluxos e agentes automatizados.' },
+  { value: 'optimization', helper: 'Melhorias contÃ­nuas, testes A/B e ajustes finos.' },
+  { value: 'research', helper: 'Pesquisa, curadoria de conteÃºdo e descoberta.' }
 ]
 
 const COMPATIBILITY_OPTIONS: Array<{ value: AICompatibility; helper: string }> = [
-  { value: 'chatgpt', helper: 'CompatÃƒÂ­vel com GPT-4, GPT-4o e variaÃƒÂ§ÃƒÂµes.' },
+  { value: 'chatgpt', helper: 'CompatÃ­vel com GPT-4, GPT-4o e variaÃ§Ãµes.' },
   { value: 'claude', helper: 'Funciona com Claude 3 e Claude 3.5.' },
-  { value: 'gemini', helper: 'Para produtos da famÃƒÂ­lia Google Gemini.' },
+  { value: 'gemini', helper: 'Para produtos da famÃ­lia Google Gemini.' },
   { value: 'midjourney', helper: 'Fluxos usando Midjourney para imagens.' },
-  { value: 'dalle', helper: 'Suporte a DALLÃ‚Â·E e Image API da OpenAI.' },
-  { value: 'stable-diffusion', helper: 'CompatÃƒÂ­vel com SDXL ou variantes open source.' }
+  { value: 'dalle', helper: 'Suporte a DALLÂ·E e Image API da OpenAI.' },
+  { value: 'stable-diffusion', helper: 'CompatÃ­vel com SDXL ou variantes open source.' }
 ]
 
 export default function ToolsFiltersDrawer({
@@ -97,14 +97,11 @@ export default function ToolsFiltersDrawer({
   }, [filters])
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = isOpen ? 'hidden' : ''
 
     return () => {
-      document.body.style.overflow = ''
+      document.body.style.overflow = previousOverflow
     }
   }, [isOpen])
 
@@ -112,9 +109,7 @@ export default function ToolsFiltersDrawer({
     if (!isOpen) return
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose()
-      }
+      if (event.key === 'Escape') onClose()
     }
 
     document.addEventListener('keydown', handleKeyDown)
@@ -122,25 +117,27 @@ export default function ToolsFiltersDrawer({
   }, [isOpen, onClose])
 
   const handleBackdropClick = useCallback((event: MouseEvent<HTMLDivElement>) => {
-    if (event.target === event.currentTarget) {
-      onClose()
-    }
+    if (event.target === event.currentTarget) onClose()
   }, [onClose])
 
   const setFilterValue = useCallback(<K extends keyof ToolsFilters>(key: K, value: ToolsFilters[K]) => {
-    setTempFilters((prev) => ({ ...prev, [key]: value }))
+    setTempFilters((previous) => ({ ...previous, [key]: value }))
   }, [])
 
-  const toggleFilterValue = useCallback(<K extends keyof Pick<ToolsFilters, 'activity' | 'type' | 'compatibility'>>(key: K, value: string) => {
-    setTempFilters((prev) => {
-      const current = prev[key] as string[]
-      const exists = current.includes(value)
-      return {
-        ...prev,
-        [key]: exists ? current.filter((item) => item !== value) : [...current, value]
-      }
-    })
-  }, [])
+  const toggleFilterValue = useCallback(
+    <K extends keyof Pick<ToolsFilters, 'activity' | 'type' | 'compatibility'>>(key: K, value: string) => {
+      setTempFilters((previous) => {
+        const current = previous[key] as string[]
+        const exists = current.includes(value)
+
+        return {
+          ...previous,
+          [key]: exists ? current.filter((item) => item !== value) : [...current, value],
+        }
+      })
+    },
+    []
+  )
 
   const handleClearFilters = useCallback(() => {
     setTempFilters({
@@ -149,7 +146,7 @@ export default function ToolsFiltersDrawer({
       sort: 'relevance',
       type: [],
       compatibility: [],
-      activity: []
+      activity: [],
     })
   }, [filters.search])
 
@@ -165,32 +162,31 @@ export default function ToolsFiltersDrawer({
       chips.push({
         id: 'category',
         label: `Categoria: ${tempFilters.category}`,
-        onRemove: () => setFilterValue('category', 'all')
+        onRemove: () => setFilterValue('category', 'all'),
       })
     }
 
     tempFilters.type.forEach((type) => {
       chips.push({
-        id: 'type-' + type,
-        label: TOOL_TYPE_LABELS[type as ToolType],
-        onRemove: () => toggleFilterValue('type', type)
+        id: `type-${type}`,
+        label: TOOL_TYPE_LABELS[type],
+        onRemove: () => toggleFilterValue('type', type),
       })
     })
 
-    tempFilters.compatibility.forEach((compat) => {
+    tempFilters.compatibility.forEach((compatibility) => {
       chips.push({
-        id: 'compat-' + compat,
-        label: COMPATIBILITY_LABELS[compat as AICompatibility],
-        onRemove: () => toggleFilterValue('compatibility', compat)
+        id: `compat-${compatibility}`,
+        label: COMPATIBILITY_LABELS[compatibility as AICompatibility],
+        onRemove: () => toggleFilterValue('compatibility', compatibility),
       })
     })
 
     tempFilters.activity.forEach((activity) => {
-      const chipLabel = activity === 'isFavorite' ? 'Somente favoritos' : 'Editados por mim'
       chips.push({
-        id: 'activity-' + activity,
-        label: chipLabel,
-        onRemove: () => toggleFilterValue('activity', activity)
+        id: `activity-${activity}`,
+        label: activity === 'isFavorite' ? 'Somente favoritos' : 'Editados por mim',
+        onRemove: () => toggleFilterValue('activity', activity),
       })
     })
 
@@ -198,15 +194,17 @@ export default function ToolsFiltersDrawer({
   }, [tempFilters, setFilterValue, toggleFilterValue])
 
   const activeFiltersCount = useMemo(() => {
-    let count = 0
-    if (tempFilters.category !== 'all') count += 1
-    count += tempFilters.type.length
-    count += tempFilters.compatibility.length
-    count += tempFilters.activity.length
-    return count
+    return (
+      (tempFilters.category !== 'all' ? 1 : 0) +
+      tempFilters.type.length +
+      tempFilters.compatibility.length +
+      tempFilters.activity.length
+    )
   }, [tempFilters])
 
-  if (!isOpen) return null
+  if (!isOpen) {
+    return null
+  }
 
   return (
     <>
@@ -219,47 +217,51 @@ export default function ToolsFiltersDrawer({
       <div
         ref={drawerRef}
         className={cn(
-          'fixed inset-x-0 bottom-0 z-50 max-h-[90vh] overflow-hidden rounded-t-3xl border border-white/10 bg-black/90 text-white shadow-2xl backdrop-blur lg:inset-y-0 lg:left-auto lg:h-full lg:w-full lg:max-w-md lg:rounded-none',
+          'fixed inset-x-0 bottom-0 z-50 max-h-[90vh] overflow-hidden rounded-t-3xl border border-white/10 bg-black/90 text-white shadow-2xl backdrop-blur',
+          'lg:inset-y-0 lg:left-auto lg:h-full lg:max-w-md lg:rounded-none'
         )}
         role="dialog"
         aria-modal="true"
         aria-labelledby="tools-filters-title"
       >
         <div className="flex h-full flex-col">
-          <header className="flex items-start justify-between gap-3 border-b border-white/10 px-6 py-5">
-            <div className="flex items-center gap-3">
-              <div className="rounded-2xl border border-white/10 bg-white/10 p-2">
-                <Filter className="h-5 w-5" />
+          <header className="sticky top-0 z-10 border-b border-white/10 bg-black/90 px-6 pt-6 pb-4 backdrop-blur">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="rounded-2xl border border-white/10 bg-white/10 p-2">
+                  <Filter className="h-5 w-5" aria-hidden />
+                </div>
+                <div>
+                  <h2 id="tools-filters-title" className="text-lg font-semibold">
+                    Filtros avanÃ§ados
+                  </h2>
+                  <p className="text-sm text-white/70">
+                    Refine sua busca por categoria, tipo, compatibilidade e atividades recentes.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 id="tools-filters-title" className="text-lg font-semibold">Filtros avanÃƒÂ§ados</h2>
-                <p className="text-sm text-white/70">
-                  Refine sua busca por categoria, tipo, compatibilidade e atividades recentes.
-                </p>
-              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-full text-white/70 hover:text-white"
+                onClick={onClose}
+                aria-label="Fechar filtros"
+              >
+                <X className="h-5 w-5" aria-hidden />
+              </Button>
             </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 rounded-full text-white/70 hover:text-white"
-              onClick={onClose}
-              aria-label="Fechar filtros"
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          </header>
 
-          <div className="space-y-2 border-b border-white/10 px-6 py-3">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-white/50">
-              <Tag className="h-3.5 w-3.5" />
+            <div className="mt-4 flex items-center gap-2 text-xs uppercase tracking-wide text-white/50">
+              <Tag className="h-3.5 w-3.5" aria-hidden />
               <span>Filtros ativos</span>
               <Badge variant="outline" className="border-white/15 text-white/70">
                 {activeFiltersCount}
               </Badge>
             </div>
+
             {activeChips.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
+              <div className="mt-3 flex flex-wrap gap-2">
                 {activeChips.map((chip) => (
                   <span
                     key={chip.id}
@@ -270,19 +272,17 @@ export default function ToolsFiltersDrawer({
                       type="button"
                       onClick={chip.onRemove}
                       className="inline-flex h-5 w-5 items-center justify-center rounded-full text-white/60 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-                      aria-label={'Remover filtro ' + chip.label}
+                      aria-label={`Remover filtro ${chip.label}`}
                     >
-                      <X className="h-3 w-3" />
+                      <X className="h-3 w-3" aria-hidden />
                     </button>
                   </span>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-white/60">
-                Nenhum filtro adicional aplicado.
-              </p>
+              <p className="mt-3 text-sm text-white/60">Nenhum filtro adicional aplicado.</p>
             )}
-          </div>
+          </header>
 
           <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
             <section className="space-y-3">
@@ -312,9 +312,9 @@ export default function ToolsFiltersDrawer({
 
             <section className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-white/90">OrdenaÃƒÂ§ÃƒÂ£o</h3>
+                <h3 className="text-sm font-semibold text-white/90">OrdenaÃ§Ã£o</h3>
                 <Badge variant="outline" className="border-white/15 text-white/70">
-                  {tempFilters.sort === 'relevance' ? 'RelevÃƒÂ¢ncia' : 'Recentes'}
+                  {tempFilters.sort === 'relevance' ? 'RelevÃ¢ncia' : 'Recentes'}
                 </Badge>
               </div>
               <div className="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4">
@@ -422,7 +422,7 @@ export default function ToolsFiltersDrawer({
             </section>
           </div>
 
-          <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-white/10 bg-black/85 px-6 py-4 backdrop-blur">
+          <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-white/10 bg-black/90 px-6 py-4 pb-[calc(env(safe-area-inset-bottom,0)+1rem)] backdrop-blur">
             <Button
               type="button"
               variant="ghost"
@@ -450,3 +450,4 @@ export default function ToolsFiltersDrawer({
     </>
   )
 }
+

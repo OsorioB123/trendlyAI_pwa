@@ -1,17 +1,18 @@
-'use client'
+﻿'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { 
-  X, 
-  Copy, 
-  Compass, 
-  CheckCircle, 
-  Code2, 
-  MessageSquareCode, 
-  BrainCircuit, 
-  Cpu 
+import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  X,
+  Copy,
+  Compass,
+  CheckCircle,
+  Code2,
+  MessageSquareCode,
+  BrainCircuit,
+  Cpu,
+  Sparkles,
 } from 'lucide-react'
-import { Tool } from '../../types/tool'
+import type { Tool } from '../../types/tool'
 
 interface ToolModalProps {
   tool: Tool | null
@@ -19,293 +20,310 @@ interface ToolModalProps {
   onClose: () => void
 }
 
-export default function ToolModal({ tool, isOpen, onClose }: ToolModalProps) {
-  const closeBtnRef = useRef<HTMLButtonElement | null>(null)
-  const lastFocusedRef = useRef<HTMLElement | null>(null)
-  const [isExpanded, setIsExpanded] = useState(false)
-  const [editedContent, setEditedContent] = useState(tool?.content || '')
-  const [showSaveButton, setShowSaveButton] = useState(false)
-  const [toast, setToast] = useState({ show: false, message: '' })
+type ToastState = {
+  message: string
+  visible: boolean
+}
 
-  // Tool logos mapping
-  const toolLogos = {
-    "Claude": <BrainCircuit className="w-4 h-4" />,
-    "ChatGPT": <MessageSquareCode className="w-4 h-4" />,
-    "Gemini": <Cpu className="w-4 h-4" />,
-    "Midjourney": <Cpu className="w-4 h-4" />,
-    "DALL-E": <Cpu className="w-4 h-4" />,
-    "Stable Diffusion": <Cpu className="w-4 h-4" />
-  }
+const COMPATIBILITY_ICONS: Record<string, JSX.Element> = {
+  Claude: <BrainCircuit className="h-4 w-4" aria-hidden />,
+  ChatGPT: <MessageSquareCode className="h-4 w-4" aria-hidden />,
+  Gemini: <Cpu className="h-4 w-4" aria-hidden />,
+  Midjourney: <Cpu className="h-4 w-4" aria-hidden />,
+  'DALL-E': <Cpu className="h-4 w-4" aria-hidden />,
+  'Stable Diffusion': <Cpu className="h-4 w-4" aria-hidden />,
+}
+
+export default function ToolModal({ tool, isOpen, onClose }: ToolModalProps) {
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null)
+  const lastFocusedElementRef = useRef<HTMLElement | null>(null)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [editedContent, setEditedContent] = useState('')
+  const [showSaveButton, setShowSaveButton] = useState(false)
+  const [toast, setToast] = useState<ToastState>({ message: '', visible: false })
+
+  const compatibilityTools = useMemo(() => {
+    if (!tool?.compatibility?.length) return []
+
+    return tool.compatibility.map((item) => {
+      const label = mapCompatibilityLabel(item)
+      const icon = COMPATIBILITY_ICONS[label] ?? <Sparkles className="h-4 w-4" aria-hidden />
+
+      return (
+        <span
+          key={item}
+          className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white"
+        >
+          {icon}
+          {label}
+        </span>
+      )
+    })
+  }, [tool])
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-      // store last focused element to restore later
-      if (typeof document !== 'undefined') {
-        lastFocusedRef.current = document.activeElement as HTMLElement
-      }
-      setEditedContent(tool?.content || '')
-      setIsExpanded(false)
-      setShowSaveButton(false)
-      // move focus to close button
-      setTimeout(() => closeBtnRef.current?.focus(), 0)
-    } else {
-      document.body.style.overflow = ''
-      // restore focus to the element that opened the modal
-      setTimeout(() => lastFocusedRef.current?.focus?.(), 0)
-    }
+    if (!isOpen || !tool) return
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    lastFocusedElementRef.current = document.activeElement as HTMLElement
+
+    setEditedContent(tool.content ?? '')
+    setIsExpanded(false)
+    setShowSaveButton(false)
+
+    const focusTimeout = window.setTimeout(() => closeButtonRef.current?.focus(), 0)
 
     return () => {
-      document.body.style.overflow = ''
+      document.body.style.overflow = previousOverflow
+      window.clearTimeout(focusTimeout)
     }
   }, [isOpen, tool])
 
-  const showToast = (message: string) => {
-    setToast({ show: true, message })
-    setTimeout(() => setToast({ show: false, message: '' }), 2500)
-  }
+  useEffect(() => {
+    if (isOpen) return
+    const timer = window.setTimeout(() => lastFocusedElementRef.current?.focus?.(), 0)
+    return () => window.clearTimeout(timer)
+  }, [isOpen])
 
-  const copyToClipboard = (content: string) => {
-    navigator.clipboard.writeText(content).then(() => {
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, onClose])
+
+  useEffect(() => {
+    if (!toast.visible) return
+
+    const timeout = window.setTimeout(() => setToast({ message: '', visible: false }), 2500)
+    return () => window.clearTimeout(timeout)
+  }, [toast])
+
+  const showToast = (message: string) => setToast({ message, visible: true })
+
+  const copyToClipboard = async (content: string) => {
+    try {
+      await navigator.clipboard.writeText(content)
       showToast('Prompt copiado!')
-    }).catch(() => {
-      showToast('Erro ao copiar prompt')
-    })
+    } catch (error) {
+      console.error('Failed to copy prompt:', error)
+      showToast('Erro ao copiar prompt.')
+    }
   }
 
-  const handleExpandPrompt = () => {
-    setIsExpanded(true)
+  const handleRestoreDefault = () => {
+    if (!tool) return
+    const confirmation = window.confirm('Tem certeza? Suas ediÃ§Ãµes serÃ£o perdidas.')
+    if (!confirmation) return
+
+    setEditedContent(tool.content ?? '')
+    setShowSaveButton(false)
+    showToast('Prompt restaurado ao padrÃ£o.')
   }
 
+  const handleSaveChanges = () => {
+    if (!tool) return
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(`tool-${tool.id}`, editedContent)
+    }
+    setShowSaveButton(false)
+    showToast('AlteraÃ§Ãµes salvas!')
+  }
+
+  const handleContentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setEditedContent(event.target.value)
+    setShowSaveButton(true)
+
+    event.target.style.height = 'auto'
+    event.target.style.height = `${Math.min(event.target.scrollHeight, 300)}px`
+  }
+
+  const handleExpandPrompt = () => setIsExpanded(true)
   const handleCollapsePrompt = () => {
     setIsExpanded(false)
     setShowSaveButton(false)
   }
 
-  const handleRestoreDefault = () => {
-    if (confirm('Tem certeza? Suas edições serão perdidas.')) {
-      setEditedContent(tool?.content || '')
-      setShowSaveButton(false)
-      showToast('Prompt restaurado ao padrão.')
-    }
+  const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) onClose()
   }
 
-  const handleSaveChanges = () => {
-    // In a real app, this would save to backend/localStorage
-    if (tool) {
-      localStorage.setItem(`tool-${tool.id}`, editedContent)
-    }
-    setShowSaveButton(false)
-    showToast('Alterações salvas!')
+  if (!tool || !isOpen) {
+    return null
   }
-
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setEditedContent(e.target.value)
-    setShowSaveButton(true)
-    
-    // Auto-resize textarea
-    e.target.style.height = 'auto'
-    e.target.style.height = Math.min(e.target.scrollHeight, 300) + 'px'
-  }
-
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose()
-    }
-  }
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-      }
-    }
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown)
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [isOpen, onClose])
-
-  if (!isOpen || !tool) return null
-
-  const compatibilityTools = tool.compatibility?.map(toolName => (
-    <div 
-      key={toolName} 
-      className="p-2 rounded-lg flex flex-col items-center gap-1 transition-all hover:scale-110 hover:bg-white/10 hover:border-white/15 bg-white/5 border border-transparent" 
-      title={toolName}
-    >
-      <div className="w-8 h-8 text-white/70 flex items-center justify-center">
-        {toolLogos[toolName as keyof typeof toolLogos] || <Cpu className="w-4 h-4" />}
-      </div>
-      <span className="text-xs text-white/60">{toolName}</span>
-    </div>
-  )) || []
 
   return (
     <>
-      {/* A11y: announce toast messages to screen readers */}
-      <div className="sr-only" aria-live="polite" aria-atomic="true">{toast.show ? toast.message : ''}</div>
-      {/* Backdrop */}
-      <div 
-        className={`fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
-          isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-        }`}
+      <div
+        className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm transition-opacity duration-300"
         onClick={handleBackdropClick}
       />
-      
-      {/* Modal Container */}
-      <div 
-        className={`fixed z-[101] transition-all duration-300 ${
-          isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-        } top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[min(90vw,800px)] h-[min(85vh,750px)] rounded-3xl
-        backdrop-blur-2xl bg-slate-900/90 overflow-hidden md:block
-        mobile:fixed mobile:bottom-0 mobile:left-0 mobile:right-0 mobile:h-[90vh] mobile:rounded-t-[20px] mobile:border-b-0 mobile:transform-none mobile:w-full mobile:translate-x-0 mobile:translate-y-0`}
+
+      <div
+        className="fixed top-1/2 left-1/2 z-[101] h-[min(85vh,750px)] w-[min(90vw,800px)] -translate-x-1/2 -translate-y-1/2 transform rounded-3xl bg-slate-900/90 backdrop-blur-2xl transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30 md:overflow-hidden"
         role="dialog"
         aria-modal="true"
         aria-labelledby={`tool-modal-title-${tool.id}`}
       >
-        {/* Inner Content */}
-        <div className={`h-full w-full transition-all duration-300 ${
-          isOpen ? 'opacity-100 transform-none' : 'opacity-0 translate-y-5'
-        }`}>
-          <div className="p-6 pt-12 md:pt-6 h-full flex flex-col">
-            {/* Close Button */}
-            <button 
-              ref={closeBtnRef}
-              onClick={onClose}
-              className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors bg-black/20 hover:bg-black/40 rounded-full z-10 focus-ring"
-              aria-label="Fechar"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            
-            {/* Header */}
-            <div className="flex-shrink-0 mb-6">
-              <h2 id={`tool-modal-title-${tool.id}`} className="text-2xl font-semibold tracking-tight pr-10 font-sans">
+        <div className="flex h-full flex-col p-6 pt-12 md:pt-6">
+          <button
+            ref={closeButtonRef}
+            type="button"
+            onClick={onClose}
+            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-black/20 text-white/70 transition-colors hover:bg-black/40 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+            aria-label="Fechar"
+          >
+            <X className="h-5 w-5" aria-hidden />
+          </button>
+
+          <header className="mb-6 flex-shrink-0 space-y-4 pr-10">
+            <div className="space-y-2">
+              <h2 id={`tool-modal-title-${tool.id}`} className="text-2xl font-semibold tracking-tight text-white">
                 {tool.title}
               </h2>
-              <p className="text-white/70 mt-2">{tool.description}</p>
-              <div className="flex flex-wrap gap-2 mt-4">
-                {tool.tags?.map(tag => (
-                  <span key={tag} className="px-3 py-1 text-xs font-medium rounded-full backdrop-blur-lg bg-white/10 text-white">
-                    {tag}
-                  </span>
-                ))}
-              </div>
+              <p className="text-white/70">{tool.description}</p>
             </div>
-            
-            {/* Scrollable Content */}
-            <div className="flex-grow overflow-y-auto space-y-6 scrollbar-hide -mr-2 pr-2">
-              
-              {/* How to Use Guide */}
-              {tool.how_to_use && (
-                <div className="p-4 rounded-xl bg-white/5">
-                  <div className="flex items-start gap-3">
-                    <Compass className="w-5 h-5 text-white flex-shrink-0 mt-1" />
-                    <div>
-                      <h4 className="font-semibold">Guia Rápido</h4>
-                      <p className="text-sm text-white/70 mt-1">{tool.how_to_use}</p>
-                    </div>
+            <div className="flex flex-wrap gap-2">
+              {tool.tags?.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </header>
+
+          <section className="-mr-2 flex-grow space-y-6 overflow-y-auto pr-2 scrollbar-hide">
+            {tool.how_to_use && (
+              <article className="rounded-xl bg-white/5 p-4">
+                <div className="flex items-start gap-3">
+                  <Compass className="mt-1 h-5 w-5 text-white" aria-hidden />
+                  <div>
+                    <h3 className="font-semibold text-white">Guia rÃ¡pido</h3>
+                    <p className="mt-1 text-sm text-white/70">{tool.how_to_use}</p>
                   </div>
                 </div>
-              )}
+              </article>
+            )}
 
-              {/* Compatibility Tools */}
-              {compatibilityTools.length > 0 && (
-                <div className="p-4 rounded-xl bg-white/5">
-                  <h4 className="font-semibold mb-3 flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-white" />
-                    Também funciona com
-                  </h4>
-                  <div className="flex items-center flex-wrap gap-3">
-                    {compatibilityTools}
+            {compatibilityTools.length > 0 && (
+              <article className="rounded-xl bg-white/5 p-4">
+                <h3 className="mb-3 flex items-center gap-2 font-semibold text-white">
+                  <CheckCircle className="h-4 w-4" aria-hidden />
+                  TambÃ©m funciona com
+                </h3>
+                <div className="flex flex-wrap items-center gap-3">{compatibilityTools}</div>
+              </article>
+            )}
+
+            <article className="space-y-4 rounded-xl bg-white/5 p-4">
+              <div className="flex items-center justify-between">
+                <h3 className="flex items-center gap-2 font-semibold text-white">
+                  <Code2 className="h-4 w-4" aria-hidden />
+                  Prompt principal
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(editedContent)}
+                  className="rounded-lg p-2 text-white/70 transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                  title="Copiar prompt"
+                >
+                  <Copy className="h-4 w-4" aria-hidden />
+                </button>
+              </div>
+
+              {!isExpanded && (
+                <div>
+                  <div className="relative max-h-[140px] overflow-hidden rounded-lg bg-black/20 p-4">
+                    <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed text-gray-200">
+                      {editedContent.substring(0, 200)}{editedContent.length > 200 ? 'â€¦' : ''}
+                    </pre>
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-slate-900 to-transparent" />
                   </div>
-                </div>
-              )}
-
-              {/* Main Prompt Section */}
-              <div className="p-4 rounded-xl bg-white/5 space-y-4">
-                <div className="flex justify-between items-center">
-                  <h4 className="font-semibold flex items-center gap-2">
-                    <Code2 className="w-4 h-4 text-white" />
-                    Prompt Principal
-                  </h4>
-                  <button 
-                    onClick={() => copyToClipboard(editedContent)}
-                    className="p-2 rounded-lg hover:bg-white/10 transition-colors" 
-                    title="Copiar prompt"
+                  <button
+                    type="button"
+                    onClick={handleExpandPrompt}
+                    className="mt-3 text-sm font-medium text-white transition-colors hover:text-white/80"
                   >
-                    <Copy className="w-4 h-4" />
+                    Expandir para editar
                   </button>
                 </div>
+              )}
 
-                {/* Preview Mode */}
-                {!isExpanded && (
-                  <div>
-                    <div className="bg-black/20 rounded-lg p-4 relative max-h-[120px] overflow-hidden">
-                      <pre className="text-sm leading-relaxed text-gray-300 whitespace-pre-wrap font-mono">
-                        {editedContent.substring(0, 200)}...
-                      </pre>
-                      <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-slate-900 to-transparent"></div>
-                    </div>
-                    <button 
-                      onClick={handleExpandPrompt}
-                      className="mt-3 text-sm font-medium text-white hover:text-white/80 transition-colors"
+              {isExpanded && (
+                <div className="space-y-3">
+                  <textarea
+                    className="h-auto w-full resize-none rounded-lg bg-black/30 p-4 font-mono text-sm leading-relaxed text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                    rows={8}
+                    value={editedContent}
+                    onChange={handleContentChange}
+                  />
+                  <div className="flex flex-wrap items-center gap-4">
+                    {showSaveButton && (
+                      <button
+                        type="button"
+                        onClick={handleSaveChanges}
+                        className="rounded-full bg-green-500/20 px-3 py-1.5 text-xs font-medium text-green-300 transition-colors hover:bg-green-500/30"
+                      >
+                        Salvar alteraÃ§Ãµes
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleRestoreDefault}
+                      className="text-xs font-medium text-red-400/80 transition-colors hover:text-red-400"
                     >
-                      Expandir para editar
+                      Restaurar padrÃ£o
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCollapsePrompt}
+                      className="ml-auto text-sm text-white/60 transition-colors hover:text-white"
+                    >
+                      Recolher
                     </button>
                   </div>
-                )}
-
-                {/* Edit Mode */}
-                {isExpanded && (
-                  <div>
-                    <textarea
-                      className="w-full bg-black/30 p-4 rounded-lg text-sm leading-relaxed resize-none focus:outline-none transition-colors font-mono text-white"
-                      rows={8}
-                      value={editedContent}
-                      onChange={handleContentChange}
-                    />
-                    <div className="mt-3 flex items-center flex-wrap gap-4">
-                      {showSaveButton && (
-                        <button 
-                          onClick={handleSaveChanges}
-                          className="bg-green-500/20 text-green-300 text-xs font-medium px-3 py-1.5 rounded-full hover:bg-green-500/30 transition-colors"
-                        >
-                          Salvar Alterações
-                        </button>
-                      )}
-                      <button 
-                        onClick={handleRestoreDefault}
-                        className="text-xs text-red-400/80 hover:text-red-400 transition-colors font-medium"
-                      >
-                        Restaurar Padrão
-                      </button>
-                      <button 
-                        onClick={handleCollapsePrompt}
-                        className="text-sm text-white/60 hover:text-white transition-colors ml-auto"
-                      >
-                        Recolher
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+                </div>
+              )}
+            </article>
+          </section>
         </div>
       </div>
 
-      {/* Toast Notification */}
-      {toast.show && (
-        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[200] pointer-events-none backdrop-blur-lg bg-white/10 shadow-2xl rounded-full py-3 px-6 text-white text-sm font-medium transition-all duration-300">
+      {toast.visible && (
+        <div className="pointer-events-none fixed bottom-6 left-1/2 z-[200] -translate-x-1/2 rounded-full bg-white/10 px-6 py-3 text-sm font-medium text-white shadow-2xl backdrop-blur-lg">
           {toast.message}
         </div>
       )}
     </>
   )
 }
+
+function mapCompatibilityLabel(value: string): string {
+  switch (value) {
+    case 'chatgpt':
+      return 'ChatGPT'
+    case 'claude':
+      return 'Claude'
+    case 'gemini':
+      return 'Gemini'
+    case 'midjourney':
+      return 'Midjourney'
+    case 'dalle':
+      return 'DALL-E'
+    case 'stable-diffusion':
+      return 'Stable Diffusion'
+    default:
+      return value
+  }
+}
+

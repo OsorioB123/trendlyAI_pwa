@@ -1,11 +1,11 @@
 // Tool/Prompt categories based on HTML reference
-export type ToolCategory = 
-  | 'Copywriting' 
-  | 'SEO' 
-  | 'Imagem' 
-  | 'Análise' 
-  | 'Negócios' 
-  | 'Marketing' 
+export type ToolCategory =
+  | 'Copywriting'
+  | 'SEO'
+  | 'Imagem'
+  | 'Análise'
+  | 'Negócios'
+  | 'Marketing'
   | 'Design'
 
 // Tool types for filtering

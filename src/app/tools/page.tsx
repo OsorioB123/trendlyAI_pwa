@@ -84,7 +84,7 @@ const normalizeTags = (tags: string[] | null | undefined) =>
   Array.isArray(tags) ? tags : []
 
 const escapeIlikePattern = (value: string) =>
-  value.replace(/[%_]/g, (match) => '\' + match)
+  value.replace(/[%_]/g, (match) => '\\' + match)
 
 const isToolType = (value: string | undefined): value is ToolType => {
   if (!value) return false
@@ -828,7 +828,7 @@ function ToolsPageContent() {
             {filters.search ? (
               <>
                 <h3 className="text-2xl font-semibold text-white drop-shadow-sm">
-                  Nenhuma ferramenta encontrada para "{filters.search}"
+                  Nenhuma ferramenta encontrada para &ldquo;{filters.search}&rdquo;
                 </h3>
                 <p className="mx-auto mb-6 max-w-md text-white/70 drop-shadow-sm">
                   Experimente termos mais gerais ou explore nossas categorias populares.

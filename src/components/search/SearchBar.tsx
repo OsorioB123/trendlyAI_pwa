@@ -22,10 +22,10 @@ interface SearchBarProps {
 const QUICK_SUGGESTIONS = [
   { label: 'Copywriting', icon: '✍️', category: 'Copywriting' },
   { label: 'SEO', icon: '📈', category: 'SEO' },
-  { label: 'Geração de imagem', icon: '🎨', category: 'Imagem' },
+  { label: 'Geração de imagem', icon: '🖼️', category: 'Imagem' },
   { label: 'Análise de dados', icon: '📊', category: 'Análise' },
-  { label: 'Marketing', icon: '📢', category: 'Marketing' },
-  { label: 'Design', icon: '🎯', category: 'Design' }
+  { label: 'Marketing', icon: '📣', category: 'Marketing' },
+  { label: 'Design', icon: '🎨', category: 'Design' }
 ]
 
 const RECENT_SEARCHES = [
@@ -141,6 +141,9 @@ export default function SearchBar({
           onFocus={handleFocus}
           type="text"
           autoComplete="off"
+          role={suggestionsEnabled ? 'combobox' : undefined}
+          aria-autocomplete={suggestionsEnabled ? 'list' : undefined}
+          aria-controls={suggestionsEnabled ? 'tools-search-suggestions' : undefined}
           placeholder={dynamicPlaceholder}
           aria-expanded={suggestionsEnabled ? showSuggestions : undefined}
           className="h-8 w-full bg-transparent text-base outline-none placeholder:text-white/50"
@@ -159,6 +162,7 @@ export default function SearchBar({
 
       {suggestionsEnabled && showSuggestions && (
         <div
+          id="tools-search-suggestions"
           role="listbox"
           aria-label="Sugestões de busca"
           className="absolute left-0 right-0 top-full z-40 mt-2 origin-top rounded-2xl border border-white/10 bg-black/85 p-4 text-white shadow-lg backdrop-blur"
