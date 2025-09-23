@@ -25,6 +25,17 @@ export default function HelpPage() {
   const router = useRouter()
   const { currentBackground } = useBackground()
   const helpData = useHelp('primeiros-passos')
+  const {
+    setActiveCategory,
+    markFAQViewed,
+    searchFAQ,
+    createSupportTicket,
+    isLoading,
+    isSearching,
+    error: helpError,
+    refetch,
+    faqItems
+  } = helpData
   const transitionSafe = respectReducedMotion({ transition: { duration: 0.3 } }).transition as any
   
   // Local state for UI
@@ -40,10 +51,10 @@ export default function HelpPage() {
 
   // Update FAQ items when active tab changes
   useEffect(() => {
-    if (activeTab && helpData.setActiveCategory) {
-      helpData.setActiveCategory(activeTab)
+    if (activeTab && setActiveCategory) {
+      setActiveCategory(activeTab)
     }
-  }, [activeTab, helpData.setActiveCategory])
+  }, [activeTab, setActiveCategory])
 
   // Tab configuration
   const tabs = [
@@ -72,8 +83,8 @@ export default function HelpPage() {
 
   const handleFAQItemClick = async (item: FAQItem) => {
     // Mark FAQ as viewed
-    if (helpData.markFAQViewed) {
-      await helpData.markFAQViewed(item.id)
+    if (markFAQViewed) {
+      await markFAQViewed(item.id)
     }
     
     // Toggle accordion
@@ -83,7 +94,9 @@ export default function HelpPage() {
   // Search handler
   const handleSearch = async () => {
     const query = searchQuery.trim()
-    await helpData.searchFAQ({ query, category: activeTab })
+    if (searchFAQ) {
+      await searchFAQ({ query, category: activeTab })
+    }
   }
 
   // Create ticket handler
@@ -96,7 +109,12 @@ export default function HelpPage() {
       setTicketFeedback('Preencha assunto e descrição.')
       return
     }
-    const { success, error } = await helpData.createSupportTicket({
+    if (!createSupportTicket) {
+      setTicketFeedback('Função de ticket indisponível no momento.')
+      return
+    }
+
+    const { success, error } = await createSupportTicket({
       subject,
       description,
       category: activeTab,
@@ -114,7 +132,7 @@ export default function HelpPage() {
   }
 
   // Loading state
-  if (helpData.isLoading) {
+  if (isLoading) {
     return (
       <div 
         className="min-h-screen flex items-center justify-center"
@@ -166,10 +184,10 @@ export default function HelpPage() {
                 />
                 <button
                   onClick={handleSearch}
-                  disabled={helpData.isSearching}
+                  disabled={isSearching}
                   className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-white text-black rounded-lg text-sm font-semibold hover:bg-gray-100 disabled:opacity-50"
                 >
-                  {helpData.isSearching ? 'Buscando...' : 'Buscar'}
+                  {isSearching ? 'Buscando...' : 'Buscar'}
                 </button>
               </div>
               <button
@@ -235,7 +253,7 @@ export default function HelpPage() {
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        disabled={helpData.isLoading}
+                        disabled={isLoading}
                         className={`relative z-10 flex items-center gap-3 px-4 py-3 font-medium transition-colors disabled:opacity-50 ${
                           activeTab === tab.id ? 'text-white' : 'text-white/60 hover:text-white'
                         }`}
@@ -250,11 +268,11 @@ export default function HelpPage() {
 
               {/* FAQ Content */}
               <div className="lg:col-span-3">
-                {helpData.error ? (
+                {helpError ? (
                   <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
-                    <p className="text-red-400 text-sm">{helpData.error}</p>
+                    <p className="text-red-400 text-sm">{helpError}</p>
                     <button 
-                      onClick={helpData.refetch}
+                      onClick={refetch}
                       className="mt-2 text-xs text-red-300 hover:text-red-200 underline"
                     >
                       Tentar novamente
@@ -262,7 +280,7 @@ export default function HelpPage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {helpData.faqItems.map((item) => (
+                    {faqItems.map((item) => (
                       <div key={item.id} className="last:border-b-0">
                         <button
                           type="button"
@@ -302,7 +320,7 @@ export default function HelpPage() {
                       </div>
                     ))}
 
-                    {helpData.faqItems.length === 0 && !helpData.isLoading && (
+            {faqItems.length === 0 && !isLoading && (
                       <div className="text-center py-12">
                         <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
                           <Headphones className="w-8 h-8 text-white/40" />

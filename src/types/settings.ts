@@ -22,6 +22,7 @@ export interface StudioTheme {
   id: string
   name: string
   background: string // CSS gradient/background definition
+  imageUrl: string
 }
 
 // Security tab interfaces
@@ -164,6 +165,8 @@ export interface UseSettingsReturn {
   setActiveModal: (modal: SecurityModal) => void
   setEditingField: (field: string | null) => void
   showToast: (notification: Omit<ToastNotification, 'id'>) => void
+  toasts: ToastNotification[]
+  dismissToast: (id: string) => void
 }
 
 // Component props interfaces
@@ -230,21 +233,6 @@ export interface ToggleSwitchProps {
 }
 
 // Studio themes configuration
-export const STUDIO_THEMES: StudioTheme[] = [
-  { id: 'default', name: 'Padrão', background: 'linear-gradient(135deg, #0a0a0a 0%, #141414 100%)' },
-  { id: 'theme-2', name: 'Vidro', background: 'radial-gradient(circle at 30% 20%, rgba(255,255,255,0.18), rgba(0,0,0,0) 60%), linear-gradient(135deg, #0b0b0b, #171717)' },
-  { id: 'theme-3', name: 'Nevoa', background: 'radial-gradient(60% 60% at 20% 20%, rgba(255,255,255,0.12) 0%, rgba(0,0,0,0) 100%), linear-gradient(160deg, #0a0a0a, #101010)' },
-  { id: 'theme-4', name: 'Carbono', background: 'repeating-linear-gradient(45deg, #0c0c0c 0, #0c0c0c 10px, #101010 10px, #101010 20px)' },
-  { id: 'theme-5', name: 'Grafite', background: 'linear-gradient(180deg, #111 0%, #0b0b0b 100%)' },
-  { id: 'theme-6', name: 'Chumbo', background: 'radial-gradient(50% 50% at 50% 50%, #1a1a1a 0%, #0f0f0f 100%)' },
-  { id: 'theme-7', name: 'Slate', background: 'linear-gradient(200deg, #0d0d0d 0%, #161616 100%)' },
-  { id: 'theme-8', name: 'Onix', background: 'conic-gradient(from 180deg at 50% 50%, #101010, #0a0a0a, #101010)' },
-  { id: 'theme-9', name: 'Cinzento', background: 'linear-gradient(145deg, #0e0e0e 0%, #121212 100%)' },
-  { id: 'theme-10', name: 'Nebulosa', background: 'radial-gradient(circle at 70% 30%, rgba(255,255,255,0.10), rgba(0,0,0,0) 50%), linear-gradient(145deg, #0b0b0b, #151515)' },
-  { id: 'theme-11', name: 'Aço', background: 'linear-gradient(125deg, #131313 0%, #0e0e0e 100%)' },
-  { id: 'theme-12', name: 'Midnight', background: 'linear-gradient(160deg, #0a0a0a 0%, #101010 50%, #0a0a0a 100%)' }
-]
-
 // Validation constants
 export const VALIDATION_RULES = {
   PASSWORD_MIN_LENGTH: 8,

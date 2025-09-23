@@ -10,11 +10,8 @@ import { useAuth } from '../contexts/AuthContext'
 import ChatService from '../lib/services/chatService'
 import type {
   Conversation,
-  ConversationListItem,
   CreateConversationRequest,
-  UpdateConversationRequest,
-  ConversationsResponse,
-  ChatServiceResponse
+  UpdateConversationRequest
 } from '../types/chat'
 import { CHAT_CONSTANTS, CHAT_ERRORS, PORTUGUESE_MESSAGES } from '../types/chat'
 
@@ -327,7 +324,8 @@ export function useConversations(): UseConversationsReturn {
     
     // Cancel any active editing
     if (editingConversationId) {
-      cancelRename()
+      setEditingConversationId(null)
+      setEditingTitle('')
     }
   }, [editingConversationId])
 

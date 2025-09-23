@@ -163,7 +163,6 @@ function ChatPageContent() {
         <Header 
           variant={HeaderVariant.CHAT} 
           onMenuToggle={conversations.toggleMobileSidebar}
-          showMobileSidebar={conversations.isMobileSidebarOpen}
         />
 
         {/* Chat Messages */}

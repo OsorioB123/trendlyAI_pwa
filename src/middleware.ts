@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { hasCompletedOnboardingFromCookies, ONBOARDING_STORAGE_KEY } from './lib/onboarding'
+import { hasCompletedOnboardingFromCookies } from './lib/onboarding'
 
 export async function middleware(req: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -17,7 +17,7 @@ export async function middleware(req: NextRequest) {
           return req.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
+          cookiesToSet.forEach(({ name, value }) =>
             req.cookies.set(name, value)
           )
           supabaseResponse = NextResponse.next({

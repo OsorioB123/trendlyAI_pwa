@@ -13,7 +13,6 @@ import type {
   ChatServiceResponse,
   ConversationsResponse,
   MessagesResponse,
-  StreamResponse,
   AIResponseOptions,
   UserCredits
 } from '../../types/chat'
@@ -482,8 +481,6 @@ class ChatService {
         return { success: false, error: messagesResult.error }
       }
 
-      const recentMessages = messagesResult.data!.messages.slice(-10)
-      
       // This would integrate with your Salina AI service
       // For now, return a simulated response
       const responses = [
@@ -494,7 +491,9 @@ class ChatService {
         'Perfeito! Com base na nossa conversa, vejo que você está indo na direção certa. Aqui está minha análise...'
       ]
 
-      const content = responses[Math.floor(Math.random() * responses.length)]
+      const baseResponse = responses[Math.floor(Math.random() * responses.length)]
+      const maxTokens = options?.max_tokens ? Math.max(options.max_tokens, 50) : undefined
+      const content = maxTokens ? baseResponse.slice(0, maxTokens) : baseResponse
       const tokens_used = Math.floor(content.length / 4) // Rough estimation
 
       return {
@@ -660,7 +659,7 @@ class ChatService {
    */
   static async consumeUserCredits(userId: string, amount: number = 1): Promise<ChatServiceResponse<UserCredits>> {
     try {
-      const { data, error } = await (supabase as any).rpc('consume_user_credits', {
+      const { error } = await (supabase as any).rpc('consume_user_credits', {
         user_id: userId,
         credit_amount: amount
       })

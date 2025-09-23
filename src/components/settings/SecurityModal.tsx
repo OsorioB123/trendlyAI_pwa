@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { X, Eye, EyeOff, AlertTriangle, Lock, Mail, Shield, Trash2 } from 'lucide-react'
 import { SecurityModalProps, ChangeEmailRequest, ChangePasswordRequest, DeleteAccountRequest, VALIDATION_RULES } from '../../types/settings'
 import { Input } from '@/components/ui/input'
@@ -68,11 +68,7 @@ export default function SecurityModal({ type, isOpen, onClose, onSubmit, isLoadi
     }
   }, [isOpen])
 
-  useEffect(() => {
-    validateForm()
-  }, [formData, type])
-
-  const validateForm = () => {
+  const validateForm = useCallback(() => {
     const newErrors: Record<string, string> = {}
     let valid = true
 
@@ -127,7 +123,11 @@ export default function SecurityModal({ type, isOpen, onClose, onSubmit, isLoadi
 
     setErrors(newErrors)
     setIsFormValid(valid && Object.keys(formData).length > 0)
-  }
+  }, [formData, type])
+
+  useEffect(() => {
+    validateForm()
+  }, [validateForm])
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev: any) => ({ ...prev, [field]: value }))

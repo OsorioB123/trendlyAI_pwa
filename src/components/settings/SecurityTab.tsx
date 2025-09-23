@@ -88,8 +88,9 @@ export default function SecurityTab({
   const securityScore = getSecurityScore()
 
   const getScoreColor = (percentage: number) => {
-    // Simplified to grayscale styling
-    return 'text-white bg-white/10'
+    if (percentage >= 75) return 'text-emerald-200 bg-emerald-500/10'
+    if (percentage >= 50) return 'text-yellow-200 bg-yellow-500/10'
+    return 'text-red-200 bg-red-500/10'
   }
 
   const formatLastChange = (date?: Date) => {

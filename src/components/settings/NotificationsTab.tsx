@@ -54,7 +54,6 @@ export default function NotificationsTab({
             checked={notifications.email_notifications}
             onChange={(checked) => handleToggleChange('email_notifications', checked)}
             disabled={isLoading}
-            color="blue"
           />
 
           {/* Push Notifications */}
@@ -65,7 +64,6 @@ export default function NotificationsTab({
             checked={notifications.push_notifications}
             onChange={(checked) => handleToggleChange('push_notifications', checked)}
             disabled={isLoading}
-            color="green"
           />
 
           {/* Weekly Reports */}
@@ -76,7 +74,6 @@ export default function NotificationsTab({
             checked={notifications.weekly_reports}
             onChange={(checked) => handleToggleChange('weekly_reports', checked)}
             disabled={isLoading}
-            color="purple"
           />
 
           {/* Marketing Communications */}
@@ -87,7 +84,6 @@ export default function NotificationsTab({
             checked={!!notifications.marketing_communications}
             onChange={(checked) => handleToggleChange('marketing_communications' as any, checked)}
             disabled={isLoading}
-            color="orange"
           />
         </div>
       </div>
@@ -110,7 +106,6 @@ export default function NotificationsTab({
             checked={notifications.security_alerts}
             onChange={(checked) => handleToggleChange('security_alerts', checked)}
             disabled={true} // Always required for security
-            color="default"
           />
 
           {/* Feature Updates */}
@@ -121,7 +116,6 @@ export default function NotificationsTab({
             checked={!!notifications.feature_updates}
             onChange={(checked) => handleToggleChange('feature_updates' as any, checked)}
             disabled={isLoading}
-            color="blue"
           />
 
           {/* Community Activity */}
@@ -132,7 +126,6 @@ export default function NotificationsTab({
             checked={!!notifications.community_activity}
             onChange={(checked) => handleToggleChange('community_activity' as any, checked)}
             disabled={isLoading}
-            color="green"
           />
 
           {/* System Maintenance */}
@@ -143,7 +136,6 @@ export default function NotificationsTab({
             checked={!!notifications.system_maintenance}
             onChange={(checked) => handleToggleChange('system_maintenance' as any, checked)}
             disabled={isLoading}
-            color="purple"
           />
         </div>
       </div>

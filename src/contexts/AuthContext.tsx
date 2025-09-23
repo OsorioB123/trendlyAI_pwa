@@ -133,7 +133,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               console.log('📝 Checking/creating profile for signed in user...')
               try {
                 await loadUserProfile(session.user.id)
-              } catch (error) {
+              } catch {
                 // If profile doesn't exist, create it
                 console.log('Creating profile for user without one')
                 await createUserProfile(session.user)

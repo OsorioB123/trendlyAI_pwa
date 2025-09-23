@@ -11,7 +11,7 @@ interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
-  ({ className, animation = 'shimmer', delay = 0, ...props }, ref) => {
+  ({ className, animation = 'shimmer', delay = 0, style, ...props }, ref) => {
     const getAnimationClasses = () => {
       switch (animation) {
         case 'pulse':
@@ -24,6 +24,11 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
       }
     }
 
+    const combinedStyle = {
+      ...style,
+      ...(delay ? { animationDelay: `${delay}s` } : {})
+    }
+
     return (
       <div
         ref={ref}
@@ -32,6 +37,7 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
           getAnimationClasses(),
           className
         )}
+        style={combinedStyle}
         {...props}
       />
     )
@@ -94,7 +100,7 @@ const SkeletonToolCard = ({ className, ...props }: SkeletonProps) => (
     transition={{ duration: 0.3 }}
     className={cn('tool-card-grid-item', className)}
   >
-    <SkeletonCard className="relative overflow-hidden">
+    <SkeletonCard className="relative overflow-hidden" {...props}>
       {/* Category tag skeleton */}
       <div className="absolute top-5 left-5">
         <Skeleton className="h-6 w-20 rounded-full" delay={0.1} />

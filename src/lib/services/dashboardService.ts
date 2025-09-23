@@ -18,6 +18,7 @@ interface UserTrackRow {
     title: string | null
     difficulty: string | null
     category: string | null
+    thumbnail_url: string | null
   } | null
 }
 
@@ -178,7 +179,8 @@ const FALLBACK_SUMMARY: DashboardSummary = {
       level: 'Intermediário',
       progress: 65,
       updatedAt: addDays(-1),
-      category: 'Growth'
+      category: 'Growth',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?w=1000&q=80&auto=format&fit=crop'
     },
     {
       id: 'track-2',
@@ -186,7 +188,8 @@ const FALLBACK_SUMMARY: DashboardSummary = {
       level: 'Avançado',
       progress: 35,
       updatedAt: addDays(-3),
-      category: 'Monetização'
+      category: 'Monetização',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1000&q=80&auto=format&fit=crop'
     }
   ],
   snapshot: {
@@ -225,7 +228,7 @@ export async function fetchDashboardSummary(userId?: string | null): Promise<Das
         .maybeSingle(),
       supabase
         .from('user_tracks')
-        .select('track_id, progress, status, updated_at, tracks ( id, title, difficulty, category )')
+        .select('track_id, progress, status, updated_at, tracks ( id, title, difficulty, category, thumbnail_url )')
         .eq('user_id', userId)
         .limit(12),
       supabase
@@ -331,7 +334,8 @@ function buildTrackSummaries(rows: UserTrackRow[]): DashboardTrackSummary[] {
     level: mapDifficulty(row.tracks?.difficulty),
     progress: row.progress ?? 0,
     updatedAt: row.updated_at ?? undefined,
-    category: row.tracks?.category ?? undefined
+    category: row.tracks?.category ?? undefined,
+    thumbnailUrl: row.tracks?.thumbnail_url ?? undefined
   }))
 }
 

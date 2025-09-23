@@ -1,9 +1,7 @@
 'use client'
 
-import { FormEvent } from 'react'
+import { FormEvent, useMemo, useRef, useState } from 'react'
 import { Send } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
-import { cn } from '@/lib/utils'
 
 interface DashboardHeroProps {
   greeting: string
@@ -24,85 +22,117 @@ export function DashboardHero({
   quickActions,
   loading = false
 }: DashboardHeroProps) {
+  const formRef = useRef<HTMLFormElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [chipsVisible, setChipsVisible] = useState(false)
+  const [isFocused, setIsFocused] = useState(false)
+
+  const combinedGreeting = useMemo(() => `${greeting}, ${userName}`, [greeting, userName])
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!commandValue.trim()) return
     onSubmit(commandValue.trim())
+    setChipsVisible(false)
+  }
+
+  const handleFocus = () => {
+    setIsFocused(true)
+    setChipsVisible(true)
+  }
+
+  const handleBlur = () => {
+    window.setTimeout(() => {
+      const active = document.activeElement
+      if (!formRef.current || !active) {
+        setChipsVisible(false)
+        setIsFocused(false)
+        return
+      }
+      if (!formRef.current.contains(active)) {
+        setChipsVisible(false)
+        setIsFocused(false)
+      }
+    }, 120)
+  }
+
+  const handleChipClick = (value: string) => {
+    onCommandChange(value)
+    requestAnimationFrame(() => inputRef.current?.focus())
+    setChipsVisible(false)
   }
 
   return (
-    <section className="relative z-10 flex flex-col items-center text-center text-white">
-      <div className="mb-6 space-y-4">
-        <p className="text-sm uppercase tracking-[0.35em] text-white/50">TrendlyAI Dashboard</p>
-        <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">
-          {greeting.split('').map((char, index) => (
-            <span
-              key={'greeting-' + index}
-              className="inline-block animate-dashboard-greeting"
-              style={{ animationDelay: String(index * 45) + 'ms' }}
-            >
-              {char === ' ' ? ' ' : char}
-            </span>
-          ))}
-          <span
-            className="inline-block animate-dashboard-greeting"
-            style={{ animationDelay: String(greeting.length * 45) + 'ms' }}
+    <section className="w-full text-white">
+      <div className="min-h-[40vh] flex flex-col items-center justify-center mt-12 mb-6">
+        <div className="mb-6 text-center animate-entry">
+          <h2
+            id="dashboard-greeting"
+            className="text-3xl font-semibold tracking-tight md:text-4xl"
+            aria-label={`${greeting}, ${userName}`}
           >
-            ,
-          </span>
-          {' '}
-          {userName.split('').map((char, index) => (
-            <span
-              key={'name-' + index}
-              className="inline-block animate-dashboard-greeting text-brand-yellow"
-              style={{ animationDelay: String((greeting.length + index + 1) * 45) + 'ms' }}
+            {combinedGreeting.split('').map((char, index) => (
+              <span
+                key={`${char}-${index}`}
+                className="greeting-char"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                {char === ' ' ? '\u00A0' : char}
+              </span>
+            ))}
+          </h2>
+        </div>
+
+        <div className="w-full max-w-2xl mx-auto animate-entry delay-1">
+          {quickActions.length > 0 && (
+            <div
+              className={`hs-chip-container flex flex-wrap justify-center gap-2 mb-4 transition-opacity ${chipsVisible ? 'opacity-100 pointer-events-auto' : 'pointer-events-none opacity-0'}`}
+              aria-hidden={!chipsVisible}
             >
-              {char === ' ' ? ' ' : char}
-            </span>
-          ))}
-        </h1>
-        <p className="mx-auto max-w-2xl text-base text-white/70">
-          Acompanhe seus números, finalize trilhas e descubra ferramentas criadas para acelerar sua próxima grande ideia.
-        </p>
+              {quickActions.slice(0, 4).map((item, index) => (
+                <button
+                  key={item}
+                  type="button"
+                  className="hs-chip"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => handleChipClick(item)}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <form
+            ref={formRef}
+            onSubmit={handleSubmit}
+            className={`hs-outline transition ${isFocused ? 'is-active' : ''} ${loading ? 'pointer-events-none opacity-60' : ''}`}
+          >
+            <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-md">
+              <input
+                ref={inputRef}
+                type="text"
+                placeholder="O que vamos criar hoje?"
+                value={commandValue}
+                onChange={(event) => onCommandChange(event.target.value)}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                className="w-full bg-transparent text-base text-white placeholder:text-white/60 focus:outline-none"
+                disabled={loading}
+              />
+              <button
+                type="submit"
+                className="liquid-glass-pill flex h-10 w-10 items-center justify-center"
+                aria-label="Enviar comando"
+                disabled={loading || !commandValue.trim()}
+              >
+                <Send className="h-4 w-4" />
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-
-      <form
-        onSubmit={handleSubmit}
-        className={cn('dashboard-command-form relative w-full max-w-2xl overflow-hidden rounded-2xl border border-white/12 bg-white/10 backdrop-blur-2xl transition focus-within:border-white/25',
-          loading && 'pointer-events-none opacity-70'
-        )}
-      >
-        <input
-          type="text"
-          value={commandValue}
-          onChange={(event) => onCommandChange(event.target.value)}
-          placeholder="Descreva o que quer criar hoje..."
-          className="w-full bg-transparent py-4 pl-6 pr-14 text-left text-base placeholder:text-white/60 focus:outline-none"
-        />
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex w-14 items-center justify-center">
-          <div className="pointer-events-auto">
-            <Button type="submit" size="icon" className="h-11 w-11 rounded-full bg-brand-yellow text-black hover:bg-white">
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </form>
-
-      {quickActions.length > 0 && (
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          {quickActions.slice(0, 4).map((item, index) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => onCommandChange(item)}
-              className="dashboard-chip"
-              style={{ animationDelay: String(index * 80) + 'ms' }}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-      )}
     </section>
   )
 }

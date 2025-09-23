@@ -13,9 +13,7 @@ import type {
   SearchFAQData,
   CreateSupportTicketData,
   AddSupportMessageData,
-  FAQViewData,
-  FAQHelpfulData,
-  FAQSearchFilters
+  FAQHelpfulData
 } from '../../types/help'
 
 class HelpService {

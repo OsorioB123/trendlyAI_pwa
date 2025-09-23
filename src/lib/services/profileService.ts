@@ -13,8 +13,7 @@ import type {
   ReferralInfo,
   NextActionRecommendation,
   ServiceResponse,
-  ProfileUpdateData,
-  AvatarUploadResult
+  ProfileUpdateData
 } from '../../types/profile'
 // Avatar upload functionality will be handled by the auth context for now
 // import { uploadImage, compressImage, deleteImage } from '../../../frontend/src/utils/supabaseStorage'
@@ -89,10 +88,10 @@ class ProfileService {
 
       // Clean the updates object
       const cleanUpdates = Object.fromEntries(
-        Object.entries(updates).filter(([_, value]) => value !== undefined && value !== null)
+        Object.entries(updates).filter(([, value]) => value !== undefined && value !== null)
       )
 
-      const { data, error } = await this.getClient()
+      const { error } = await this.getClient()
         .from('profiles')
         .update({
           ...cleanUpdates,
@@ -107,18 +106,15 @@ class ProfileService {
         return { success: false, error: error.message }
       }
 
-      const profile: UserProfile = {
-        ...data,
-        level: (data as any).level || 'Explorador',
-        total_tracks: (data as any).total_tracks || 0,
-        completed_modules: (data as any).completed_modules || 0,
-        streak_days: (data as any).streak_days || 0,
-        referral_credits: (data as any).referral_credits || 0,
-        created_at: new Date((data as any).created_at),
-        updated_at: new Date((data as any).updated_at)
-      } as any
+      const profileResponse = await this.getUserProfile(userId)
+      if (profileResponse.success && profileResponse.data) {
+        return { success: true, data: profileResponse.data }
+      }
 
-      return { success: true, data: profile }
+      return {
+        success: false,
+        error: profileResponse.error || 'Erro ao atualizar perfil'
+      }
 
     } catch (error) {
       console.error('Profile update error:', error)
@@ -137,19 +133,12 @@ class ProfileService {
     try {
       const supabase = this.getClient()
       
-      // Get current profile to delete old avatar if exists
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('avatar_url')
-        .eq('id', userId)
-        .single()
-
       // Create file path
       const fileExt = file.name.split('.').pop()
       const filePath = `${userId}/avatar.${fileExt}`
       
       // Upload to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, file, { upsert: true })
 
@@ -164,7 +153,7 @@ class ProfileService {
         .getPublicUrl(filePath)
 
       // Update profile with new avatar URL
-      const { data, error: updateError } = await supabase
+      const { error: updateError } = await supabase
         .from('profiles')
         .update({
           avatar_url: publicUrl,
@@ -476,6 +465,7 @@ class ProfileService {
    */
   static async getNextActionRecommendation(userId: string): Promise<ServiceResponse<NextActionRecommendation>> {
     try {
+      console.debug('Generating next action recommendation for', userId)
 
       // This would typically use AI/ML or rule-based system
       // For now, return a mock recommendation
@@ -568,7 +558,6 @@ class ProfileService {
 
       const profile = profileResult.data
       let completionScore = 0
-      const totalFields = 4
 
       // Check each field
       if (profile.display_name?.trim()) completionScore += 25

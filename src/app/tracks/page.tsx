@@ -85,7 +85,7 @@ export default function TracksPage() {
     
     try {
       await toggleFavorite(trackId)
-    } catch (error) {
+    } catch {
       setError('Falha ao atualizar favorito')
       setTimeout(() => setError(null), 3000)
     }
@@ -192,7 +192,15 @@ export default function TracksPage() {
       }}
     >
       <Header variant={HeaderVariant.SECONDARY} />
-      
+
+      {error && (
+        <div className="mx-auto mt-6 max-w-5xl">
+          <div className="rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+            {error}
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <div className="max-w-7xl mx-auto">
         {/* Page Header */}

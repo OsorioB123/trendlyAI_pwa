@@ -36,6 +36,7 @@
   ],
   "exclude": [
     "node_modules",
-    "performance_optimized_tools_page.tsx"
+    "performance_optimized_tools_page.tsx",
+    "docs"
   ]
 }

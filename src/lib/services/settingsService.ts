@@ -6,7 +6,6 @@ import {
   SecuritySettings,
   ChangeEmailRequest,
   ChangePasswordRequest,
-  Setup2FARequest,
   Verify2FASetup,
   DeleteAccountRequest,
   NotificationPreferences,
@@ -15,9 +14,9 @@ import {
   PasswordValidation,
   AvatarUploadResult,
   VALIDATION_RULES,
-  DEFAULT_NOTIFICATION_PREFERENCES,
-  STUDIO_THEMES
+  DEFAULT_NOTIFICATION_PREFERENCES
 } from '../../types/settings'
+import { STUDIO_THEMES } from '@/data/studioThemes'
 
 export class SettingsService {
   
@@ -116,7 +115,7 @@ export class SettingsService {
 
       updates.updated_at = new Date().toISOString()
 
-      const { data, error } = await (supabase
+      const { error } = await (supabase
         .from('profiles') as any)
         .update(updates)
         .eq('id', userId)
@@ -152,7 +151,7 @@ export class SettingsService {
       const fileExt = file.name.split('.').pop()
       const fileName = `avatar-${userId}-${Date.now()}.${fileExt}`
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from(STORAGE_BUCKETS.AVATARS)
         .upload(fileName, file, {
           cacheControl: '3600',
@@ -208,7 +207,8 @@ export class SettingsService {
 
       const preferences = {
         ...((currentProfile as Database['public']['Tables']['profiles']['Row'])?.preferences as any || {}),
-        studio_theme: themeId
+        studio_theme: themeId,
+        background: themeId
       }
 
       const { error } = await (supabase
@@ -354,8 +354,9 @@ export class SettingsService {
     }
   }
 
-  static async setup2FA(password: string): Promise<SettingsResponse<Verify2FASetup>> {
+  static async setup2FA(_password: string): Promise<SettingsResponse<Verify2FASetup>> {
     try {
+      void _password
       // Some projects may not have MFA enabled; handle gracefully
       if (!('mfa' in supabase.auth)) {
         return {

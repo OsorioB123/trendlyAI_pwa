@@ -138,6 +138,19 @@ function ToolsPageContent() {
     return () => clearTimeout(debounceTimer)
   }, [searchTerm, filters.category, router])
 
+  useEffect(() => {
+    const toolId = searchParams?.get('tool')
+    if (!toolId) {
+      setSelectedTool(null)
+      return
+    }
+
+    const match = tools.find((tool) => String(tool.id) === toolId)
+    if (match) {
+      setSelectedTool(match)
+    }
+  }, [searchParams, tools])
+
   // Mock favorites functionality with loading state
   const handleToggleFavorite = useCallback(async (tool: Tool) => {
     const toolId = tool.id
@@ -164,7 +177,7 @@ function ToolsPageContent() {
           last_used: new Date().toISOString()
         })
       if (error) throw error
-    } catch (error) {
+    } catch {
       // Revert optimistic update on error
       setFavorites(previous)
       setError('Falha ao atualizar favorito')
@@ -239,9 +252,22 @@ function ToolsPageContent() {
     [displayedCount, filteredTools.length]
   )
 
+  const updateToolQuery = useCallback((toolId?: string) => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    if (toolId) {
+      params.set('tool', toolId)
+    } else {
+      params.delete('tool')
+    }
+    const query = params.toString()
+    router.replace(query ? `?${query}` : '?', { scroll: false })
+  }, [router])
+
   const handleToolClick = useCallback((tool: Tool) => {
     setSelectedTool(tool)
-  }, [])
+    updateToolQuery(String(tool.id))
+  }, [updateToolQuery])
 
   const handleLoadMore = useCallback(async () => {
     setIsLoading(true)
@@ -295,6 +321,11 @@ function ToolsPageContent() {
     setDisplayedCount(TOOLS_PER_PAGE)
   }, [])
 
+  const handleModalClose = useCallback(() => {
+    setSelectedTool(null)
+    updateToolQuery(undefined)
+  }, [updateToolQuery])
+
   // Quick category filters (based on most popular from HTML reference)
   // Quick category buttons removidos (duplicado visual)
 
@@ -318,6 +349,14 @@ function ToolsPageContent() {
       }}
     >
       <Header variant={HeaderVariant.SECONDARY} />
+
+      {error && (
+        <div className="mx-auto mt-6 max-w-5xl">
+          <div className="rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+            {error}
+          </div>
+        </div>
+      )}
       
       {/* Main Content */}
       <div className="max-w-7xl mx-auto">
@@ -727,7 +766,7 @@ function ToolsPageContent() {
       <ToolModal
         tool={selectedTool}
         isOpen={selectedTool !== null}
-        onClose={() => setSelectedTool(null)}
+        onClose={handleModalClose}
       />
     </div>
   )

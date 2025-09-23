@@ -121,45 +121,10 @@ export default function OnboardingPage() {
   const router = useRouter()
   const { changeBackground } = useBackground()
   const observerRef = useRef<IntersectionObserver | null>(null)
+  const initializedRef = useRef(false)
   
   const totalSlides = 4
   const transitionSafe = respectReducedMotion({ transition: { duration: MOTION_CONSTANTS.DURATION.normal } }).transition as any
-
-  // Handle slide navigation - exact match from HTML reference
-  const showSlide = useCallback((slideNumber: number) => {
-    console.log('showSlide called with:', slideNumber) // Debug log
-    setCurrentSlide(slideNumber)
-    
-    // Initialize theme selector on slide 3 - ONLY when actually navigating to slide 3
-    if (slideNumber === 3 && !themesInitialized) {
-      console.log('Initializing theme selector for slide 3') // Debug log
-      setThemesInitialized(true)
-      
-      // Setup intersection observer for mobile
-      setTimeout(() => {
-        if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-          const selectedElement = document.getElementById(`theme-${selectedThemeId}`)
-          if (selectedElement?.parentElement) {
-            selectedElement.parentElement.scrollIntoView({ 
-              behavior: 'auto', 
-              inline: 'center' 
-            })
-          }
-          setupIntersectionObserver()
-        }
-        
-        // Ensure default theme is selected and visible
-        if (typeof document !== 'undefined') {
-          const defaultSphere = document.getElementById(`theme-${selectedThemeId}`)
-          if (defaultSphere) {
-            defaultSphere.classList.add('is-selected', 'is-in-view')
-          }
-        }
-      }, 100)
-    }
-    
-    // Framer Motion handles entrance animations; no manual CSS restart needed
-  }, [selectedThemeId, themesInitialized])
 
   // Setup intersection observer for mobile theme selection - exact from HTML reference
   const setupIntersectionObserver = useCallback(() => {
@@ -207,6 +172,42 @@ export default function OnboardingPage() {
       observerRef.current?.observe(container)
     })
   }, [])
+
+  // Handle slide navigation - exact match from HTML reference
+  const showSlide = useCallback((slideNumber: number) => {
+    console.log('showSlide called with:', slideNumber) // Debug log
+    setCurrentSlide(slideNumber)
+    
+    // Initialize theme selector on slide 3 - ONLY when actually navegating to slide 3
+    if (slideNumber === 3 && !themesInitialized) {
+      console.log('Initializing theme selector for slide 3') // Debug log
+      setThemesInitialized(true)
+      
+      // Setup intersection observer for mobile
+      setTimeout(() => {
+        if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+          const selectedElement = document.getElementById(`theme-${selectedThemeId}`)
+          if (selectedElement?.parentElement) {
+            selectedElement.parentElement.scrollIntoView({ 
+              behavior: 'auto', 
+              inline: 'center' 
+            })
+          }
+          setupIntersectionObserver()
+        }
+        
+        // Ensure default theme is selected and visible
+        if (typeof document !== 'undefined') {
+          const defaultSphere = document.getElementById(`theme-${selectedThemeId}`)
+          if (defaultSphere) {
+            defaultSphere.classList.add('is-selected', 'is-in-view')
+          }
+        }
+      }, 100)
+    }
+    
+    // Framer Motion handles entrance animations; no manual CSS restart needed
+  }, [selectedThemeId, themesInitialized, setupIntersectionObserver])
 
   // Handle theme selection - CRITICAL: Must NOT trigger slide navigation
   const handleThemeSelect = useCallback((themeId: string) => {
@@ -272,9 +273,11 @@ export default function OnboardingPage() {
 
   // Initialize first slide - only once on mount
   useEffect(() => {
+    if (initializedRef.current) return
+    initializedRef.current = true
     console.log('Component mounted, showing slide 1')
     showSlide(1)
-  }, []) // Empty dependency array - only run once
+  }, [showSlide])
 
   // Debug effect to catch unwanted showSlide calls
   useEffect(() => {

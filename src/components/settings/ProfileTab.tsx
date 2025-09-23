@@ -1,8 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Check } from 'lucide-react'
-import { ProfileTabProps, STUDIO_THEMES, VALIDATION_RULES } from '../../types/settings'
+import { ProfileTabProps, VALIDATION_RULES } from '../../types/settings'
+import { DEFAULT_STUDIO_THEME_ID, STUDIO_THEMES, studioThemeMap } from '@/data/studioThemes'
+import { useBackground } from '@/contexts/BackgroundContext'
+import { cn } from '@/lib/utils'
 import InlineEditableField from './InlineEditableField'
 import AvatarUpload from './AvatarUpload'
 
@@ -17,6 +20,25 @@ export default function ProfileTab({
   onEditField 
 }: ProfileTabProps) {
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const [isUpdatingTheme, setIsUpdatingTheme] = useState(false)
+  const [pendingThemeId, setPendingThemeId] = useState<string | null>(null)
+  const { changeBackground } = useBackground()
+  const availableThemes = useMemo(() => (
+    themes && themes.length > 0 ? themes : STUDIO_THEMES
+  ), [themes])
+  const fallbackTheme = studioThemeMap[DEFAULT_STUDIO_THEME_ID]
+  const activeThemeId = pendingThemeId ?? profile?.studio_theme ?? fallbackTheme?.id ?? DEFAULT_STUDIO_THEME_ID
+  const selectedTheme = availableThemes.find((theme) => theme.id === activeThemeId) || fallbackTheme
+
+  useEffect(() => {
+    if (!pendingThemeId || !profile?.studio_theme) {
+      return
+    }
+
+    if (profile.studio_theme === pendingThemeId) {
+      setPendingThemeId(null)
+    }
+  }, [pendingThemeId, profile?.studio_theme])
 
   if (!profile) {
     return (
@@ -56,6 +78,28 @@ export default function ProfileTab({
       return result
     } finally {
       setUploadingAvatar(false)
+    }
+  }
+
+  const handleThemeSelect = async (themeId: string) => {
+    if (isUpdatingTheme || profile.studio_theme === themeId) {
+      return
+    }
+
+    setIsUpdatingTheme(true)
+    setPendingThemeId(themeId)
+    const previousThemeId = profile.studio_theme || DEFAULT_STUDIO_THEME_ID
+
+    try {
+      await changeBackground(themeId, { persist: false })
+      const success = await onUpdateTheme(themeId)
+
+      if (!success) {
+        await changeBackground(previousThemeId, { persist: false })
+        setPendingThemeId(null)
+      }
+    } finally {
+      setIsUpdatingTheme(false)
     }
   }
 
@@ -146,43 +190,52 @@ export default function ProfileTab({
 
           {/* Theme Gallery */}
           <div className="w-full hide-scrollbar overflow-x-auto lg:overflow-x-visible">
-            <div className="flex gap-4 lg:grid lg:grid-cols-6 lg:gap-4 pb-4 lg:pb-0">
-              {STUDIO_THEMES.map((theme) => {
-                const isSelected = profile.studio_theme === theme.id
-                const isInView = true // For mobile scroll tracking if needed
-                
+            <div className="flex gap-4 pb-4 snap-x snap-mandatory lg:grid lg:grid-cols-6 lg:gap-4 lg:pb-0 lg:snap-none">
+              {availableThemes.map((theme) => {
+                const isSelected = activeThemeId === theme.id
+                const themeImage = theme.imageUrl || studioThemeMap[theme.id]?.imageUrl
+
                 return (
                   <button
                     key={theme.id}
-                    onClick={() => onUpdateTheme(theme.id)}
-                    className={`
-                      relative flex-shrink-0 w-20 h-20 rounded-full overflow-hidden transition-all duration-400 cursor-pointer
-                      ${isSelected 
-                        ? 'ring-2 ring-white/70 scale-110' 
-                        : 'ring-0 hover:scale-110'
-                      }
-                      ${isInView ? 'lg:transform-none' : 'transform scale-90 opacity-70'}
-                    `}
+                    type="button"
+                    onClick={() => handleThemeSelect(theme.id)}
+                    disabled={isLoading || isUpdatingTheme}
+                    aria-pressed={isSelected}
+                    className={cn(
+                      'group relative flex h-20 w-20 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/10 transition-transform duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 disabled:cursor-not-allowed disabled:opacity-60 snap-center',
+                      isSelected ? 'scale-110 border-white/40' : 'hover:scale-105'
+                    )}
                     style={{
-                      background: theme.background,
+                      backgroundImage: themeImage ? `url(${themeImage})` : undefined,
+                      background: !themeImage ? theme.background : undefined,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat'
                     }}
                     title={theme.name}
                   >
-                    {/* Clean full-bleed background without inner overlays to avoid edge artifacts */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-black/70 opacity-60 transition-opacity duration-300 group-hover:opacity-40" />
+                    <div className="absolute inset-[2px] rounded-full border border-white/15" />
 
-                    {/* Selection indicator */}
-                    {isSelected && (
-                      <div className="absolute inset-0 rounded-full flex items-center justify-center bg-black/40 transition-all duration-300">
-                        <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center animate-scale-in">
-                          <Check size={16} className="text-black" />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Theme name tooltip */}
-                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10">
+                    <span className="relative text-[0.7rem] font-medium text-white drop-shadow">
                       {theme.name}
+                    </span>
+
+                    <div
+                      className={cn(
+                        'absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity duration-200',
+                        isSelected ? 'opacity-100' : 'group-hover:opacity-60'
+                      )}
+                    >
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-black">
+                        <Check size={16} />
+                      </span>
                     </div>
+
+                    <span className="pointer-events-none absolute -bottom-8 left-1/2 w-max -translate-x-1/2 rounded bg-black/80 px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                      {theme.name}
+                    </span>
                   </button>
                 )
               })}
@@ -190,21 +243,31 @@ export default function ProfileTab({
           </div>
 
           {/* Theme info */}
-          <div className="mt-6 p-4 bg-black/50 rounded-lg">
+          <div className="mt-6 rounded-lg bg-black/50 p-4">
             <div className="flex items-center gap-3">
-              <div 
-                className="w-8 h-8 rounded-lg"
+              <div
+                className="h-10 w-10 overflow-hidden rounded-lg border border-white/10"
                 style={{
-                  background: STUDIO_THEMES.find(t => t.id === profile.studio_theme)?.background || 'linear-gradient(135deg, #0a0a0a, #141414)'
+                  backgroundImage: selectedTheme?.imageUrl
+                    ? `url(${selectedTheme.imageUrl})`
+                    : undefined,
+                  background: !selectedTheme?.imageUrl ? (selectedTheme?.background ?? fallbackTheme?.background) : undefined,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
                 }}
               />
               <div>
                 <p className="text-white font-medium">
-                  {STUDIO_THEMES.find(t => t.id === profile.studio_theme)?.name || 'Padrão'}
+                  {selectedTheme?.name || fallbackTheme?.name || 'Padrão'}
                 </p>
-                <p className="text-white/60 text-sm">
+                <p className="text-sm text-white/60">
                   Tema ativo do seu ambiente de trabalho
                 </p>
+                {isUpdatingTheme && (
+                  <p className="mt-1 text-xs text-white/40">
+                    Salvando preferências...
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -259,41 +322,3 @@ export default function ProfileTab({
     </div>
   )
 }
-
-// Additional styles
-const profileTabStyles = `
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .shadow-inset-lg {
-    box-shadow: inset 0 0 20px 3px rgba(0,0,0,0.3);
-  }
-
-  @keyframes scale-in {
-    from {
-      transform: scale(0.8);
-      opacity: 0;
-    }
-    to {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-
-  .animate-scale-in {
-    animation: scale-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-
-  .liquid-glass {
-    backdrop-filter: blur(20px);
-    background-color: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
-  }
-`

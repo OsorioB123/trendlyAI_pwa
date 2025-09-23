@@ -58,6 +58,7 @@ export interface DashboardTrackSummary {
   progress: number
   updatedAt?: string
   category?: string
+  thumbnailUrl?: string
 }
 
 export interface DashboardSnapshot {

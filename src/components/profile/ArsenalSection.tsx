@@ -93,7 +93,7 @@ export default function ArsenalSection({
                   key={track.id}
                   track={track as any}
                   variant="compact"
-                  onClick={(trackItem) => onTrackClick?.(trackItem)}
+                  onClick={() => onTrackClick?.(track)}
                 />
               ))
             ) : (

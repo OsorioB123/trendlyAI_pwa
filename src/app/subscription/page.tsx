@@ -7,7 +7,6 @@ import { ArrowLeft, Gem, Download, PauseCircle, XCircle, ChevronDown } from 'luc
 import { useRouter } from 'next/navigation'
 import { useSubscription } from '../../hooks/useSubscription'
 import { useToastActions } from '../../components/ui/Toast'
-import { useAuth } from '../../contexts/AuthContext'
 import { 
   SUBSCRIPTION_STATUS_LABELS,
   BILLING_STATUS_LABELS,
@@ -16,7 +15,6 @@ import {
 
 export default function SubscriptionPage() {
   const router = useRouter()
-  const { profile } = useAuth()
   const subscription = useSubscription()
   const toast = useToastActions()
   
@@ -72,7 +70,7 @@ export default function SubscriptionPage() {
       } else if (response.error) {
         toast.error('Erro ao pausar assinatura', response.error)
       }
-    } catch (e) {
+    } catch {
       toast.error('Erro ao pausar assinatura')
     } finally {
       setIsPauseLoading(false)
@@ -93,7 +91,7 @@ export default function SubscriptionPage() {
       } else if (response.error) {
         toast.error('Erro ao cancelar', response.error)
       }
-    } catch (e) {
+    } catch {
       toast.error('Erro ao cancelar assinatura')
     } finally {
       setIsCancelLoading(false)

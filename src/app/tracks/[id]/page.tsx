@@ -58,33 +58,11 @@ export default function TrackPage() {
     }
   }, [trackId, user?.id])
 
-  const loadTrackPublic = useCallback(async () => {
-    if (!trackId) return
-    try {
-      setLoading(true)
-      const trackData = await TrackService.getTrackPublic(trackId)
-
-      if (!trackData) {
-        setError('Trilha não encontrada')
-        return
-      }
-
-      setTrack(trackData)
-    } catch (error) {
-      console.error('Error loading track:', error)
-      setError('Erro ao carregar trilha')
-    } finally {
-      setLoading(false)
-    }
-  }, [trackId])
-
   useEffect(() => {
-    if (trackId && user) {
+    if (trackId) {
       loadTrack()
-    } else if (trackId) {
-      loadTrackPublic()
     }
-  }, [trackId, user, loadTrack, loadTrackPublic])
+  }, [trackId, loadTrack])
 
   const handleStartTrack = async () => {
     if (!user) {
@@ -314,7 +292,6 @@ export default function TrackPage() {
           <div className="mb-8">
             <h2 className="text-xl font-bold mb-6">Avalie esta trilha</h2>
             <TrackRating 
-              trackId={trackId}
               currentRating={track.userReview}
               onSubmitRating={handleSubmitRating}
             />

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Track, UserTrackProgress, TracksFilters } from '../types/track'
 import { TrackService } from '../lib/services/trackService'
 import { useAuth } from '../contexts/AuthContext'
@@ -72,15 +72,14 @@ export function useTracks(initialLimit: number = 50): UseTracksReturn {
         
         // Extract favorites from progress data
         favoritesData = Object.entries(progressData)
-          .filter(([_, progress]) => progress.isFavorite)
-          .map(([trackId, _]) => trackId)
+          .filter(([, progress]) => progress.isFavorite)
+          .map(([trackId]) => trackId)
       }
       
       // Enhance tracks with user data
       const enhancedTracks = tracksData.map(track => {
         const progress = progressData[track.id.toString()]
-        const isFavorited = favoritesData.includes(track.id.toString())
-        
+
         return {
           ...track,
           progress: progress?.progressPercentage || 0,
@@ -158,6 +157,21 @@ export function useTracks(initialLimit: number = 50): UseTracksReturn {
     }
   }, [isAuthenticated, user?.id, favorites])
 
+  // Get track progress percentage
+  const getTrackProgress = useCallback((trackId: string): number => {
+    const progress = userProgress[trackId]
+    return progress?.progressPercentage || 0
+  }, [userProgress])
+
+  // Get track status
+  const getTrackStatus = useCallback((trackId: string): 'nao_iniciado' | 'em_andamento' | 'concluido' => {
+    const progress = userProgress[trackId]
+    if (!progress) return 'nao_iniciado'
+    if (progress.completedAt) return 'concluido'
+    if (progress.progressPercentage > 0) return 'em_andamento'
+    return 'nao_iniciado'
+  }, [userProgress])
+
   // Filter tracks based on filters
   const filterTracks = useCallback((filters: TracksFilters): Track[] => {
     let result = [...tracks]
@@ -216,22 +230,7 @@ export function useTracks(initialLimit: number = 50): UseTracksReturn {
 
     setFilteredTracks(result)
     return result
-  }, [tracks, favorites])
-
-  // Get track progress percentage
-  const getTrackProgress = useCallback((trackId: string): number => {
-    const progress = userProgress[trackId]
-    return progress?.progressPercentage || 0
-  }, [userProgress])
-
-  // Get track status
-  const getTrackStatus = useCallback((trackId: string): 'nao_iniciado' | 'em_andamento' | 'concluido' => {
-    const progress = userProgress[trackId]
-    if (!progress) return 'nao_iniciado'
-    if (progress.completedAt) return 'concluido'
-    if (progress.progressPercentage > 0) return 'em_andamento'
-    return 'nao_iniciado'
-  }, [userProgress])
+  }, [tracks, favorites, getTrackStatus])
 
   // Check if track is favorited
   const isTrackFavorited = useCallback((trackId: string): boolean => {

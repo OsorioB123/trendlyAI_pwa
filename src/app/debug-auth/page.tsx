@@ -108,8 +108,8 @@ export default function DebugAuthPage() {
       const { error } = await supabase.from('profiles').select('count').limit(1)
       
       addResult('connection_test', {
-        success: !signupError,
-        error: signupError?.message,
+        success: !error,
+        error: error?.message,
         can_access_profiles: !error
       })
 

@@ -19,7 +19,6 @@ import type {
   SearchFAQData,
   CreateSupportTicketData,
   AddSupportMessageData,
-  FAQViewData,
   FAQHelpfulData
 } from '../types/help'
 

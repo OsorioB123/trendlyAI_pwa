@@ -15,16 +15,14 @@ import type {
   ArsenalData,
   ReferralInfo,
   NextActionRecommendation,
-  ServiceResponse,
-  ProfileUpdateData,
-  ProfileFormData
+  ProfileUpdateData
 } from '../types/profile'
 
 /**
  * Custom hook for managing profile state and operations
  */
 export function useProfile(): UseProfileReturn {
-  const { user, profile: authProfile, updateProfile: updateAuthProfile, updateAvatar: updateAuthAvatar } = useAuth()
+  const { user, profile: authProfile, updateProfile: updateAuthProfile } = useAuth()
   
   // State management
   const [profile, setProfile] = useState<UserProfile | null>(null)
@@ -219,7 +217,7 @@ export function useProfile(): UseProfileReturn {
     } finally {
       setIsUploading(false)
     }
-  }, [user?.id, updateAuthAvatar])
+  }, [user?.id])
 
   /**
    * Save specific field with optimistic updates
@@ -272,82 +270,6 @@ export function useProfile(): UseProfileReturn {
   }, [profile])
 
   // =====================================================
-  // ARSENAL OPERATIONS
-  // =====================================================
-
-  /**
-   * Refresh arsenal data
-   */
-  const refreshArsenal = useCallback(async (): Promise<boolean> => {
-    if (!user?.id) return false
-
-    try {
-      const response = await ProfileService.getArsenalData(user.id)
-      
-      if (response.success && response.data) {
-        setArsenalData(response.data)
-        return true
-      } else {
-        setError(response.error || 'Erro ao carregar arsenal')
-        return false
-      }
-
-    } catch (error) {
-      console.error('Error refreshing arsenal:', error)
-      setError('Erro inesperado ao carregar arsenal')
-      return false
-    }
-  }, [user?.id])
-
-  /**
-   * Refresh metrics
-   */
-  const refreshMetrics = useCallback(async (): Promise<boolean> => {
-    if (!user?.id) return false
-
-    try {
-      const response = await ProfileService.getProfileMetrics(user.id)
-      
-      if (response.success && response.data) {
-        setMetrics(response.data)
-        return true
-      } else {
-        setError(response.error || 'Erro ao carregar métricas')
-        return false
-      }
-
-    } catch (error) {
-      console.error('Error refreshing metrics:', error)
-      setError('Erro inesperado ao carregar métricas')
-      return false
-    }
-  }, [user?.id])
-
-  /**
-   * Refresh referral info
-   */
-  const refreshReferral = useCallback(async (): Promise<boolean> => {
-    if (!user?.id) return false
-
-    try {
-      const response = await ProfileService.getReferralInfo(user.id)
-      
-      if (response.success && response.data) {
-        setReferralInfo(response.data)
-        return true
-      } else {
-        setError(response.error || 'Erro ao carregar informações de indicação')
-        return false
-      }
-
-    } catch (error) {
-      console.error('Error refreshing referral info:', error)
-      setError('Erro inesperado ao carregar indicações')
-      return false
-    }
-  }, [user?.id])
-
-  // =====================================================
   // UI STATE ACTIONS
   // =====================================================
 
@@ -372,37 +294,6 @@ export function useProfile(): UseProfileReturn {
       })
     }
   }, [profile])
-
-  // =====================================================
-  // COMPUTED VALUES
-  // =====================================================
-
-  /**
-   * Check if profile data is available
-   */
-  const hasProfileData = Boolean(profile)
-
-  /**
-   * Check if profile is complete
-   */
-  const isProfileComplete = Boolean(
-    profile?.display_name?.trim() &&
-    profile?.bio?.trim() &&
-    profile?.avatar_url
-  )
-
-  /**
-   * Get profile completion percentage
-   */
-  const completionPercentage = (() => {
-    if (!profile) return 0
-    let score = 0
-    if (profile.display_name?.trim()) score += 25
-    if (profile.bio?.trim()) score += 25
-    if (profile.avatar_url) score += 25
-    if (profile.level !== 'Explorador') score += 25
-    return score
-  })()
 
   // =====================================================
   // RETURN HOOK INTERFACE

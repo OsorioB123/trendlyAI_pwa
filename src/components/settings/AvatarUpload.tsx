@@ -9,9 +9,10 @@ import { AvatarUploadResult } from '../../types/settings'
 interface AvatarUploadProps {
   currentAvatarUrl?: string
   onUpload: (file: File) => Promise<AvatarUploadResult>
+  isUploading?: boolean
 }
 
-export default function AvatarUpload({ currentAvatarUrl, onUpload }: AvatarUploadProps) {
+export default function AvatarUpload({ currentAvatarUrl, onUpload, isUploading = false }: AvatarUploadProps) {
   const [preview, setPreview] = useState<string | null>(null)
   const [dragActive, setDragActive] = useState(false)
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle')
@@ -33,7 +34,10 @@ export default function AvatarUpload({ currentAvatarUrl, onUpload }: AvatarUploa
     return null
   }
 
+  const isBusy = isUploading || uploadStatus === 'uploading'
+
   const handleFileSelect = (file: File) => {
+    if (isBusy) return
     const error = validateFile(file)
     if (error) {
       setErrorMessage(error)
@@ -77,6 +81,7 @@ export default function AvatarUpload({ currentAvatarUrl, onUpload }: AvatarUploa
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isBusy) return
     const file = e.target.files?.[0]
     if (file) {
       handleFileSelect(file)
@@ -86,6 +91,7 @@ export default function AvatarUpload({ currentAvatarUrl, onUpload }: AvatarUploa
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    if (isBusy) return
     setDragActive(true)
   }
 
@@ -103,6 +109,7 @@ export default function AvatarUpload({ currentAvatarUrl, onUpload }: AvatarUploa
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    if (isBusy) return
     setDragActive(false)
 
     const files = e.dataTransfer.files
@@ -112,7 +119,9 @@ export default function AvatarUpload({ currentAvatarUrl, onUpload }: AvatarUploa
   }
 
   const openFileDialog = () => {
-    fileInputRef.current?.click()
+    if (!isBusy) {
+      fileInputRef.current?.click()
+    }
   }
 
   const currentImage = preview || currentAvatarUrl || 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=200&q=80'

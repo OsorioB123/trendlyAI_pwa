@@ -11,13 +11,10 @@ import ChatService from '../lib/services/chatService'
 import type {
   Message,
   Conversation,
-  ChatState,
   ChatInputState,
-  UserCredits,
-  CreateMessageRequest,
-  ChatServiceResponse
+  UserCredits
 } from '../types/chat'
-import { CHAT_CONSTANTS, CHAT_ERRORS, PORTUGUESE_MESSAGES } from '../types/chat'
+import { CHAT_CONSTANTS, CHAT_ERRORS } from '../types/chat'
 
 export interface UseChatReturn {
   // Data
@@ -156,6 +153,15 @@ export function useChat(): UseChatReturn {
     loadCredits()
   }, [loadCredits])
 
+  /**
+   * Scroll to bottom of chat
+   */
+  const scrollToBottom = useCallback(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
+  }, [])
+
   // =====================================================
   // CHAT OPERATIONS
   // =====================================================
@@ -238,40 +244,7 @@ export function useChat(): UseChatReturn {
       setIsSending(false)
       setIsStreaming(false)
     }
-  }, [user?.id, activeConversation?.id, userCredits, loadMessages, loadCredits])
-
-  /**
-   * Set active conversation
-   */
-  const setActiveConversation = useCallback((conversation: Conversation | null) => {
-    // Unsubscribe from previous conversation
-    if (messagesSubscriptionRef.current) {
-      ChatService.unsubscribe(messagesSubscriptionRef.current)
-      messagesSubscriptionRef.current = null
-    }
-
-    setActiveConversationState(conversation)
-    
-    // Clear messages when switching conversations
-    setMessages([])
-    setError(null)
-    
-    // Clear input
-    setInputState(prev => ({ 
-      ...prev, 
-      value: '',
-      attachments: []
-    }))
-
-    // Subscribe to new conversation if provided
-    if (conversation?.id) {
-      subscribeToMessages()
-    }
-  }, [])
-
-  // =====================================================
-  // REAL-TIME FEATURES
-  // =====================================================
+  }, [user?.id, activeConversation?.id, userCredits, loadMessages, loadCredits, scrollToBottom])
 
   /**
    * Subscribe to messages for active conversation
@@ -312,7 +285,7 @@ export function useChat(): UseChatReturn {
     } catch (error) {
       console.error('Error subscribing to messages:', error)
     }
-  }, [activeConversation?.id])
+  }, [activeConversation?.id, scrollToBottom])
 
   /**
    * Unsubscribe from messages
@@ -323,6 +296,39 @@ export function useChat(): UseChatReturn {
       messagesSubscriptionRef.current = null
     }
   }, [])
+
+  /**
+   * Set active conversation
+   */
+  const setActiveConversation = useCallback((conversation: Conversation | null) => {
+    // Unsubscribe from previous conversation
+    if (messagesSubscriptionRef.current) {
+      ChatService.unsubscribe(messagesSubscriptionRef.current)
+      messagesSubscriptionRef.current = null
+    }
+
+    setActiveConversationState(conversation)
+    
+    // Clear messages when switching conversations
+    setMessages([])
+    setError(null)
+    
+    // Clear input
+    setInputState(prev => ({ 
+      ...prev, 
+      value: '',
+      attachments: []
+    }))
+
+    // Subscribe to new conversation if provided
+    if (conversation?.id) {
+      subscribeToMessages()
+    }
+  }, [subscribeToMessages])
+
+  // =====================================================
+  // REAL-TIME FEATURES
+  // =====================================================
 
   // Subscribe when conversation changes
   useEffect(() => {
@@ -366,15 +372,6 @@ export function useChat(): UseChatReturn {
    */
   const clearError = useCallback(() => {
     setError(null)
-  }, [])
-
-  /**
-   * Scroll to bottom of chat
-   */
-  const scrollToBottom = useCallback(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-    }
   }, [])
 
   // Auto-scroll when new messages arrive
