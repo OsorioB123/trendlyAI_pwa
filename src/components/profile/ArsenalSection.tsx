@@ -2,11 +2,13 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Wrench, Compass } from 'lucide-react'
-import TrackCard from '../cards/TrackCard'
-import type { ArsenalSectionProps } from '../../types/profile'
+import type { ComponentType } from 'react'
+import { Compass, Wrench } from 'lucide-react'
+import type { ArsenalSectionProps, Track, ArsenalTab } from '../../types/profile'
 import { ARSENAL_TABS } from '../../types/profile'
 import { MOTION_CONSTANTS, respectReducedMotion } from '@/lib/motion'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { cn } from '@/lib/utils'
 
 export default function ArsenalSection({
   arsenalData,
@@ -18,10 +20,6 @@ export default function ArsenalSection({
   className = ''
 }: ArsenalSectionProps) {
   const transitionSafe = respectReducedMotion({ transition: { duration: 0.3 } }).transition as any
-
-  const indicatorStyle = activeTab === 'trails'
-    ? { left: '0%', width: '50%' }
-    : { left: '50%', width: '50%' }
 
   if (isLoading) {
     return (
@@ -45,117 +43,154 @@ export default function ArsenalSection({
   }
 
   return (
-    <motion.section 
-      className={`bg-white/8 backdrop-blur-lg rounded-2xl p-8 ${className}`}
+    <motion.section
+      className={cn('rounded-3xl border border-white/10 bg-white/5 p-8 shadow-[0_25px_120px_-60px_rgba(0,0,0,0.8)] backdrop-blur-2xl', className)}
       variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
       initial="initial"
       animate="animate"
       transition={transitionSafe}
     >
-      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-6 mb-8">
-        <h2 className="text-3xl font-medium text-white tracking-tight">Seu Arsenal</h2>
-        
-        {/* Tabs */}
-        <div className="relative flex">
-          <button 
-            onClick={() => onTabChange('trails')}
-            className={`text-white px-6 py-3 font-medium transition-colors ${
-              activeTab === 'trails' ? 'text-white' : 'text-white/60 hover:text-white'
-            }`}
-          >
-            {ARSENAL_TABS.trails.label}
-          </button>
-          <button 
-            onClick={() => onTabChange('tools')}
-            className={`text-white px-6 py-3 font-medium transition-colors ${
-              activeTab === 'tools' ? 'text-white' : 'text-white/60 hover:text-white'
-            }`}
-          >
-            {ARSENAL_TABS.tools.label}
-          </button>
-          
-          {/* Animated tab indicator */}
-          <div 
-            className="absolute bottom-0 h-0.5 bg-white rounded-full transition-all duration-300"
-            style={indicatorStyle}
-          />
+      <Tabs value={activeTab} onValueChange={(value) => onTabChange(value as ArsenalTab)} className="space-y-8">
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-sm font-medium uppercase tracking-[0.3em] text-white/50">Seu Arsenal</p>
+            <h2 className="mt-2 text-3xl font-semibold text-white tracking-tight md:text-[2.2rem]">
+              Continue evoluindo sua jornada
+            </h2>
+          </div>
+          <TabsList className="bg-white/10 p-1 text-white/70">
+            <TabsTrigger value="trails" className="px-5 py-2 text-sm data-[state=active]:bg-white/25 data-[state=active]:text-white">
+              {ARSENAL_TABS.trails.label}
+            </TabsTrigger>
+            <TabsTrigger value="tools" className="px-5 py-2 text-sm data-[state=active]:bg-white/25 data-[state=active]:text-white">
+              {ARSENAL_TABS.tools.label}
+            </TabsTrigger>
+          </TabsList>
         </div>
-      </div>
 
-      {/* Tab Content */}
-      <div className="relative mt-8 min-h-[400px]">
-        {/* Trilhas Salvas */}
-        {activeTab === 'trails' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <TabsContent value="trails" className="mt-4">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {arsenalData?.tracks && arsenalData.tracks.length > 0 ? (
               arsenalData.tracks.map((track) => (
-                <TrackCard
-                  key={track.id}
-                  track={track as any}
-                  variant="compact"
-                  onClick={() => onTrackClick?.(track)}
-                />
+                <ArsenalTrackCard key={track.id} track={track as Track} onTrackClick={onTrackClick} />
               ))
             ) : (
-              <div className="col-span-full text-center py-16 flex flex-col items-center">
-                <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center mb-8">
-                  <Compass className="w-12 h-12 text-white" />
-                </div>
-                <h3 className="text-2xl font-medium text-white mb-3">Nenhuma trilha salva ainda.</h3>
-                <p className="text-white/60 max-w-md leading-relaxed mb-8">
-                  Explore nossas trilhas e salve as que mais despertam seu interesse para encontrá-las aqui.
-                </p>
-                <button 
-                  onClick={() => window.location.href = '/tracks'}
-                  className="bg-white/10 backdrop-blur-md rounded-full px-8 py-4 flex items-center gap-3 font-medium hover:bg-white/15 hover:scale-105 transition-all duration-300"
-                >
-                  <Compass className="w-5 h-5" />
-                  <span>Explorar Trilhas</span>
-                </button>
-              </div>
+              <EmptyState
+                icon={Compass}
+                title="Nenhuma trilha salva ainda"
+                description="Explore nossas trilhas e salve as que mais despertam seu interesse para encontrá-las aqui."
+                actionLabel="Explorar Trilhas"
+                onAction={() => window.location.assign('/tracks')}
+              />
             )}
           </div>
-        )}
+        </TabsContent>
 
-        {/* Ferramentas */}
-        {activeTab === 'tools' && (
-          <div className="text-center py-16 flex flex-col items-center">
-            <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center mb-8">
-              <Wrench className="w-12 h-12 text-white" />
+        <TabsContent value="tools" className="mt-4">
+          {arsenalData?.tools && arsenalData.tools.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {arsenalData.tools.map((tool) => (
+                <div
+                  key={tool.id}
+                  className="rounded-2xl border border-white/10 bg-white/5 p-5 text-left text-white/80 shadow-[0_10px_50px_rgba(0,0,0,0.4)]"
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-white">{tool.name}</h3>
+                      <p className="mt-1 text-sm text-white/60">{tool.description}</p>
+                    </div>
+                    <span className="rounded-full bg-white/10 px-3 py-1 text-xs uppercase tracking-wide text-white/60">
+                      {tool.category}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-            <h3 className="text-2xl font-medium text-white mb-3">Seu arsenal aguarda.</h3>
-            <p className="text-white/60 max-w-md leading-relaxed mb-8">
-              Favorite as ferramentas e prompts que definem seu gênio criativo para encontrá-los aqui.
-            </p>
-            <button 
-              onClick={onNavigateToTools}
-              className="bg-white/10 backdrop-blur-md rounded-full px-8 py-4 flex items-center gap-3 font-medium hover:bg-white/15 hover:scale-105 transition-all duration-300"
-            >
-              <Compass className="w-5 h-5" />
-              <span>Explorar Ferramentas</span>
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* CSS animations */}
-      <style jsx>{`
-        .animate-entry {
-          opacity: 0;
-          transform: translateY(30px);
-          animation: slideInFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .animate-entry.delay-2 { 
-          animation-delay: 0.3s; 
-        }
-        
-        @keyframes slideInFade {
-          to { 
-            opacity: 1; 
-            transform: translateY(0); 
-          }
-        }
-      `}</style>
+          ) : (
+            <EmptyState
+              icon={Wrench}
+              title="Seu arsenal aguarda"
+              description="Favorite as ferramentas e prompts que definem seu gênio criativo para encontrá-los aqui."
+              actionLabel="Explorar Ferramentas"
+              onAction={onNavigateToTools}
+            />
+          )}
+        </TabsContent>
+      </Tabs>
     </motion.section>
+  )
+}
+
+function ArsenalTrackCard({ track, onTrackClick }: { track: Track; onTrackClick?: (track: Track) => void }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onTrackClick?.(track)}
+      className="group relative flex h-80 w-full overflow-hidden rounded-2xl border border-white/10 text-left transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_35px_90px_-45px_rgba(0,0,0,0.8)]"
+      style={{
+        backgroundImage: `url(${track.backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent transition-opacity group-hover:from-black/90" />
+      <div className="relative flex h-full w-full flex-col justify-end gap-4 p-6">
+        <div className="space-y-2">
+          <span className="text-xs uppercase tracking-[0.3em] text-white/50">Trilha</span>
+          <h3 className="text-xl font-semibold text-white">{track.title}</h3>
+        </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-sm text-white/70">
+            <span>Progresso</span>
+            <span>{Math.round(track.progress ?? 0)}%</span>
+          </div>
+          <div className="h-2 w-full rounded-full bg-white/20">
+            <div
+              className="h-full rounded-full bg-white transition-all duration-500"
+              style={{ width: `${Math.round(track.progress ?? 0)}%` }}
+            />
+          </div>
+        </div>
+        <div className="flex items-center justify-between text-sm text-white/80">
+          <span className="rounded-full bg-white/10 px-3 py-1 text-xs uppercase tracking-widest text-white/70">
+            {track.category || 'Conteúdo' }
+          </span>
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em]">
+            Continuar
+            <Compass className="h-3.5 w-3.5" />
+          </span>
+        </div>
+      </div>
+    </button>
+  )
+}
+
+function EmptyState({
+  icon: Icon,
+  title,
+  description,
+  actionLabel,
+  onAction
+}: {
+  icon: ComponentType<{ className?: string }>
+  title: string
+  description: string
+  actionLabel: string
+  onAction?: () => void
+}) {
+  return (
+    <div className="flex flex-col items-center rounded-3xl border border-white/10 bg-white/5 p-12 text-center text-white shadow-[0_25px_120px_-60px_rgba(0,0,0,0.8)]">
+      <div className="flex h-24 w-24 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/80">
+        <Icon className="h-12 w-12" />
+      </div>
+      <h3 className="mt-8 text-2xl font-semibold text-white">{title}</h3>
+      <p className="mt-3 max-w-md text-sm text-white/60">{description}</p>
+      <button
+        onClick={() => onAction?.()}
+        className="mt-8 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:bg-white/20"
+      >
+        {actionLabel}
+      </button>
+    </div>
   )
 }

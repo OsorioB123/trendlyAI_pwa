@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, X, Loader } from 'lucide-react'
+import { CheckCircle2, XCircle, Loader } from 'lucide-react'
 import { useProfile } from '../../hooks/useProfile'
 import { useAuth } from '../../contexts/AuthContext'
 import Header from '../../components/layout/Header'
@@ -12,6 +12,8 @@ import ProfileHeader from '../../components/profile/ProfileHeader'
 import NextActionCard from '../../components/profile/NextActionCard'
 import ArsenalSection from '../../components/profile/ArsenalSection'
 import ReferralSection from '../../components/profile/ReferralSection'
+import { AmbientSelector } from '../../components/profile/ambient-selector/AmbientSelector'
+import { SettingsService } from '@/lib/services/settingsService'
 import type { ArsenalTab, ReferralTab } from '../../types/profile'
 import { useBackground } from '../../contexts/BackgroundContext'
 
@@ -42,6 +44,7 @@ export default function ProfileContent() {
   const [activeReferralTab, setActiveReferralTab] = useState<ReferralTab>('credits')
   const [successMessage, setSuccessMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const [isAmbientSaving, setIsAmbientSaving] = useState(false)
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -62,6 +65,32 @@ export default function ProfileContent() {
 
     return () => clearTimeout(timeout)
   }, [profileError, clearError])
+
+  const handlePersistAmbient = async (themeId: string) => {
+    if (!user?.id) return false
+
+    try {
+      setIsAmbientSaving(true)
+      const response = await SettingsService.updateStudioTheme(user.id, themeId)
+
+      if (response.success) {
+        setSuccessMessage('Ambiente atualizado com sucesso!')
+        setTimeout(() => setSuccessMessage(''), 3000)
+        return true
+      }
+
+      setErrorMessage(response.error || 'Não foi possível atualizar o ambiente.')
+      setTimeout(() => setErrorMessage(''), 4000)
+      return false
+    } catch (error) {
+      console.error('Error persisting ambient selection:', error)
+      setErrorMessage('Erro inesperado ao salvar ambiente.')
+      setTimeout(() => setErrorMessage(''), 4000)
+      return false
+    } finally {
+      setIsAmbientSaving(false)
+    }
+  }
 
   // Show loading state
   if (authLoading || profileLoading || !user || !profile) {
@@ -105,17 +134,28 @@ export default function ProfileContent() {
       />
 
       {/* Toast Messages */}
-      {successMessage && (
-        <div className="fixed top-4 right-4 z-50 flex items-center gap-2 bg-green-500/20 border border-green-500/30 text-green-300 px-4 py-3 rounded-xl backdrop-blur-xl">
-          <Check className="w-5 h-5" />
-          {successMessage}
-        </div>
-      )}
-      
-      {errorMessage && (
-        <div className="fixed top-4 right-4 z-50 flex items-center gap-2 bg-red-500/20 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl backdrop-blur-xl">
-          <X className="w-5 h-5" />
-          {errorMessage}
+      {(successMessage || errorMessage) && (
+        <div className="fixed top-6 right-6 z-50 space-y-3">
+          {successMessage && (
+            <div className="relative flex items-start gap-3 rounded-2xl border border-white/20 bg-white/10 px-5 py-4 text-white shadow-lg shadow-black/30 backdrop-blur-xl">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-400/20 text-emerald-200">
+                <CheckCircle2 className="h-5 w-5" />
+              </div>
+              <div className="flex-1 text-sm leading-5 text-white/90">
+                {successMessage}
+              </div>
+            </div>
+          )}
+          {errorMessage && (
+            <div className="relative flex items-start gap-3 rounded-2xl border border-white/20 bg-white/10 px-5 py-4 text-white shadow-lg shadow-black/30 backdrop-blur-xl">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-500/20 text-rose-200">
+                <XCircle className="h-5 w-5" />
+              </div>
+              <div className="flex-1 text-sm leading-5 text-white/90">
+                {errorMessage}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -132,6 +172,13 @@ export default function ProfileContent() {
             onAvatarUpload={uploadAvatar}
             isUploading={profileUploading}
             isSaving={profileSaving}
+          />
+
+          {/* Ambient Selector */}
+          <AmbientSelector
+            className="mt-2"
+            onPersist={handlePersistAmbient}
+            isSaving={isAmbientSaving}
           />
 
           {/* Next Action Card */}

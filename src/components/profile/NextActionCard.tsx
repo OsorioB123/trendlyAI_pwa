@@ -1,7 +1,7 @@
 
 'use client'
 
-import { Lightbulb, Play } from 'lucide-react'
+import { Lightbulb, ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { MOTION_CONSTANTS, respectReducedMotion } from '@/lib/motion'
 import type { NextActionProps } from '../../types/profile'
@@ -24,25 +24,30 @@ export default function NextActionCard({
       animate="animate"
       transition={transitionSafe}
     >
-      <div className="relative overflow-hidden rounded-2xl">
-        <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 animate-pulse"></div>
-        <div className="relative bg-white/8 backdrop-blur-lg rounded-2xl p-8 flex flex-col md:flex-row items-start md:items-center gap-6">
-          <div className="w-14 h-14 flex-shrink-0 flex items-center justify-center rounded-full bg-white/8">
-            <Lightbulb className="w-7 h-7 text-white" />
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/20 via-white/5 to-transparent p-[1px]">
+        <div className="relative overflow-hidden rounded-[32px] bg-black/30">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.2),transparent_45%)]" />
+          <div className="relative flex flex-col gap-6 p-8 md:flex-row md:items-center">
+            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.35)]">
+              <Lightbulb className="h-7 w-7 text-white" />
+            </div>
+            <div className="flex-1 space-y-2 text-left">
+              <h2 className="text-xl font-semibold text-white md:text-2xl">
+                {recommendation.title}
+              </h2>
+              <p className="text-sm leading-relaxed text-white/70 md:text-base">
+                {recommendation.description}
+              </p>
+            </div>
+            <button
+              onClick={onActionClick}
+              className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full border border-white/20 bg-white px-6 py-3 text-sm font-semibold text-black transition-transform duration-300 hover:scale-[1.03] hover:shadow-[0_20px_40px_rgba(0,0,0,0.35)]"
+            >
+              <span>{recommendation.action_text}</span>
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <span className="absolute inset-0 -z-10 bg-gradient-to-r from-white/80 via-white to-white/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            </button>
           </div>
-          <div className="flex-grow">
-            <h2 className="text-xl font-medium text-white mb-2">{recommendation.title}</h2>
-            <p className="text-white/70 leading-relaxed">
-              {recommendation.description}
-            </p>
-          </div>
-          <button 
-            onClick={onActionClick}
-            className="bg-white/10 backdrop-blur-md rounded-full px-6 py-3 flex-shrink-0 flex items-center gap-3 font-medium w-full md:w-auto justify-center hover:bg-white/15 hover:scale-105 transition-all duration-300"
-          >
-            <Play className="w-4 h-4" />
-            <span>{recommendation.action_text}</span>
-          </button>
         </div>
       </div>
 

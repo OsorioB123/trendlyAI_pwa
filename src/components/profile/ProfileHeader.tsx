@@ -3,17 +3,19 @@
 import { useState, useRef } from 'react'
 import Image from 'next/image'
 import {
-  Camera, 
-  Edit2, 
-  Check, 
-  X, 
-  Loader, 
-  Navigation, 
-  Award, 
-  Flame 
+  Camera,
+  Edit2,
+  Check,
+  X,
+  Loader,
+  Navigation,
+  Award,
+  Flame,
+  Sparkles
 } from 'lucide-react'
 import type { ProfileHeaderProps } from '../../types/profile'
 import { PROFILE_LEVELS } from '../../types/profile'
+import { cn } from '@/lib/utils'
 
 export default function ProfileHeader({
   profile,
@@ -113,14 +115,19 @@ export default function ProfileHeader({
   const levelInfo = PROFILE_LEVELS[levelKey]
 
   return (
-    <section className={`flex flex-col md:flex-row gap-8 items-center text-center md:text-left mb-16 animate-entry ${className}`}>
+    <section
+      className={cn(
+        'flex flex-col md:flex-row items-center gap-8 rounded-3xl border border-white/10 bg-white/10/60 p-8 md:p-10 text-center md:text-left shadow-[0_20px_80px_-40px_rgba(0,0,0,0.6)] backdrop-blur-2xl animate-entry',
+        className
+      )}
+    >
       {/* Avatar */}
       <button 
         className="relative flex-shrink-0 group avatar-interactive-wrapper"
         onClick={handleAvatarClick}
         disabled={isUploading}
       >
-        <div className="w-32 h-32 rounded-full overflow-hidden relative">
+        <div className="relative h-32 w-32 rounded-full border border-white/20 bg-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.35)]">
           <Image
             src={profile.avatar_url || 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=300&q=80'}
             alt="Avatar do usuário"
@@ -132,7 +139,7 @@ export default function ProfileHeader({
         </div>
         
         {/* Avatar Overlay */}
-        <div className="absolute inset-0 rounded-full flex items-center justify-center avatar-overlay bg-black/0 hover:bg-black/60 transition-all duration-300">
+        <div className="avatar-overlay absolute inset-0 flex items-center justify-center rounded-full bg-black/0 transition-all duration-300 hover:bg-black/60">
           {isUploading ? (
             <Loader className="w-6 h-6 text-white animate-spin" />
           ) : (
@@ -162,7 +169,7 @@ export default function ProfileHeader({
                 value={formData.display_name}
                 onChange={(e) => handleInputChange('display_name', e.target.value)}
                 onKeyDown={(e) => handleKeyDown(e, 'display_name')}
-                className="text-5xl font-medium text-white tracking-tight bg-transparent border-b-2 border-white/50 focus:outline-none focus:border-white"
+                className="text-4xl md:text-5xl font-semibold tracking-tight text-white/90 bg-transparent border-b border-white/30 focus:outline-none focus:border-white"
                 autoFocus
                 disabled={isSaving}
                 placeholder="Digite seu nome"
@@ -183,41 +190,39 @@ export default function ProfileHeader({
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2 group">
-              <h1 className="text-5xl font-medium text-white tracking-tight">
+            <div className="group flex items-center gap-2">
+              <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white">
                 {profile.display_name || 'Usuário'}
               </h1>
               <button
                 onClick={() => handleFieldEdit('display_name')}
-                className="p-1 text-white/40 hover:text-white/80 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="rounded-full p-1 text-white/40 transition-all hover:text-white/80 group-hover:opacity-100 opacity-0"
               >
                 <Edit2 className="w-4 h-4" />
               </button>
             </div>
           )}
         </div>
-        
+
         {/* Level */}
-        <p className={`text-lg mb-6 ${levelInfo.color}`}>
-          Nível Criativo: {levelInfo.name}
-        </p>
-        
-        {/* Metrics Pills */}
-        <div className="flex flex-wrap justify-center md:justify-start items-center gap-3 mb-6">
-          <div className="metric-pill bg-white/8 rounded-full px-4 py-2 text-sm font-medium text-white flex items-center gap-2 hover:bg-white/15 hover:-translate-y-0.5 transition-all duration-300">
-            <Navigation className="w-4 h-4" />
-            {profile.total_tracks || 0} Trilhas Ativas
-          </div>
-          <div className="metric-pill bg-white/8 rounded-full px-4 py-2 text-sm font-medium text-white flex items-center gap-2 hover:bg-white/15 hover:-translate-y-0.5 transition-all duration-300">
-            <Award className="w-4 h-4" />
-            {profile.completed_modules || 0} Módulos Concluídos
-          </div>
-          <div className="metric-pill bg-white/8 rounded-full px-4 py-2 text-sm font-medium text-white flex items-center gap-2 hover:bg-white/15 hover:-translate-y-0.5 transition-all duration-300">
-            <Flame className="w-4 h-4" />
-            Streak: {profile.streak_days || 0} Dias
-          </div>
+        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white/80 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+          <Sparkles className="h-4 w-4" />
+          <span>Nível Criativo: {levelInfo.name}</span>
         </div>
-        
+
+        {/* Metrics Pills */}
+        <div className="mb-6 flex flex-wrap items-center justify-center gap-3 md:justify-start">
+          <MetricPill icon={<Navigation className="h-4 w-4" />}>
+            {profile.total_tracks || 0} Trilhas Ativas
+          </MetricPill>
+          <MetricPill icon={<Award className="h-4 w-4" />}>
+            {profile.completed_modules || 0} Módulos Concluídos
+          </MetricPill>
+          <MetricPill icon={<Flame className="h-4 w-4" />}>
+            Streak: {profile.streak_days || 0} Dias
+          </MetricPill>
+        </div>
+
         {/* Editable Bio */}
         <div className="mt-6">
           {editingField === 'bio' ? (
@@ -256,13 +261,13 @@ export default function ProfileHeader({
             </div>
           ) : (
             <div className="group">
-              <div className="flex items-start gap-2">
-                <p className="text-white/70 leading-relaxed flex-1">
+              <div className="flex items-start gap-3">
+                <p className="flex-1 text-base leading-relaxed text-white/70">
                   {profile.bio || 'Adicione uma biografia para contar mais sobre você...'}
                 </p>
                 <button
                   onClick={() => handleFieldEdit('bio')}
-                  className="p-1 text-white/40 hover:text-white/80 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                  className="flex-shrink-0 rounded-full p-1 text-white/40 transition-opacity hover:text-white/80 group-hover:opacity-100 opacity-0"
                 >
                   <Edit2 className="w-4 h-4" />
                 </button>
@@ -275,10 +280,10 @@ export default function ProfileHeader({
       {/* CSS styles */}
       <style jsx>{`
         .avatar-interactive-wrapper {
-          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .avatar-interactive-wrapper:hover {
-          transform: scale(1.05);
+          transform: translateY(-4px) scale(1.04);
         }
         .animate-entry {
           opacity: 0;
@@ -286,15 +291,21 @@ export default function ProfileHeader({
           animation: slideInFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         @keyframes slideInFade {
-          to { 
-            opacity: 1; 
-            transform: translateY(0); 
+          to {
+            opacity: 1;
+            transform: translateY(0);
           }
-        }
-        .metric-pill {
-          backdrop-filter: blur(8px);
         }
       `}</style>
     </section>
+  )
+}
+
+function MetricPill({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white/80 shadow-[0_0_20px_rgba(255,255,255,0.15)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/20">
+      {icon}
+      {children}
+    </span>
   )
 }
