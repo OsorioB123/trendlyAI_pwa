@@ -1,11 +1,10 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { motion, AnimatePresence, useAnimation } from 'framer-motion'
+import { type ChangeEvent, type FocusEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { Search, X, Clock, TrendingUp } from 'lucide-react'
-import { respectReducedMotion } from '@/lib/motion'
-import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 
 type Variant = 'tools' | 'tracks' | 'default'
 
@@ -46,23 +45,23 @@ export default function SearchBar({
   onQuickFilter,
   resultsCount,
 }: SearchBarProps) {
+  const [announcement, setAnnouncement] = useState('Digite para buscar')
   const [isFocused, setIsFocused] = useState(false)
-  const [isTyping, setIsTyping] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
-  const [reducedMotion, setReducedMotion] = useState(false)
-  const [ariaAnnouncement, setAriaAnnouncement] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const searchIconControls = useAnimation()
+  const wrapperRef = useRef<HTMLDivElement>(null)
+
+  const suggestionsEnabled = variant === 'tools'
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const update = () => setReducedMotion(mq.matches)
-    update()
-    mq.addEventListener?.('change', update)
-    return () => mq.removeEventListener?.('change', update)
-  }, [])
+    if (typeof resultsCount !== 'number') return
+    const term = value.trim()
+    if (term.length === 0) {
+      setAnnouncement('Digite para buscar')
+    } else {
+      setAnnouncement(`${resultsCount} resultados para "${term}"`)
+    }
+  }, [value, resultsCount])
 
   const dynamicPlaceholder = useMemo(() => {
     if (placeholder) return placeholder
@@ -74,218 +73,147 @@ export default function SearchBar({
     return 'Buscar...'
   }, [placeholder, variant, totalTools])
 
-  useEffect(() => {
-    // Fechar sugestões ao clicar fora
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setShowSuggestions(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
-
-  useEffect(() => {
-    // Anunciar mudanças de busca/resultado para tecnologias assistivas
-    if (typeof resultsCount === 'number') {
-      const term = value?.trim()
-      if (term) {
-        setAriaAnnouncement(`${resultsCount} resultados para "${term}"`)
-      } else {
-        setAriaAnnouncement('Digite para buscar')
-      }
-    }
-  }, [value, resultsCount])
-
   const handleFocus = () => {
     setIsFocused(true)
-    setShowSuggestions(true)
-    searchIconControls.start('focus')
-  }
-
-  const handleBlur = () => {
-    setIsFocused(false)
-    setIsTyping(false)
-    // pequeno atraso para permitir clique nas sugestões
-    setTimeout(() => setShowSuggestions(false), 150)
-    searchIconControls.start('idle')
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value
-    onChange(newValue)
-    if (newValue && !isTyping) {
-      setIsTyping(true)
-      searchIconControls.start('typing')
-    } else if (!newValue && isTyping) {
-      setIsTyping(false)
-      searchIconControls.start(isFocused ? 'focus' : 'idle')
+    if (suggestionsEnabled) {
+      setShowSuggestions(true)
     }
-    setShowSuggestions(newValue.length === 0)
+  }
+
+  const handleBlur = (event: FocusEvent<HTMLElement>) => {
+    setIsFocused(false)
+    if (!suggestionsEnabled) return
+    const next = event.relatedTarget as HTMLElement | null
+    if (!next || !wrapperRef.current?.contains(next)) {
+      setShowSuggestions(false)
+    }
+  }
+
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const nextValue = event.target.value
+    onChange(nextValue)
+    if (suggestionsEnabled) {
+      setShowSuggestions(nextValue.length === 0 && isFocused)
+    }
   }
 
   const handleClear = () => {
     onChange('')
-    setIsTyping(false)
+    if (suggestionsEnabled) {
+      setShowSuggestions(true)
+    }
     inputRef.current?.focus()
-    searchIconControls.start('focus')
-    if ('vibrate' in navigator) navigator.vibrate(30)
-    setShowSuggestions(true)
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      if (value) handleClear(); else inputRef.current?.blur()
-    }
-    if (e.key === 'Enter' && !reducedMotion) {
-      searchIconControls.start('searching')
-      setTimeout(() => {
-        searchIconControls.start(isTyping ? 'typing' : isFocused ? 'focus' : 'idle')
-      }, 800)
-    }
-  }
-
-  const handleSuggestionClick = (suggestion: string) => {
-    onChange(suggestion)
+  const handleSuggestionSelect = (text: string) => {
+    onChange(text)
     setShowSuggestions(false)
-    inputRef.current?.blur()
+    inputRef.current?.focus()
   }
 
   const handleQuickFilter = (category: string) => {
     onQuickFilter?.(category)
     setShowSuggestions(false)
-    inputRef.current?.blur()
+    inputRef.current?.focus()
   }
-
-  // Variants
-  const containerVariants = {
-    idle: {
-      scale: 1,
-      boxShadow: '0 0 0 0px rgba(255, 255, 255, 0)',
-      borderColor: 'rgba(255, 255, 255, 0.1)',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)'
-    },
-    focus: {
-      scale: 1.01,
-      boxShadow: '0 0 0 3px rgba(255, 255, 255, 0.08)',
-      borderColor: 'rgba(255, 255, 255, 0.3)',
-      backgroundColor: 'rgba(0, 0, 0, 0.6)',
-      transition: respectReducedMotion({ transition: { duration: 0.2, ease: 'cubic-bezier(0.16, 1, 0.3, 1)' } }).transition
-    },
-    typing: {
-      scale: 1.01,
-      boxShadow: '0 0 0 3px rgba(255, 255, 255, 0.1)',
-      borderColor: 'rgba(255, 255, 255, 0.4)',
-      backgroundColor: 'rgba(0, 0, 0, 0.65)'
-    }
-  }
-
-  const searchIconVariants = {
-    idle: { scale: 1, rotate: 0, color: 'rgba(255, 255, 255, 0.6)' },
-    focus: { scale: 1.06, rotate: 0, color: 'rgba(255, 255, 255, 0.85)', transition: respectReducedMotion({ transition: { duration: 0.2 } }).transition },
-    typing: { scale: reducedMotion ? 1.05 : [1.08, 1.15, 1.08], rotate: reducedMotion ? 0 : [0, 5, -5, 0], color: 'rgba(255, 255, 255, 0.95)', transition: reducedMotion ? { duration: 0 } : { duration: 1, repeat: Infinity, ease: 'easeInOut' } },
-    searching: { rotate: reducedMotion ? 0 : 360, scale: 1.05, color: 'rgba(255, 255, 255, 0.95)', transition: reducedMotion ? { duration: 0 } : { rotate: { duration: 0.8, repeat: Infinity, ease: 'linear' } } }
-  }
-
-  const currentState = isTyping && isFocused ? 'typing' : isFocused ? 'focus' : 'idle'
 
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
-      {/* aria-live announcement for SR users */}
-      <div aria-live="polite" aria-atomic="true" className="sr-only">{ariaAnnouncement}</div>
+    <div
+      ref={wrapperRef}
+      className={cn('relative', className)}
+      onBlur={handleBlur}
+    >
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {announcement}
+      </div>
 
-      <motion.div
-        className="relative rounded-xl border transition-all duration-200"
-        variants={containerVariants as any}
-        animate={currentState}
-        whileTap={{ scale: 0.99 }}
-      >
-        <motion.div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none" variants={searchIconVariants as any} animate={searchIconControls}>
-          <Search className="w-5 h-5" />
-        </motion.div>
+      <label htmlFor="tools-search" className="sr-only">
+        Buscar ferramentas
+      </label>
 
-        <motion.input
+      <div className="group relative flex items-center rounded-xl border border-white/10 bg-black/50 px-4 py-3 text-white transition-colors focus-within:border-white/30 focus-within:bg-black/60">
+        <Search className="mr-3 h-4 w-4 text-white/60 group-focus-within:text-white" />
+        <input
+          id="tools-search"
           ref={inputRef}
-          type="text"
-          placeholder={dynamicPlaceholder}
           value={value}
-          onChange={handleChange}
+          onChange={handleInputChange}
           onFocus={handleFocus}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-          className="w-full h-12 pl-12 pr-12 bg-transparent text-white placeholder-white/50 focus:outline-none"
-          aria-label="Buscar"
+          type="text"
           autoComplete="off"
-          spellCheck={false}
+          placeholder={dynamicPlaceholder}
+          aria-expanded={suggestionsEnabled ? showSuggestions : undefined}
+          className="h-8 w-full bg-transparent text-base outline-none placeholder:text-white/50"
         />
+        {value && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="ml-3 inline-flex h-7 w-7 items-center justify-center rounded-full text-white/60 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+            aria-label="Limpar busca"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+      </div>
 
-        <AnimatePresence>
-          {value && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleClear}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full hover:bg-white/10"
-              aria-label="Limpar busca"
-            >
-              <X className="w-4 h-4 text-white/70" />
-            </Button>
-          )}
-        </AnimatePresence>
-      </motion.div>
+      {suggestionsEnabled && showSuggestions && (
+        <div
+          role="listbox"
+          aria-label="Sugestões de busca"
+          className="absolute left-0 right-0 top-full z-40 mt-2 origin-top rounded-2xl border border-white/10 bg-black/85 p-4 text-white shadow-lg backdrop-blur"
+          onMouseDown={(event) => event.preventDefault()}
+        >
+          <div className="mb-3 flex items-center justify-between text-xs uppercase tracking-wide text-white/60">
+            <span>Sugestões rápidas</span>
+            <Badge variant="outline" className="border-white/20 text-white/70">
+              Ferramentas
+            </Badge>
+          </div>
+          <div className="mb-4 flex flex-wrap gap-2">
+            {QUICK_SUGGESTIONS.map((suggestion) => (
+              <Button
+                key={suggestion.category}
+                type="button"
+                variant="secondary"
+                onClick={() => handleQuickFilter(suggestion.category)}
+                className="h-9 rounded-full border border-white/15 bg-white/10 px-3 text-sm text-white transition hover:border-white/25 hover:bg-white/15"
+              >
+                <span className="mr-1" aria-hidden>
+                  {suggestion.icon}
+                </span>
+                {suggestion.label}
+              </Button>
+            ))}
+          </div>
 
-      {/* Suggestions Panel */}
-      {showSuggestions && (isFocused || value === '') && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-4 bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl z-50 shadow-2xl">
-          {value === '' ? (
-            <>
-              <div className="mb-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <TrendingUp className="w-4 h-4 text-white/60" />
-                  <span className="text-sm font-medium text-white/80">Categorias Populares</span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {QUICK_SUGGESTIONS.map(suggestion => (
-                    <Badge
-                      key={suggestion.category}
-                      variant="secondary"
-                      className="cursor-pointer bg-white/10 hover:bg-white/20 text-white border-white/20 transition-colors"
-                      onClick={() => handleQuickFilter(suggestion.category)}
-                      aria-label={`Filtrar por ${suggestion.label}`}
-                    >
-                      <span className="mr-1">{suggestion.icon}</span>
-                      {suggestion.label}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <Clock className="w-4 h-4 text-white/60" />
-                  <span className="text-sm font-medium text-white/80">Buscas Recentes</span>
-                </div>
-                <div className="space-y-1">
-                  {RECENT_SEARCHES.map(search => (
-                    <button
-                      key={search}
-                      onClick={() => handleSuggestionClick(search)}
-                      className="w-full text-left px-3 py-2 text-sm text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-                    >
-                      {search}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </>
-          ) : (
-            <div>
-              <span className="text-sm text-white/60">Pressione Enter para buscar por &quot;{value}&quot;</span>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-white/60">
+              <TrendingUp className="h-4 w-4" />
+              <span>Buscas recentes</span>
             </div>
-          )}
+            <ul className="space-y-1" role="presentation">
+              {RECENT_SEARCHES.map((recent) => (
+                <li key={recent}>
+                  <button
+                    type="button"
+                    onClick={() => handleSuggestionSelect(recent)}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-white/80 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                  >
+                    <Clock className="h-3.5 w-3.5 text-white/40" aria-hidden />
+                    <span>{recent}</span>
+                  </button>
+                </li>
+              ))}
+              {RECENT_SEARCHES.length === 0 && (
+                <li className="px-3 py-2 text-sm text-white/60">
+                  Nenhuma busca recente.
+                </li>
+              )}
+            </ul>
+          </div>
         </div>
       )}
     </div>
   )
 }
-
