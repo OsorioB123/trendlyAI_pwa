@@ -21,7 +21,7 @@ Track the full refactor plan for the /tools page so we keep history even if chat
 | 1 | Supabase integration (server filters, data normalization, favorites) | [x] Done | Section 1.1; passed 
 px tsc --noEmit. |
 | 2 | Layout & responsiveness (hero, persistent filter bar, adaptive grid) | [~] In progress | Hero sections refreshed, persistent summary added; polish on cards/grid pending. |
-| 3 | Filter components (SearchBar, drawer, shadcn patterns, a11y) | [~] In progress | SearchBar rebuilt com sugestÃµes acessÃ­veis; drawer reorganizado. |
+| 3 | Filter components (SearchBar, drawer, shadcn patterns, a11y) | [~] In progress | SearchBar rebuilt com sugestÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âµes acessÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­veis; drawer reorganizado. |
 | 4 | Cards, modal, favorites UX polish | [ ] Open | Pending new layout decisions. |
 | 5 | Validation (smoke, Playwright, a11y, docs) | [ ] Open | Plan after phases 2-4. |
 
@@ -72,15 +72,14 @@ ullsLast; current usage sticks to { ascending }.
 
 ### 2.1 Progresso recente
 - Wrapper principal usa <main> com skip-link, background adaptativo e padding consistente (src/app/tools/page.tsx).
-- Barra persistente exibe contador, carregamento Loader2, chips removÃ­veis e CTA de limpar filtros.
-- Drawer mobile usa cabeÃ§alho fixo, corpo rolÃ¡vel e padding seguro (src/components/tools/ToolsFiltersDrawer.tsx).
-- Skeletons, load-more e empty state alinhados ao novo grid responsivo (1 â†’ 4 colunas).
+- Barra persistente exibe contador, carregamento Loader2, chips removÃƒÂ­veis e CTA de limpar filtros.
+- Drawer mobile usa cabeÃƒÂ§alho fixo, corpo rolÃƒÂ¡vel e padding seguro (src/components/tools/ToolsFiltersDrawer.tsx).
+- Skeletons, load-more e empty state alinhados ao novo grid responsivo (1 Ã¢â€ â€™ 4 colunas).
 
 ### 2.2 PrÃ³ximos passos
-- Ajustar ToolCard/Modal para alturas consistentes e foco declarado.
-- Validar comportamento em telas <640px (scroll do drawer + fixar cabeÃ§alho).
+- Validar comportamento em telas <640px (scroll do drawer + cabeÃ§alho fixo).
+  - Checklist mobile: abrir o drawer em viewport estreita, garantir cabeÃ§alho fixo, corpo rolÃ¡vel e foco de retorno ao fechar.
 - Revisar gradientes/backdrop para reduzir opacidade em temas claros.
-
 
 ### Dependencies
 - UX decisions (wireframes, design tokens).
@@ -91,28 +90,31 @@ ullsLast; current usage sticks to { ascending }.
 - **ToolsFiltersDrawer**: reuse toggle helpers to avoid duplicate logic, consider grouping filters (tabs/accordions), sticky footer with actions, summary of active filters.
 - **Filter summary**: represent active filters as removable chips outside the drawer.
 ### 3.1 Progresso recente
-- SearchBar refeito com navegaÃ§Ã£o por teclado, resumos aria-live e sugestÃµes de quick filters acessÃ­veis (src/components/search/SearchBar.tsx).
-- ToolsFiltersDrawer reorganizado com resumo de chips, seÃ§Ãµes agrupadas, sticky footer e integraÃ§Ã£o com tipos/compatibilidades (src/components/tools/ToolsFiltersDrawer.tsx).
-- SearchBar e ToolsFiltersDrawer com strings/Ã­cones normalizados (acentos vÃ¡lidos) e atributos de combobox ajustados para manter aria-expanded vÃ¡lido; lint/tsc limpos (npm run lint, npx tsc --noEmit).
+- SearchBar refeito com navegação por teclado, aria-live e quick filters acessíveis (src/components/search/SearchBar.tsx).
+- ToolsFiltersDrawer reorganizado com chips ativos, seções agrupadas e sticky footer (src/components/tools/ToolsFiltersDrawer.tsx).
+- SearchBar/ToolsFiltersDrawer com strings e combobox normalizados; lint/tsc verdes (npm run lint, npx tsc --noEmit).
 
-### 3.2 PrÃ³ximos passos
-- Avaliar uso de Command/Combox para busca avanÃ§ada dentro do drawer.
-- Incluir filtros salvos e suporte a combinaÃ§Ãµes multi-select persistentes.
+### 3.2 Próximos passos
+- Avaliar uso de Command/Combobox para busca avançada dentro do drawer.
+- Incluir filtros salvos e suporte a combinações multi-select persistentes.
 - Garantir testes de teclado completos (tab/shift+tab) em todos os componentes.
 
 ## 4. Cards / Modal / Favorites (To do)
 - Standardise quick actions (favorite, open modal) with accessible patterns.
 - Align skeleton vs. final card visuals to reduce duplication.
-- Cards e modal com interações de favorito/abre modal padronizadas, foco controlado e strings saneadas (src/components/cards/ToolCard.tsx, src/components/modals/ToolModal.tsx).
+- Cards e modal com interaÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âµes de favorito/abre modal padronizadas, foco controlado e strings saneadas (src/components/cards/ToolCard.tsx, src/components/modals/ToolModal.tsx).
 - Update modal notifications (loading, saved states) and confirm copy actions feedback.
 - Ensure favorite state is in sync after Supabase operations (already ready in the data layer).
 
 ## 5. Validation & QA (To do)
+- Checklist inicial: 1) executar \\
+pm run smoke:dev\\, 2) validar favoritos (toggle otimista + Supabase), 3) checar fluxo mobile/drawer, 4) leitura com leitor de tela nas aÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Âµes principais.
 - Run npm run smoke:dev (/, /api/auth/admin, /test-supabase).
 - Draft Playwright scenarios (mobile vs desktop filters, favorites, drawer interactions).
 - Accessibility checklist: keyboard flow, aria attributes, reduced motion, contrast.
 - Performance: watch layout shifts, skeleton timing, background behaviour.
 
+- Checklist inicial: 1) `npm run smoke:dev`, 2) validar favoritos (toggle otimista + Supabase), 3) exercÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­cio mobile <640px (drawer/modal), 4) leitura com leitor de tela nas principais aÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âµes.
 ## Reference Material
 - Supabase types: src/types/database.ts.
 - shadcn CLI: 
