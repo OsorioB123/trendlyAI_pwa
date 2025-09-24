@@ -43,6 +43,7 @@ export interface Tool {
   how_to_use?: string
   isFavorite: boolean
   isEdited: boolean
+  isPremium?: boolean
   usageCount?: number
   difficulty?: 'beginner' | 'intermediate' | 'advanced'
   estimatedTime?: string

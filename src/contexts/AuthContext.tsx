@@ -20,6 +20,7 @@ export interface Profile {
   preferences?: any
   created_at?: string
   updated_at?: string
+  is_premium?: boolean
 }
 
 interface AuthContextType {
@@ -94,7 +95,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('🔄 Auth state changed:', event, {
+        console.log('?? Auth state changed:', event, {
           hasSession: !!session,
           hasUser: !!session?.user,
           userId: session?.user?.id,
@@ -117,7 +118,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         if (session?.user) {
-          console.log('👤 User session found, loading profile...')
+          console.log('?? User session found, loading profile...')
           try {
             // Load or create user profile with timeout
             const profilePromise = loadUserProfile(session.user.id)
@@ -126,11 +127,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             )
             
             await Promise.race([profilePromise, timeoutPromise])
-            console.log('✅ Profile loading completed successfully')
+            console.log('? Profile loading completed successfully')
             
             // Handle profile creation on signup and onboarding checks
             if (event === 'SIGNED_IN' && session?.user) {
-              console.log('📝 Checking/creating profile for signed in user...')
+              console.log('?? Checking/creating profile for signed in user...')
               try {
                 await loadUserProfile(session.user.id)
               } catch {
@@ -145,17 +146,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               console.log('Sign-in onboarding check:', shouldOnboard)
             }
           } catch (error) {
-            console.error('❌ Profile loading failed or timed out:', error)
+            console.error('? Profile loading failed or timed out:', error)
             // Continue with auth flow even if profile loading fails
           }
         } else {
-          console.log('🚫 No user session, clearing profile and onboarding status')
+          console.log('?? No user session, clearing profile and onboarding status')
           setProfile(null)
           setNeedsOnboarding(false)
         }
         
         // Always ensure loading is set to false after auth state change
-        console.log('✅ Auth state change complete - setting loading to false')
+        console.log('? Auth state change complete - setting loading to false')
         setLoading(false)
       }
     )
@@ -182,12 +183,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setProfile({
             id: userId,
             email: '',
-            display_name: 'Usuário',
+            display_name: 'Usu�rio',
             level: 'Iniciante',
             credits: 0,
             streak_days: 0,
             total_tracks: 0,
-            completed_modules: 0
+            completed_modules: 0,
+            is_premium: false
           })
         } else {
           console.error('Error loading profile:', error)
@@ -209,9 +211,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const profileData = {
         id: user.id,
         email: user.email || '',
-        display_name: user.user_metadata?.display_name || 
-                     user.email?.split('@')[0] || 
-                     'Usuário',
+        display_name: user.user_metadata?.display_name ||
+                     user.email?.split('@')[0] ||
+                     'Usu�rio',
+        is_premium: false,
       }
 
       const { data, error } = await (supabase
@@ -234,14 +237,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log('🔄 Starting signIn process for:', email)
+      console.log('?? Starting signIn process for:', email)
       setLoading(true)
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
       
-      console.log('🔍 SignIn response:', { 
+      console.log('?? SignIn response:', { 
         hasUser: !!data?.user, 
         userEmail: data?.user?.email,
         hasSession: !!data?.session,
@@ -250,10 +253,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       return { data, error }
     } catch (error) {
-      console.error('❌ Sign in error:', error)
+      console.error('? Sign in error:', error)
       return { data: null, error }
     } finally {
-      console.log('✅ SignIn finally block - setting loading to false')
+      console.log('? SignIn finally block - setting loading to false')
       setLoading(false)
     }
   }
@@ -261,32 +264,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string, userData: any = {}) => {
     try {
       setLoading(true)
-      console.log('🔄 Starting signup process for:', email)
-      console.log('📝 User data received:', userData)
+      console.log('?? Starting signup process for:', email)
+      console.log('?? User data received:', userData)
       
-      // CORREÇÃO: Estruturar corretamente os dados para o Supabase
+      // CORRE��O: Estruturar corretamente os dados para o Supabase
       const signUpOptions = {
         email,
         password,
         options: {
-          data: userData // Os dados do usuário devem estar dentro de options.data
+          data: userData // Os dados do usu�rio devem estar dentro de options.data
         }
       }
       
-      console.log('📤 Sending signup request with options:', signUpOptions)
+      console.log('?? Sending signup request with options:', signUpOptions)
       
       const { data, error } = await supabase.auth.signUp(signUpOptions)
       
       if (error) {
-        console.error('❌ Signup error:', error)
-        console.error('❌ Error details:', {
+        console.error('? Signup error:', error)
+        console.error('? Error details:', {
           message: error.message,
           status: error.status,
           name: error.name
         })
       } else {
-        console.log('✅ Signup successful:', data)
-        console.log('📊 Signup data details:', {
+        console.log('? Signup successful:', data)
+        console.log('?? Signup data details:', {
           hasUser: !!data.user,
           userEmail: data.user?.email,
           hasSession: !!data.session,
@@ -295,18 +298,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         })
         
         if (data.user && !data.session) {
-          console.log('📧 User created but needs email confirmation')
+          console.log('?? User created but needs email confirmation')
         } else if (data.session) {
-          console.log('🎉 User created and automatically signed in')
+          console.log('?? User created and automatically signed in')
         }
       }
       
       return { data, error }
     } catch (error) {
-      console.error('❌ Signup exception:', error)
+      console.error('? Signup exception:', error)
       return { data: null, error }
     } finally {
-      console.log('✅ SignUp process complete - setting loading to false')
+      console.log('? SignUp process complete - setting loading to false')
       setLoading(false)
     }
   }
@@ -482,3 +485,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 }
 
 export default AuthContext
+
+
+
+

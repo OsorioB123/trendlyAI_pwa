@@ -10,6 +10,8 @@ import { ArrowRight, Check } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useBackground } from '../../contexts/BackgroundContext'
 import { markOnboardingComplete } from '../../lib/onboarding'
+import { useAuth } from '../../contexts/AuthContext'
+import { Input } from '@/components/ui/input'
 
 interface Theme {
   id: string
@@ -121,13 +123,33 @@ export default function OnboardingPage() {
   
   const router = useRouter()
   const { changeBackground } = useBackground()
+  const { user, profile, updateProfile } = useAuth()
   const observerRef = useRef<IntersectionObserver | null>(null)
   const scrollCleanupRef = useRef<(() => void) | null>(null)
   const scrollAnimationIdRef = useRef<number | null>(null)
   const initializedRef = useRef(false)
   
-  const totalSlides = 4
+  const totalSlides = 5
   const transitionSafe = respectReducedMotion({ transition: { duration: MOTION_CONSTANTS.DURATION.normal } }).transition as any
+
+  const [nickname, setNickname] = useState('')
+  const [nicknameError, setNicknameError] = useState<string | null>(null)
+  const [savingNickname, setSavingNickname] = useState(false)
+
+  useEffect(() => {
+    if (profile?.display_name) {
+      setNickname((prev) => prev || profile.display_name)
+    }
+  }, [profile?.display_name])
+
+  const validateNickname = useCallback((value: string) => {
+    const trimmed = value.trim()
+    if (!trimmed) return 'Informe um apelido para continuar'
+    const words = trimmed.split(/\s+/).filter(Boolean)
+    if (words.length > 10) return 'Use no máximo 10 palavras'
+    if (trimmed.length > 120) return 'Texto muito longo'
+    return null
+  }, [])
 
   // Setup intersection observer for mobile theme selection - exact from HTML reference
   const setupMobileThemeSync = useCallback(() => {
@@ -264,19 +286,34 @@ export default function OnboardingPage() {
 
   // Handle next button click
   const handleNext = useCallback(async () => {
+    const isNicknameSlide = currentSlide === 4
+    if (isNicknameSlide) {
+      const error = validateNickname(nickname)
+      setNicknameError(error)
+      if (error) return
+      try {
+        setSavingNickname(true)
+        if (user) {
+          await updateProfile({ display_name: nickname.trim() })
+        }
+        showSlide(currentSlide + 1)
+      } catch (error) {
+        console.error('Failed to persist onboarding nickname', error)
+        setNicknameError('Não foi possível salvar seu apelido. Tente novamente.')
+      } finally {
+        setSavingNickname(false)
+      }
+      return
+    }
+
     if (currentSlide < totalSlides) {
       showSlide(currentSlide + 1)
     } else {
-      // Persist completion flag (localStorage + cookie for middleware)
       markOnboardingComplete()
-      
-      // Save selected theme preference
       await changeBackground(selectedThemeId)
-      
-      // Navigate to dashboard
       router.push('/dashboard')
     }
-  }, [currentSlide, totalSlides, selectedThemeId, changeBackground, router, showSlide])
+  }, [currentSlide, totalSlides, selectedThemeId, changeBackground, router, showSlide, nickname, validateNickname, updateProfile, user])
 
   // Handle skip
   const handleSkip = useCallback(() => {
@@ -299,6 +336,20 @@ export default function OnboardingPage() {
     showSlide(1)
   }, [showSlide])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined
+
+    const handleResize = () => {
+      if (currentSlide === 3) {
+        setupMobileThemeSync()
+      } else {
+        scrollCleanupRef.current?.()
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [currentSlide, setupMobileThemeSync])
   // Cleanup intersection observer
   useEffect(() => {
     return () => {
@@ -389,7 +440,7 @@ export default function OnboardingPage() {
           
           {/* Slide 3 - Theme Selection - Centered layout for this slide */}
           <div id="slide-3" className={`slide ${currentSlide === 3 ? 'active' : ''}` + " !justify-center"}>
-            <div className="slide-content-theme">
+            <div className="slide-content-theme mx-auto flex w-full max-w-5xl flex-col items-center gap-8 px-2 sm:px-4 lg:max-w-6xl lg:gap-12">
               <motion.section
                 className="text-center pt-10 pb-6 flex-shrink-0 lg:pt-16 lg:pb-8"
                 variants={MOTION_CONSTANTS.VARIANTS.staggerContainer as any}
@@ -409,10 +460,10 @@ export default function OnboardingPage() {
               </motion.section>
 
               <motion.section
-                className="flex-grow w-full flex flex-col items-center justify-start min-h-0 py-6 lg:py-12"
+                className="flex-grow w-full flex flex-col items-center justify-start min-h-0 py-4 sm:py-6 lg:py-10"
                 variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
               >
-                <div id="themes-gallery" className="w-full max-w-5xl hide-scrollbar overflow-x-auto lg:overflow-x-visible pb-6 lg:pb-0 lg:mx-auto">
+                <div id="themes-gallery" className="w-full max-w-5xl hide-scrollbar overflow-x-auto pb-6 sm:pb-8 lg:overflow-visible lg:pb-0 lg:mx-auto lg:mt-4">
                   <ol id="themes-track" className="flex items-center gap-6 lg:grid lg:grid-cols-4 lg:gap-10 lg:gap-y-12 lg:max-w-none lg:px-6">
                     {THEMES.map((theme, index) => (
                       <ThemeSphere
@@ -430,8 +481,51 @@ export default function OnboardingPage() {
             </div>
           </div>
 
-          {/* Slide 4 - Bottom-left positioning on desktop, centered on mobile */}
+          {/* Slide 4 - Nickname input */}
           <div id="slide-4" className={`slide ${currentSlide === 4 ? 'active' : ''}`}>
+            <motion.div className="w-full max-w-xl">
+              <motion.h2
+                className="text-3xl md:text-4xl font-semibold tracking-tight mb-4 font-geist"
+                variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
+              >
+                Como você quer ser chamado?
+              </motion.h2>
+              <motion.p
+                className="text-base text-white/80 mb-6"
+                variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
+              >
+                Esse apelido aparece no seu dashboard e no seu perfil. Máximo de 10 palavras.
+              </motion.p>
+
+              <motion.div variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}>
+                <div className="glass-outline is-active">
+                  <div className="rounded-2xl bg-white/10 p-3 backdrop-blur-md">
+                    <Input
+                      value={nickname}
+                      onChange={(e) => {
+                        setNickname(e.target.value)
+                        if (nicknameError) setNicknameError(null)
+                      }}
+                      placeholder="Ex.: Ana, João Silva, Mestre das Ideias"
+                      className="h-12 bg-transparent text-white placeholder:text-white/60 focus-visible:ring-white/30"
+                      aria-describedby="nickname-help"
+                    />
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center justify-between">
+                  <p id="nickname-help" className="text-xs text-white/60">Até 10 palavras</p>
+                  {nicknameError ? (
+                    <p className="text-xs text-red-300">{nicknameError}</p>
+                  ) : null}
+                </div>
+              </motion.div>
+
+              {/* Use bottom Next button; keep slide compact */}
+            </motion.div>
+          </div>
+
+          {/* Slide 5 - Bottom-left positioning on desktop, centered on mobile */}
+          <div id="slide-5" className={`slide ${currentSlide === 5 ? 'active' : ''}`}>
             <motion.div className="lg:max-w-md">
               <motion.h1
                 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4 font-geist"
@@ -492,11 +586,14 @@ export default function OnboardingPage() {
             
             <button
               onClick={handleNext}
-              className="primary-button-glow"
+              disabled={savingNickname}
+              className={`primary-button-glow ${savingNickname ? 'opacity-60 pointer-events-none' : ''}`}
             >
               <div className="border-glow" />
               <span className="relative z-10 flex items-center">
-                {currentSlide === totalSlides ? (
+                {savingNickname ? (
+                  'Salvando...'
+                ) : currentSlide === totalSlides ? (
                   <>
                     Começar <Check className="ml-2 h-5 w-5" strokeWidth={1.75} />
                   </>

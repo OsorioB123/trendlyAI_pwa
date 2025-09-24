@@ -245,7 +245,7 @@ export default function TracksPage() {
             <select
               value={filters.sort}
               onChange={(e) => updateFilter('sort', e.target.value as 'top' | 'recent')}
-              className="w-full px-4 py-3 pr-10 rounded-xl backdrop-blur-[20px] bg-white/10 text-white appearance-none cursor-pointer border border-white/15 focus-visible:outline-none focus-visible:border-white/40 transition-all"
+              className="w-full px-4 py-3 pr-10 rounded-xl backdrop-blur-[20px] bg-white/10 text-white appearance-none cursor-pointer border border-transparent focus-visible:outline-none focus-visible:border-white/30 transition-all shadow-[0_12px_34px_rgba(8,10,20,0.35)]"
             >
               <option value="top" className="bg-gray-800">Mais relevantes</option>
               <option value="recent" className="bg-gray-800">Mais recentes</option>

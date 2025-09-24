@@ -14,7 +14,7 @@ import {
   NotificationsMenu,
   useHeaderData
 } from './shared'
-import { UpgradeSheet } from './upgrade/UpgradeSheet'
+import { usePaywall } from '@/components/paywall/PaywallProvider'
 
 export function SecondaryHeader() {
   const router = useRouter()
@@ -23,8 +23,8 @@ export function SecondaryHeader() {
   const { user, profile, signOut } = useAuth()
   const [showNotifications, setShowNotifications] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
-  const [showUpgrade, setShowUpgrade] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const { open: openPaywall } = usePaywall()
 
   useHeaderData(user?.id)
 
@@ -87,14 +87,16 @@ export function SecondaryHeader() {
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowUpgrade(true)}
-            className="hidden items-center gap-2 rounded-full border border-white/20 bg-white/15 px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(0,0,0,0.2)] transition-transform hover:-translate-y-0.5 hover:bg-white/25 md:inline-flex"
-            data-testid="upgrade-button"
-            aria-label="Abrir planos Maestro"
-          >
-            Explorar Maestro
-          </button>
+          {!profile?.is_premium && (
+            <button
+              onClick={() => openPaywall('header')}
+              className="hidden items-center gap-2 rounded-full border border-white/20 bg-white/15 px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(0,0,0,0.2)] transition-transform hover:-translate-y-0.5 hover:bg-white/25 md:inline-flex"
+              data-testid="upgrade-button"
+              aria-label="Abrir planos Maestro"
+            >
+              Explorar Maestro
+            </button>
+          )}
 
           <div className="relative">
             <button
@@ -156,7 +158,6 @@ export function SecondaryHeader() {
         </div>
       </div>
 
-      <UpgradeSheet open={showUpgrade} onOpenChange={setShowUpgrade} />
     </motion.header>
   )
 }

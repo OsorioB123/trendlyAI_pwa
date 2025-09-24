@@ -49,6 +49,7 @@ export interface DashboardToolSummary {
   usageCount?: number
   lastUsedAt?: string
   content?: string
+  isPremium?: boolean
 }
 
 export interface DashboardTrackSummary {
@@ -59,6 +60,7 @@ export interface DashboardTrackSummary {
   updatedAt?: string
   category?: string
   thumbnailUrl?: string
+  isPremium?: boolean
 }
 
 export interface DashboardSnapshot {

@@ -433,8 +433,8 @@ textarea:focus-visible {
 .glass-outline {
   position: relative;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05));
   padding: 1px;
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.0);
@@ -611,8 +611,8 @@ textarea:focus-visible {
 /* Theme sphere - exact implementation from HTML */
 .theme-sphere {
   position: relative;
-  width: 120px; 
-  height: 120px;
+  width: 112px; 
+  height: 112px;
   border-radius: 9999px; 
   cursor: pointer;
   border: 2px solid transparent;
@@ -696,25 +696,30 @@ textarea:focus-visible {
 /* Mobile responsive behavior - exact from HTML reference */
 @media (max-width: 1023px) {
   #studio-environment-track,
-  #themes-gallery { 
-    scroll-snap-type: x mandatory; 
-    scroll-padding: 0 calc(50vw - 60px); 
+  #themes-gallery {
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 calc(50vw - 60px);
   }
   #themes-gallery {
     padding-left: calc(50vw - 60px);
     padding-right: calc(50vw - 60px);
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
     scroll-behavior: smooth;
+  }
+  #themes-track {
+    min-width: max-content;
   }
   #themes-track li {
     scroll-snap-align: center;
   }
-  .theme-sphere { 
-    transform: scale(0.9); 
-    opacity: 0.5; 
+  .theme-sphere {
+    transform: scale(0.92);
+    opacity: 0.55;
   }
-  .theme-sphere.is-in-view { 
-    transform: scale(1); 
-    opacity: 1; 
+  .theme-sphere.is-in-view {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
@@ -785,12 +790,12 @@ textarea:focus-visible {
 
 @media (max-width: 420px) {
   #themes-gallery {
-    padding-left: calc(50vw - 50px);
-    padding-right: calc(50vw - 50px);
+    padding-left: calc(50vw - 48px);
+    padding-right: calc(50vw - 48px);
   }
   .theme-sphere {
-    width: 100px;
-    height: 100px;
+    width: 96px;
+    height: 96px;
   }
 }
 

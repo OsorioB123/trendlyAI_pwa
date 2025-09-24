@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Heart } from 'lucide-react'
+import { Heart, Lock } from 'lucide-react'
 import { Track } from '../../types/track'
 import { MOTION_CONSTANTS } from '@/lib/motion'
+import { useAuth } from '@/contexts/AuthContext'
+import { usePaywall } from '@/components/paywall/PaywallProvider'
 
 interface TrackCardFullProps {
   track: Track
@@ -21,6 +23,11 @@ export default function TrackCardFull({
 }: TrackCardFullProps) {
   const [favoriteLoading, setFavoriteLoading] = useState(false)
   const [reducedMotion, setReducedMotion] = useState(false)
+  const { profile } = useAuth()
+  const { open: openPaywall } = usePaywall()
+
+  const isPremiumUser = profile?.is_premium
+  const isLocked = track.isPremium && !isPremiumUser
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -33,6 +40,10 @@ export default function TrackCardFull({
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation()
+    if (isLocked) {
+      openPaywall('track')
+      return
+    }
     if (favoriteLoading) return
     
     setFavoriteLoading(true)
@@ -46,6 +57,10 @@ export default function TrackCardFull({
   }
 
   const handleCardClick = () => {
+    if (isLocked) {
+      openPaywall('track')
+      return
+    }
     onClick(track)
   }
 
@@ -94,6 +109,19 @@ export default function TrackCardFull({
       whileTap={reducedMotion ? undefined : { scale: 0.98 }}
       transition={{ type: 'spring', ...MOTION_CONSTANTS.SPRING.smooth }}
     >
+      {isLocked && (
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation()
+            openPaywall('track')
+          }}
+          className="absolute left-5 top-5 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/60 text-white shadow-[0_12px_32px_rgba(0,0,0,0.45)] transition-colors hover:bg-white/20"
+          aria-label="Trilha disponível no Maestro"
+        >
+          <Lock className="h-4 w-4" strokeWidth={1.5} />
+        </button>
+      )}
       {/* Favorite Button */}
         <button 
           className={`absolute top-5 right-5 z-20 w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-[20px] bg-white/10 transition-all duration-300 hover:bg-white/15 active:scale-90 ${favoriteLoading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isFavorited ? 'animate-[pop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)]' : ''}`}

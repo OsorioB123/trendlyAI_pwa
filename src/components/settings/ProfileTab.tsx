@@ -179,7 +179,7 @@ export default function ProfileTab({
           />
         </div>
         {/* Studio Environment Section */}
-        <div className="pt-10">
+        <div className="pt-10 border-t border-white/10">
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-white mb-2">Ambiente do Estúdio</h3>
             <p className="text-sm text-white/70">
@@ -246,34 +246,7 @@ export default function ProfileTab({
           )}
         </div>
 
-        {/* Profile Stats */}
-        <div className="border-t border-white/5 pt-6">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-white">
-                {new Date(profile.created_at).toLocaleDateString('pt-BR', {
-                  month: 'short',
-                  year: 'numeric'
-                })}
-              </div>
-              <div className="text-sm text-white/60">Membro desde</div>
-            </div>
 
-            <div className="text-center">
-              <div className="text-2xl font-bold text-white">
-                {new Date(profile.updated_at).toLocaleDateString('pt-BR') === new Date().toLocaleDateString('pt-BR') ? 'Hoje' : 'Ativo'}
-              </div>
-              <div className="text-sm text-white/60">Última atividade</div>
-            </div>
-
-            <div className="text-center">
-              <div className="text-2xl font-bold text-white">
-                {(profile.bio?.length || 0) > 0 ? '✓' : '—'}
-              </div>
-              <div className="text-sm text-white/60">Bio preenchida</div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   )

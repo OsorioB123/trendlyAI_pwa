@@ -197,7 +197,7 @@ export default function ToolsFiltersDrawer({
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
         className={cn(
-          'flex h-[min(90vh,700px)] w-[min(92vw,720px)] flex-col overflow-hidden border border-white/12 bg-black/95 p-0 text-white shadow-[0_40px_120px_rgba(15,15,45,0.6)] backdrop-blur-2xl sm:rounded-3xl',
+          'flex h-[min(90vh,700px)] w-[min(92vw,720px)] flex-col overflow-hidden border border-white/14 bg-black/80 p-0 text-white shadow-[0_48px_140px_rgba(8,10,25,0.55)] backdrop-blur-3xl sm:rounded-3xl',
           '[&>button]:hidden'
         )}
       >
@@ -271,10 +271,10 @@ export default function ToolsFiltersDrawer({
                 value={tempFilters.category}
                 onValueChange={(value) => setFilterValue('category', value as ToolsFilters['category'])}
               >
-                <SelectTrigger className="h-11 w-full rounded-xl border border-white/15 bg-black/70 text-white">
+                <SelectTrigger className="h-11 w-full rounded-xl border border-white/12 bg-black/65 text-white">
                   <SelectValue placeholder="Selecione uma categoria" />
                 </SelectTrigger>
-                <SelectContent className="border-white/20 bg-black/90 text-white">
+                <SelectContent className="border-white/15 bg-black/75 text-white backdrop-blur-xl">
                   <SelectItem value="all">Todas as categorias</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category} value={category}>
@@ -292,7 +292,7 @@ export default function ToolsFiltersDrawer({
                   {tempFilters.sort === 'relevance' ? 'Relevância' : 'Recentes'}
                 </Badge>
               </div>
-              <div className="space-y-3 rounded-2xl border border-white/12 bg-white/8 p-4">
+              <div className="space-y-3 rounded-2xl border border-white/10 bg-white/6 p-4 shadow-[0_20px_56px_rgba(8,10,25,0.45)]">
                 {SORT_OPTIONS.map((option) => (
                   <button
                     key={option.value}
@@ -301,20 +301,20 @@ export default function ToolsFiltersDrawer({
                     className={cn(
                       'w-full rounded-xl border px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30',
                       tempFilters.sort === option.value
-                        ? 'border-transparent bg-white text-black shadow-[0_12px_32px_rgba(0,0,0,0.25)]'
-                        : 'border-white/10 bg-white/8 text-white/80 hover:border-white/20 hover:bg-white/12'
+                        ? 'border-transparent bg-white text-black shadow-[0_16px_40px_rgba(6,8,16,0.3)]'
+                        : 'border-white/15 bg-white/6 text-white/75 hover:border-white/25 hover:bg-white/10'
                     )}
                     aria-pressed={tempFilters.sort === option.value}
                     data-active={tempFilters.sort === option.value}
                   >
                     <div className="text-sm font-medium">{option.label}</div>
-                    <p className="text-xs text-white/60">{option.description}</p>
+                    <p className={cn('text-xs transition-colors', tempFilters.sort === option.value ? 'text-black/70' : 'text-white/60')}>{option.description}</p>
                   </button>
                 ))}
               </div>
             </section>
 
-            <Separator className="border-white/10" />
+            <Separator className="border-white/8" />
 
             <section className="space-y-3">
               <div className="flex items-center justify-between">
@@ -323,7 +323,7 @@ export default function ToolsFiltersDrawer({
                   {tempFilters.type.length}
                 </Badge>
               </div>
-              <div className="space-y-3 rounded-2xl border border-white/12 bg-white/8 p-4">
+              <div className="space-y-3 rounded-2xl border border-white/10 bg-white/6 p-4 shadow-[0_20px_56px_rgba(8,10,25,0.45)]">
                 {TOOL_TYPES.map((item) => (
                   <label
                     key={item.value}
@@ -350,7 +350,7 @@ export default function ToolsFiltersDrawer({
                   {tempFilters.compatibility.length}
                 </Badge>
               </div>
-              <div className="space-y-3 rounded-2xl border border-white/12 bg-white/8 p-4">
+              <div className="space-y-3 rounded-2xl border border-white/10 bg-white/6 p-4 shadow-[0_20px_56px_rgba(8,10,25,0.45)]">
                 {COMPATIBILITY_OPTIONS.map((item) => (
                   <label
                     key={item.value}
@@ -377,7 +377,7 @@ export default function ToolsFiltersDrawer({
                   {tempFilters.activity.length}
                 </Badge>
               </div>
-              <div className="space-y-3 rounded-2xl border border-white/12 bg-white/8 p-4">
+              <div className="space-y-3 rounded-2xl border border-white/10 bg-white/6 p-4 shadow-[0_20px_56px_rgba(8,10,25,0.45)]">
                 {ACTIVITY_OPTIONS.map((option) => (
                   <label
                     key={option.value}
@@ -399,7 +399,7 @@ export default function ToolsFiltersDrawer({
           </div>
         </ScrollArea>
 
-        <DialogFooter className="gap-3 border-t border-white/10 bg-black/85 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <DialogFooter className="gap-3 border-t border-white/12 bg-black/75 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
           <Button
             type="button"
             variant="ghost"

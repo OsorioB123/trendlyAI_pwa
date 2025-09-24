@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { AuthProvider } from "../contexts/AuthContext";
 import { BackgroundProvider } from "../contexts/BackgroundContext";
 import { ToastProvider } from "../components/ui/Toast";
+import { PaywallProvider } from "../components/paywall/PaywallProvider";
 import ServiceWorkerRegister from "../components/common/ServiceWorkerRegister";
 import NetworkStatusBanner from "../components/common/NetworkStatusBanner";
 import CommandPalette from "../components/navigation/CommandPalette";
@@ -46,12 +47,14 @@ export default function RootLayout({
         <AuthProvider>
           <BackgroundProvider>
             <ToastProvider>
-              <ServiceWorkerRegister />
-              <NetworkStatusBanner />
-              <CommandPalette />
-              <div id="main-content" role="main" tabIndex={-1}>
-                {children}
-              </div>
+              <PaywallProvider>
+                <ServiceWorkerRegister />
+                <NetworkStatusBanner />
+                <CommandPalette />
+                <div id="main-content" role="main" tabIndex={-1}>
+                  {children}
+                </div>
+              </PaywallProvider>
             </ToastProvider>
           </BackgroundProvider>
         </AuthProvider>

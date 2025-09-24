@@ -1,4 +1,4 @@
-import { supabase } from '../supabase'
+﻿import { supabase } from '../supabase'
 import type {
   DashboardSummary,
   DashboardKpi,
@@ -19,6 +19,7 @@ interface UserTrackRow {
     difficulty: string | null
     category: string | null
     thumbnail_url: string | null
+    is_premium: boolean | null
   } | null
 }
 
@@ -33,6 +34,7 @@ interface UserToolRow {
     description: string | null
     category: string | null
     configuration: Record<string, unknown> | null
+    is_premium: boolean | null
   } | null
 }
 
@@ -228,12 +230,12 @@ export async function fetchDashboardSummary(userId?: string | null): Promise<Das
         .maybeSingle(),
       supabase
         .from('user_tracks')
-        .select('track_id, progress, status, updated_at, tracks ( id, title, difficulty, category, thumbnail_url )')
+        .select('track_id, progress, status, updated_at, tracks ( id, title, difficulty, category, thumbnail_url, is_premium )')
         .eq('user_id', userId)
         .limit(12),
       supabase
         .from('user_tools')
-        .select('tool_id, is_favorite, usage_count, last_used, tools ( id, name, description, category, configuration )')
+        .select('tool_id, is_favorite, usage_count, last_used, tools ( id, name, description, category, configuration, is_premium )')
         .eq('user_id', userId)
         .limit(8),
       supabase
@@ -335,7 +337,8 @@ function buildTrackSummaries(rows: UserTrackRow[]): DashboardTrackSummary[] {
     progress: row.progress ?? 0,
     updatedAt: row.updated_at ?? undefined,
     category: row.tracks?.category ?? undefined,
-    thumbnailUrl: row.tracks?.thumbnail_url ?? undefined
+    thumbnailUrl: row.tracks?.thumbnail_url ?? undefined,
+    isPremium: Boolean(row.tracks?.is_premium)
   }))
 }
 
@@ -353,7 +356,8 @@ function buildToolSummaries(rows: UserToolRow[]): DashboardToolSummary[] {
     lastUsedAt: row.last_used ?? undefined,
     content: typeof (row.tools?.configuration as any)?.prompt === 'string'
       ? ((row.tools?.configuration as any).prompt as string)
-      : undefined
+      : undefined,
+    isPremium: Boolean(row.tools?.is_premium)
   }))
 }
 
@@ -456,3 +460,4 @@ function sevenDaysAgo() {
   date.setDate(date.getDate() - 7)
   return date.toISOString()
 }
+

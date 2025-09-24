@@ -10,6 +10,8 @@ import { supabase } from '../../../lib/supabase'
 import TrackProgress from '../../../components/tracks/TrackProgress'
 import ModuleModal from '../../../components/tracks/ModuleModal'
 import TrackRating from '../../../components/tracks/TrackRating'
+import { useAuth } from '@/contexts/AuthContext'
+import { usePaywall } from '@/components/paywall/PaywallProvider'
 
 export default function TrackPage() {
   const params = useParams()
@@ -23,6 +25,8 @@ export default function TrackPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [user, setUser] = useState<any>(null)
   const [favoriteLoading, setFavoriteLoading] = useState(false)
+  const { profile: authProfile } = useAuth()
+  const { open: openPaywall } = usePaywall()
 
   useEffect(() => {
     const getUser = async () => {
@@ -74,6 +78,11 @@ export default function TrackPage() {
       return
     }
 
+    if (track?.isPremium && !authProfile?.is_premium) {
+      openPaywall('track')
+      return
+    }
+
     if (!track?.userProgress) {
       await TrackService.startTrack(user.id, trackId)
       await loadTrack()
@@ -98,7 +107,7 @@ export default function TrackPage() {
     
     if (!moduleAccess.hasAccess) {
       if (moduleAccess.reason === 'premium_required') {
-        router.push('/pricing')
+        openPaywall('track')
         return
       }
       return

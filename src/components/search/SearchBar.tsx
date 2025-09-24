@@ -51,6 +51,16 @@ export default function SearchBar({
   const inputRef = useRef<HTMLInputElement>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
 
+  const wrapperClasses = useMemo(() => {
+    const base = 'group relative flex items-center rounded-2xl px-4 py-3 text-white transition-colors backdrop-blur-xl'
+    const palette: Record<Variant, string> = {
+      default: 'border border-white/10 bg-white/10 shadow-[0_12px_36px_rgba(4,8,20,0.35)] focus-within:border-white/25 focus-within:bg-white/15',
+      tools: 'border border-white/12 bg-white/8 shadow-[0_20px_60px_rgba(4,8,24,0.45)] focus-within:border-white focus-within:bg-white/12',
+      tracks: 'border border-white/12 bg-white/8 shadow-[0_18px_48px_rgba(4,8,20,0.4)] focus-within:border-white/30 focus-within:bg-white/12'
+    }
+    return cn(base, palette[variant] ?? palette.default)
+  }, [variant])
+
   const suggestionsEnabled = variant === 'tools'
 
   useEffect(() => {
@@ -131,8 +141,8 @@ export default function SearchBar({
         Buscar ferramentas
       </label>
 
-      <div className="group relative flex items-center rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white transition-colors backdrop-blur-lg focus-within:border-white/25 focus-within:bg-white/15">
-        <Search className="mr-3 h-4 w-4 text-white/60 group-focus-within:text-white" />
+      <div className={wrapperClasses}>
+        <Search className="mr-3 h-4 w-4 text-white/55 transition-colors group-focus-within:text-white" />
         <input
           id="tools-search"
           ref={inputRef}
@@ -165,7 +175,7 @@ export default function SearchBar({
           id="tools-search-suggestions"
           role="listbox"
           aria-label="Sugestões de busca"
-          className="absolute left-0 right-0 top-full z-40 mt-2 origin-top rounded-2xl border border-white/10 bg-black/85 p-4 text-white shadow-lg backdrop-blur"
+          className="absolute left-0 right-0 top-full z-40 mt-2 origin-top rounded-2xl border border-white/12 bg-black/80 p-4 text-white shadow-[0_32px_80px_rgba(4,6,18,0.45)] backdrop-blur-xl"
           onMouseDown={(event) => event.preventDefault()}
         >
           <div className="mb-3 flex items-center justify-between text-xs uppercase tracking-wide text-white/60">

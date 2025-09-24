@@ -110,13 +110,22 @@ export default function DashboardPage() {
 
   return (
     <ProtectedRoute>
-      <div className="relative min-h-screen overflow-hidden bg-gray-950 text-white" style={backgroundStyle}>
+      <div className="relative min-h-screen overflow-hidden text-white" style={backgroundStyle}>
+        
         <BackgroundOverlay position="fixed" className="pointer-events-none from-black/70 via-black/25 to-transparent" />
 
         <Header />
 
         <main className="relative z-10 w-full">
           <div className="mx-auto flex w-full max-w-5xl flex-col px-4 pb-24 pt-32 sm:px-6 lg:px-0">
+            {/* Nickname fallback hint */}
+            {(!profile?.display_name || !profile.display_name.trim()) && (
+              <InfoMessage
+                message="Defina seu apelido para personalizar sua experiência. Esse nome aparece no dashboard e no seu perfil."
+                actionLabel="Definir agora"
+                onAction={() => router.push('/profile')}
+              />
+            )}
             {error ? (
               <InfoMessage
                 variant="error"

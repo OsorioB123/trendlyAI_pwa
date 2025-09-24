@@ -16,6 +16,7 @@ export interface Database {
         Row: {
           id: string
           email: string | null
+          display_name: string | null
           full_name: string | null
           username: string | null
           avatar_url: string | null
@@ -63,6 +64,7 @@ export interface Database {
           icon: string | null
           content: string | null
           is_active: boolean
+          is_premium: boolean
           tags: string[]
           created_at: string
           updated_at: string
@@ -161,4 +163,3 @@ export interface Database {
     }
   }
 }
-

@@ -129,8 +129,8 @@ export default function ProfileContent() {
       )}
 
       {/* Main Content */}
-      <div className="relative z-10 pt-24 pb-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-16">
+      <div className="relative z-10 pt-20 pb-24 sm:pt-24">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
 
           {/* Profile Header */}
           <ProfileHeader

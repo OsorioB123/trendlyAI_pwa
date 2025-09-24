@@ -3,11 +3,13 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import type { ComponentType } from 'react'
-import { Compass, Wrench } from 'lucide-react'
+import { Compass, Wrench, Lock } from 'lucide-react'
 import type { ArsenalSectionProps, Track, ArsenalTab } from '../../types/profile'
 import { ARSENAL_TABS } from '../../types/profile'
 import { MOTION_CONSTANTS, respectReducedMotion } from '@/lib/motion'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/contexts/AuthContext'
+import { usePaywall } from '@/components/paywall/PaywallProvider'
 
 const TAB_ITEMS: { id: ArsenalTab; label: string }[] = [
   { id: 'trails', label: ARSENAL_TABS.trails.label },
@@ -148,10 +150,7 @@ export default function ArsenalSection({
               {tab.label}
             </button>
           ))}
-          <div
-            className="pointer-events-none absolute bottom-0 left-0"
-            style={{ height: '1px', width: '100%', backgroundColor: 'rgba(255,255,255,0.08)' }}
-          />
+
           <div
             ref={indicatorRef}
             className="absolute bottom-0 h-[2px] w-0 bg-white transition-all duration-300 ease-out"
@@ -167,10 +166,20 @@ export default function ArsenalSection({
 }
 
 function ArsenalTrackCard({ track, onTrackClick }: { track: Track; onTrackClick?: (track: Track) => void }) {
+  const { profile } = useAuth()
+  const { open: openPaywall } = usePaywall()
+  const isLocked = track.isPremium && !profile?.is_premium
+
   return (
     <button
       type="button"
-      onClick={() => onTrackClick?.(track)}
+      onClick={() => {
+        if (isLocked) {
+          openPaywall('track')
+          return
+        }
+        onTrackClick?.(track)
+      }}
       className="group relative h-80 w-full overflow-hidden rounded-2xl text-left transition-transform duration-300 hover:-translate-y-1"
       style={{
         backgroundImage: `url(${track.backgroundImage})`,
@@ -178,6 +187,27 @@ function ArsenalTrackCard({ track, onTrackClick }: { track: Track; onTrackClick?
         backgroundPosition: 'center'
       }}
     >
+      {isLocked && (
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={(event) => {
+            event.stopPropagation()
+            openPaywall('track')
+          }}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault()
+              event.stopPropagation()
+              openPaywall('track')
+            }
+          }}
+          className="absolute left-5 top-5 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/60 text-white shadow-[0_12px_32px_rgba(0,0,0,0.45)] transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/40"
+          aria-label="Trilha disponível no Maestro"
+        >
+          <Lock className="h-4 w-4" strokeWidth={1.5} />
+        </div>
+      )}
       <div className="card-overlay absolute inset-0 flex flex-col justify-end p-6">
         <h3 className="text-xl font-medium text-white mb-4">{track.title}</h3>
         <div className="mb-2 flex items-center justify-between text-sm text-white/80">

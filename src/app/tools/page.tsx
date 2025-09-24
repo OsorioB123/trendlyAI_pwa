@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import {
   Suspense,
@@ -126,6 +126,7 @@ const mapToolRowToTool = (
     type: parsedType,
     compatibility: parsedCompatibilities,
     tags: sanitizedTags,
+    isPremium: Boolean(row.is_premium),
     content: row.content ?? '',
     how_to_use: undefined,
     isFavorite: false,
@@ -723,11 +724,11 @@ function ToolsPageContent() {
           </section>
         )}
         {isInitialLoading ? (
-          <div className="tools-grid grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-6">
+          <div className="tools-grid grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-5">
             {Array.from({ length: TOOLS_PER_PAGE }).map((_, index) => (
               <div
                 key={'initial-skeleton-' + index}
-                className="glass-card relative h-full min-h-[260px] sm:min-h-[280px] lg:min-h-[300px] overflow-hidden"
+                className="glass-card relative h-full min-h-[240px] sm:min-h-[250px] lg:min-h-[260px] overflow-hidden"
                 style={{
                   animationDelay: String(index * 100) + 'ms',
                   borderRadius: 'var(--radius-lg)'
@@ -800,7 +801,7 @@ function ToolsPageContent() {
         ) : displayedTools.length > 0 ? (
           <div
             id="tools-grid"
-            className="tools-grid grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-6"
+            className="tools-grid grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-5"
           >
             {displayedTools.map((tool, index) => (
               <div
@@ -918,7 +919,7 @@ function ToolsPageContent() {
         )}
 
         {isLoading && (
-          <div className="tools-grid mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-6">
+          <div className="tools-grid mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-5">
             {Array.from({
               length: Math.min(
                 TOOLS_PER_PAGE,
@@ -927,7 +928,7 @@ function ToolsPageContent() {
             }).map((_, index) => (
               <div
                 key={'loading-skeleton-' + index}
-                className="glass-card relative h-full min-h-[260px] sm:min-h-[280px] lg:min-h-[300px] overflow-hidden"
+                className="glass-card relative h-full min-h-[240px] sm:min-h-[250px] lg:min-h-[260px] overflow-hidden"
                 style={{
                   animationDelay: String(index * 100) + 'ms',
                   borderRadius: 'var(--radius-lg)'
@@ -1025,3 +1026,6 @@ function ToolsFallback() {
     </div>
   )
 }
+
+
+
