@@ -197,7 +197,7 @@ export default function ToolsFiltersDrawer({
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
         className={cn(
-          'flex h-[min(90vh,700px)] w-[min(92vw,720px)] flex-col overflow-hidden border border-white/12 bg-black/95 p-0 text-white shadow-[0_40px_120px_rgba(15,15,45,0.6)] backdrop-blur-xl sm:rounded-3xl',
+          'flex h-[min(90vh,700px)] w-[min(92vw,720px)] flex-col overflow-hidden border border-white/12 bg-black/95 p-0 text-white shadow-[0_40px_120px_rgba(15,15,45,0.6)] backdrop-blur-2xl sm:rounded-3xl',
           '[&>button]:hidden'
         )}
       >
@@ -292,19 +292,20 @@ export default function ToolsFiltersDrawer({
                   {tempFilters.sort === 'relevance' ? 'Relevância' : 'Recentes'}
                 </Badge>
               </div>
-              <div className="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="space-y-3 rounded-2xl border border-white/12 bg-white/8 p-4">
                 {SORT_OPTIONS.map((option) => (
                   <button
                     key={option.value}
                     type="button"
                     onClick={() => setFilterValue('sort', option.value)}
                     className={cn(
-                      'w-full rounded-xl border border-transparent px-4 py-3 text-left transition',
+                      'w-full rounded-xl border px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30',
                       tempFilters.sort === option.value
-                        ? 'border-white/25 bg-white/12 text-white'
-                        : 'text-white/75 hover:border-white/15 hover:bg-white/8'
+                        ? 'border-transparent bg-white text-black shadow-[0_12px_32px_rgba(0,0,0,0.25)]'
+                        : 'border-white/10 bg-white/8 text-white/80 hover:border-white/20 hover:bg-white/12'
                     )}
                     aria-pressed={tempFilters.sort === option.value}
+                    data-active={tempFilters.sort === option.value}
                   >
                     <div className="text-sm font-medium">{option.label}</div>
                     <p className="text-xs text-white/60">{option.description}</p>
@@ -322,11 +323,11 @@ export default function ToolsFiltersDrawer({
                   {tempFilters.type.length}
                 </Badge>
               </div>
-              <div className="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="space-y-3 rounded-2xl border border-white/12 bg-white/8 p-4">
                 {TOOL_TYPES.map((item) => (
                   <label
                     key={item.value}
-                    className="flex items-start gap-3 rounded-xl px-3 py-2 transition hover:bg-white/10"
+                    className="flex items-start gap-3 rounded-xl px-3 py-2 transition hover:bg-white/12"
                   >
                     <Checkbox
                       checked={tempFilters.type.includes(item.value)}
@@ -349,11 +350,11 @@ export default function ToolsFiltersDrawer({
                   {tempFilters.compatibility.length}
                 </Badge>
               </div>
-              <div className="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="space-y-3 rounded-2xl border border-white/12 bg-white/8 p-4">
                 {COMPATIBILITY_OPTIONS.map((item) => (
                   <label
                     key={item.value}
-                    className="flex items-start gap-3 rounded-xl px-3 py-2 transition hover:bg-white/10"
+                    className="flex items-start gap-3 rounded-xl px-3 py-2 transition hover:bg-white/12"
                   >
                     <Checkbox
                       checked={tempFilters.compatibility.includes(item.value)}
@@ -376,11 +377,11 @@ export default function ToolsFiltersDrawer({
                   {tempFilters.activity.length}
                 </Badge>
               </div>
-              <div className="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="space-y-3 rounded-2xl border border-white/12 bg-white/8 p-4">
                 {ACTIVITY_OPTIONS.map((option) => (
                   <label
                     key={option.value}
-                    className="flex items-start gap-3 rounded-xl px-3 py-2 transition hover:bg-white/10"
+                    className="flex items-start gap-3 rounded-xl px-3 py-2 transition hover:bg-white/12"
                   >
                     <Checkbox
                       checked={tempFilters.activity.includes(option.value)}

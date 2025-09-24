@@ -111,8 +111,9 @@ export default function ToolCard({
   )
 
   const cardBaseClasses = [
-    'prompt-card group relative flex h-full min-h-[320px] cursor-pointer rounded-2xl liquid-glass focus-ring',
-    'flex-col gap-4 p-6 transition-colors hover:bg-white/8',
+    'prompt-card group relative flex h-full w-full cursor-pointer rounded-2xl liquid-glass',
+    'min-h-[260px] sm:min-h-[280px] lg:min-h-[300px] flex-col gap-4 p-5 transition-colors hover:bg-white/8',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-0',
   ].join(' ')
 
   const motionProps = prefersReducedMotion

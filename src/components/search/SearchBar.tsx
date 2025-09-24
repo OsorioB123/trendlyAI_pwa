@@ -131,7 +131,7 @@ export default function SearchBar({
         Buscar ferramentas
       </label>
 
-      <div className="group relative flex items-center rounded-xl border border-white/10 bg-black/50 px-4 py-3 text-white transition-colors focus-within:border-white/30 focus-within:bg-black/60">
+      <div className="group relative flex items-center rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white transition-colors backdrop-blur-lg focus-within:border-white/25 focus-within:bg-white/15">
         <Search className="mr-3 h-4 w-4 text-white/60 group-focus-within:text-white" />
         <input
           id="tools-search"
@@ -146,7 +146,7 @@ export default function SearchBar({
           aria-controls={suggestionsEnabled ? 'tools-search-suggestions' : undefined}
           placeholder={dynamicPlaceholder}
           aria-expanded={suggestionsEnabled ? showSuggestions : undefined}
-          className="h-8 w-full bg-transparent text-base outline-none placeholder:text-white/50"
+          className="h-8 w-full bg-transparent text-base placeholder:text-white/50 focus-visible:outline-none"
         />
         {value && (
           <button

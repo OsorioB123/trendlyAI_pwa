@@ -613,7 +613,7 @@ function ToolsPageContent() {
   }, [currentBackground?.value, isTouchDevice])
   return (
     <div
-      className="min-h-screen bg-black text-white pt-24 pb-20 px-4"
+      className="tools-page min-h-screen bg-black text-white pt-24 pb-20 px-4"
       style={backgroundStyle}
     >
       <a
@@ -723,17 +723,17 @@ function ToolsPageContent() {
           </section>
         )}
         {isInitialLoading ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-6">
+          <div className="tools-grid grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-6">
             {Array.from({ length: TOOLS_PER_PAGE }).map((_, index) => (
               <div
                 key={'initial-skeleton-' + index}
-                className="glass-card h-72 relative overflow-hidden"
+                className="glass-card relative h-full min-h-[260px] sm:min-h-[280px] lg:min-h-[300px] overflow-hidden"
                 style={{
                   animationDelay: String(index * 100) + 'ms',
                   borderRadius: 'var(--radius-lg)'
                 }}
               >
-                <div className="flex h-full flex-col p-6">
+                <div className="flex h-full flex-col gap-4 p-5">
                   <div className="mb-4 flex items-start justify-between">
                     <div className="flex flex-col gap-2">
                       <div
@@ -800,8 +800,7 @@ function ToolsPageContent() {
         ) : displayedTools.length > 0 ? (
           <div
             id="tools-grid"
-            className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-6"
-            style={{ gridAutoRows: '1fr' }}
+            className="tools-grid grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-6"
           >
             {displayedTools.map((tool, index) => (
               <div
@@ -919,7 +918,7 @@ function ToolsPageContent() {
         )}
 
         {isLoading && (
-          <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-6">
+          <div className="tools-grid mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-6">
             {Array.from({
               length: Math.min(
                 TOOLS_PER_PAGE,
@@ -928,13 +927,13 @@ function ToolsPageContent() {
             }).map((_, index) => (
               <div
                 key={'loading-skeleton-' + index}
-                className="glass-card h-72 relative overflow-hidden"
+                className="glass-card relative h-full min-h-[260px] sm:min-h-[280px] lg:min-h-[300px] overflow-hidden"
                 style={{
                   animationDelay: String(index * 100) + 'ms',
                   borderRadius: 'var(--radius-lg)'
                 }}
               >
-                <div className="flex h-full flex-col p-6">
+                <div className="flex h-full flex-col gap-4 p-5">
                   <div className="mb-4 flex items-start justify-between">
                     <div className="flex flex-col gap-2">
                       <div
