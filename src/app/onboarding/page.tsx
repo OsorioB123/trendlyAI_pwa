@@ -49,7 +49,7 @@ function ThemeSphere({ theme, isSelected, isInView, onSelect, isDefault }: Theme
   }
 
   return (
-    <li className="relative flex flex-col items-center gap-3 p-4 pb-8 snap-center lg:items-start">
+    <li className="relative flex flex-col items-center gap-3 p-3 pb-6 snap-center lg:p-4 lg:pb-8 lg:items-center">
       {isDefault && (
         <div className="liquid-glass-tag absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap z-10">
           Padrão Trendly
@@ -239,7 +239,7 @@ export default function OnboardingPage() {
       setTimeout(() => {
         if (typeof window !== 'undefined' && window.innerWidth < 1024) {
           const selectedElement = document.getElementById(`theme-${selectedThemeId}`)
-          selectedElement?.parentElement?.scrollIntoView({ behavior: 'auto', inline: 'center' })
+          selectedElement?.parentElement?.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' })
           setupMobileThemeSync()
         }
       }, 100)
@@ -258,7 +258,7 @@ export default function OnboardingPage() {
 
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       const selectedElement = document.getElementById(`theme-${themeId}`)
-      selectedElement?.parentElement?.scrollIntoView({ behavior: 'smooth', inline: 'center' })
+      selectedElement?.parentElement?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
     }
   }, [])
 
@@ -391,7 +391,7 @@ export default function OnboardingPage() {
           <div id="slide-3" className={`slide ${currentSlide === 3 ? 'active' : ''}` + " !justify-center"}>
             <div className="slide-content-theme">
               <motion.section
-                className="text-center pt-8 pb-4 flex-shrink-0 lg:pt-10"
+                className="text-center pt-10 pb-6 flex-shrink-0 lg:pt-16 lg:pb-8"
                 variants={MOTION_CONSTANTS.VARIANTS.staggerContainer as any}
               >
                 <motion.h2
@@ -409,11 +409,11 @@ export default function OnboardingPage() {
               </motion.section>
 
               <motion.section
-                className="flex-grow flex flex-col items-center justify-center min-h-0 py-8 lg:py-12"
+                className="flex-grow w-full flex flex-col items-center justify-start min-h-0 py-6 lg:py-12"
                 variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
               >
-                <div id="themes-gallery" className="w-full hide-scrollbar overflow-x-auto lg:overflow-x-visible pb-4">
-                  <ol id="themes-track" className="flex items-center gap-6 lg:grid lg:grid-cols-4 lg:gap-10 lg:max-w-5xl lg:mx-auto lg:px-6">
+                <div id="themes-gallery" className="w-full max-w-5xl hide-scrollbar overflow-x-auto lg:overflow-x-visible pb-6 lg:pb-0 lg:mx-auto">
+                  <ol id="themes-track" className="flex items-center gap-6 lg:grid lg:grid-cols-4 lg:gap-10 lg:gap-y-12 lg:max-w-none lg:px-6">
                     {THEMES.map((theme, index) => (
                       <ThemeSphere
                         key={theme.id}

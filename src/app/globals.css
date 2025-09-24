@@ -45,6 +45,7 @@ textarea:focus-visible {
 .h-full { height: 100%; }
 .w-full { width: 100%; }
 .max-w-7xl { max-width: 80rem; margin: 0 auto; }
+.max-w-5xl { max-width: 64rem; margin: 0 auto; }
 .max-w-md { max-width: 28rem; margin: 0 auto; }
 .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
 
@@ -63,6 +64,7 @@ textarea:focus-visible {
 .grid { display: grid; }
 .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
 .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.gap-y-12 { row-gap: 3rem; }
 
 /* Spacing */
 .p-3 { padding: 0.75rem; }
@@ -692,9 +694,17 @@ textarea:focus-visible {
 /* Mobile responsive behavior - exact from HTML reference */
 @media (max-width: 1023px) {
   #studio-environment-track,
-  #themes-track { 
+  #themes-gallery { 
     scroll-snap-type: x mandatory; 
-    padding: 0 calc(50vw - 60px); 
+    scroll-padding: 0 calc(50vw - 60px); 
+  }
+  #themes-gallery {
+    padding-left: calc(50vw - 60px);
+    padding-right: calc(50vw - 60px);
+    scroll-behavior: smooth;
+  }
+  #themes-track li {
+    scroll-snap-align: center;
   }
   .theme-sphere { 
     transform: scale(0.9); 
@@ -708,6 +718,15 @@ textarea:focus-visible {
 
 /* Desktop responsive */
 @media (min-width: 1024px) {
+  #themes-track {
+    scroll-snap-type: none;
+  }
+
+  .theme-sphere {
+    width: 140px;
+    height: 140px;
+  }
+
   .lg\:grid-cols-4 { 
     grid-template-columns: repeat(4, minmax(0, 1fr)); 
   }
@@ -716,6 +735,9 @@ textarea:focus-visible {
   }
   .lg\:max-w-3xl { 
     max-width: 48rem; 
+  }
+  .lg\:max-w-none {
+    max-width: none;
   }
   .lg\:mx-auto { 
     margin-left: auto; 
@@ -729,6 +751,9 @@ textarea:focus-visible {
   }
   .lg\:max-w-md {
     max-width: 28rem;
+  }
+  .lg\:gap-y-12 {
+    row-gap: 3rem;
   }
 }
 
@@ -756,14 +781,14 @@ textarea:focus-visible {
   transform: scale(1); 
 }
 
-@media (min-width: 1024px) {
-  #themes-track {
-    scroll-snap-type: none;
+@media (max-width: 420px) {
+  #themes-gallery {
+    padding-left: calc(50vw - 50px);
+    padding-right: calc(50vw - 50px);
   }
-
   .theme-sphere {
-    width: 140px;
-    height: 140px;
+    width: 100px;
+    height: 100px;
   }
 }
 
