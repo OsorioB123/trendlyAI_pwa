@@ -182,14 +182,16 @@ export default function TracksPage() {
 
   return (
     <div 
-      className="min-h-screen pt-24 px-4"
+      className="relative min-h-screen pt-24 px-4"
       style={{
         backgroundImage: `url('${currentBackground.value}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
+        backgroundRepeat: 'no-repeat'
       }}
     >
+      <div className="absolute inset-0 -z-10 bg-black/65 lg:bg-black/55" aria-hidden />
+
       <Header />
 
       {error && (
@@ -309,12 +311,12 @@ export default function TracksPage() {
           </div>
         ) : displayedTracks.length > 0 ? (
           /* Tracks Grid */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
             {displayedTracks.map((track, index) => (
               <div
                 key={track.id}
                 data-track-index={index}
-                className="stagger-animation interactive-card card-glow"
+                className="stagger-animation"
                 style={{ 
                   animationDelay: `${(index % TRACKS_PER_PAGE) * 100}ms`,
                 }}

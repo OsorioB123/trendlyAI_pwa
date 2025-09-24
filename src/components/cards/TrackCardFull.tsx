@@ -82,9 +82,9 @@ export default function TrackCardFull({
   }
 
   return (
-    <motion.div 
-      className="interactive-card card-glow group rounded-2xl overflow-hidden relative h-80 cursor-pointer"
-      style={{ 
+    <motion.div
+      className="track-card group relative h-80 w-full cursor-pointer overflow-hidden rounded-2xl"
+      style={{
         backgroundImage: `url('${track.backgroundImage}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center'
@@ -155,29 +155,33 @@ export default function TrackCardFull({
 
       {/* Hover Effects */}
       <style jsx>{`
-        .interactive-card::before {
+        .track-card {
+          position: relative;
+          box-shadow: 0 12px 28px rgba(8, 8, 22, 0.35);
+          background: transparent;
+          transition: box-shadow 0.3s ease;
+        }
+
+        .track-card::before {
           content: '';
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: radial-gradient(600px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.1) 0%, transparent 40%);
+          inset: 0;
+          background: radial-gradient(
+            520px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            rgba(255, 255, 255, 0.12) 0%,
+            transparent 45%
+          );
           opacity: 0;
           transition: opacity 0.3s ease;
           pointer-events: none;
         }
 
-        .interactive-card:hover::before {
+        .track-card:hover::before {
           opacity: 1;
         }
 
-        .card-glow {
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .card-glow:hover {
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+        .track-card:hover {
+          box-shadow: 0 20px 46px rgba(8, 8, 22, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1);
         }
 
         @keyframes pop {

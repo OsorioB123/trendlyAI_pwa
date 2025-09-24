@@ -28,6 +28,7 @@ export function useTracks(initialLimit: number = 50): UseTracksReturn {
   const [favorites, setFavorites] = useState<string[]>([])
   const [userProgress, setUserProgress] = useState<Record<string, UserTrackProgress>>({})
   const [filteredTracks, setFilteredTracks] = useState<Track[]>([])
+  const [initialOrderMap, setInitialOrderMap] = useState<Record<string, number>>({})
   
   const { user, isAuthenticated } = useAuth()
 
@@ -95,6 +96,12 @@ export function useTracks(initialLimit: number = 50): UseTracksReturn {
       setFilteredTracks(enhancedTracks)
       setUserProgress(progressData)
       setFavorites(favoritesData)
+
+      const orderMap: Record<string, number> = {}
+      enhancedTracks.forEach((track, index) => {
+        orderMap[track.id.toString()] = index
+      })
+      setInitialOrderMap(orderMap)
       
     } catch (err) {
       console.error('Error loading tracks:', err)
@@ -215,22 +222,20 @@ export function useTracks(initialLimit: number = 50): UseTracksReturn {
         return bDate.getTime() - aDate.getTime()
       })
     } else {
-      // 'top' - sort by progress and favorites
       result.sort((a, b) => {
-        const aFavorited = favorites.includes(a.id.toString()) ? 1 : 0
-        const bFavorited = favorites.includes(b.id.toString()) ? 1 : 0
-        
-        if (aFavorited !== bFavorited) return bFavorited - aFavorited
-        
         const aProgress = a.progress || 0
         const bProgress = b.progress || 0
-        return bProgress - aProgress
+        if (bProgress !== aProgress) return bProgress - aProgress
+
+        const aIndex = initialOrderMap[a.id.toString()] ?? Number.MAX_SAFE_INTEGER
+        const bIndex = initialOrderMap[b.id.toString()] ?? Number.MAX_SAFE_INTEGER
+        return aIndex - bIndex
       })
     }
 
     setFilteredTracks(result)
     return result
-  }, [tracks, favorites, getTrackStatus])
+  }, [tracks, getTrackStatus, initialOrderMap])
 
   // Check if track is favorited
   const isTrackFavorited = useCallback((trackId: string): boolean => {

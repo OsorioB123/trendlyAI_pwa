@@ -25,6 +25,7 @@ export default function ToolCard({
   onFavorite,
   isFavorited = false,
 }: ToolCardProps) {
+  const MAX_VISIBLE_TAGS = 3
   const [favoriteState, setFavoriteState] = useState<FavoriteState>({ loading: false })
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
@@ -63,11 +64,16 @@ export default function ToolCard({
   }
 
   const renderTags = () => {
-    if (!tool.tags?.length) return null
+    if (!tool.tags?.length) {
+      return <div className="min-h-[28px]" />
+    }
+
+    const visibleTags = tool.tags.slice(0, MAX_VISIBLE_TAGS)
+    const remaining = tool.tags.length - visibleTags.length
 
     return (
-      <div className="flex flex-wrap gap-2">
-        {tool.tags.map((tag) => (
+      <div className="flex min-h-[28px] flex-wrap items-center gap-2">
+        {visibleTags.map((tag) => (
           <span
             key={tag}
             className="rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-white/80"
@@ -75,6 +81,11 @@ export default function ToolCard({
             {tag}
           </span>
         ))}
+        {remaining > 0 && (
+          <span className="rounded-full bg-white/5 px-2 py-1 text-xs font-medium text-white/60">
+            +{remaining}
+          </span>
+        )}
       </div>
     )
   }
@@ -100,8 +111,8 @@ export default function ToolCard({
   )
 
   const cardBaseClasses = [
-    'prompt-card group relative h-full cursor-pointer rounded-2xl liquid-glass focus-ring',
-    'flex flex-col gap-4 p-6 transition-colors hover:bg-white/8',
+    'prompt-card group relative flex h-full min-h-[320px] cursor-pointer rounded-2xl liquid-glass focus-ring',
+    'flex-col gap-4 p-6 transition-colors hover:bg-white/8',
   ].join(' ')
 
   const motionProps = prefersReducedMotion
@@ -114,7 +125,7 @@ export default function ToolCard({
   const snippet = tool.content?.substring(0, 200) ?? ''
 
   return (
-    <div className="px-2 pb-4 pt-2">
+    <div className="flex h-full w-full">
       <motion.div
         className={cardBaseClasses}
         role="button"
@@ -128,7 +139,7 @@ export default function ToolCard({
         {renderFavoriteButton()}
 
         <div className="relative z-10 flex h-full flex-col gap-4">
-          <header className="space-y-2 pr-10">
+          <header className="min-h-[88px] space-y-2 pr-10">
             <h3 className="text-lg font-semibold leading-snug tracking-tight text-white">
               {tool.title}
             </h3>
@@ -137,12 +148,12 @@ export default function ToolCard({
             </p>
           </header>
 
-          <div>{renderTags()}</div>
+          {renderTags()}
 
           {variant === 'compact' ? (
             <div className="mt-auto space-y-3">
               <div className="rounded-lg bg-white/5 p-4">
-                <p className="text-sm leading-relaxed text-white/85">
+                <p className="line-clamp-3 text-sm leading-relaxed text-white/85">
                   {snippet.length ? `${snippet}...` : 'Nenhum prompt disponível.'}
                 </p>
               </div>

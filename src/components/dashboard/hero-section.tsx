@@ -1,7 +1,7 @@
 'use client'
 
 import { FormEvent, useMemo, useRef, useState } from 'react'
-import { Send } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 
 interface DashboardHeroProps {
   greeting: string
@@ -107,9 +107,9 @@ export function DashboardHero({
           <form
             ref={formRef}
             onSubmit={handleSubmit}
-            className={`hs-outline transition ${isFocused ? 'is-active' : ''} ${loading ? 'pointer-events-none opacity-60' : ''}`}
+            className={`glass-outline transition ${isFocused ? 'is-active' : ''} ${loading ? 'pointer-events-none opacity-60' : ''}`}
           >
-            <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-md">
+            <div className="flex items-center gap-3 rounded-2xl bg-white/10 p-4 backdrop-blur-md">
               <input
                 ref={inputRef}
                 type="text"
@@ -123,11 +123,16 @@ export function DashboardHero({
               />
               <button
                 type="submit"
-                className="liquid-glass-pill flex h-10 w-10 items-center justify-center"
+                className="group relative flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-900 shadow-[0_12px_26px_rgba(15,23,42,0.35)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_18px_32px_rgba(15,23,42,0.45)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
                 aria-label="Enviar comando"
                 disabled={loading || !commandValue.trim()}
               >
-                <Send className="h-4 w-4" />
+                <span className="absolute inset-0 rounded-full bg-gradient-to-tr from-indigo-500 via-sky-400 to-emerald-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                <span className="absolute inset-[1px] rounded-full bg-white" />
+                <ArrowUpRight
+                  className="relative z-10 h-4 w-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                  strokeWidth={1.75}
+                />
               </button>
             </div>
           </form>

@@ -2,6 +2,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import type { CSSProperties } from 'react'
 import { motion } from 'framer-motion'
 import { MOTION_CONSTANTS, respectReducedMotion } from '../../lib/motion'
 import BackgroundOverlay from '../../components/common/BackgroundOverlay'
@@ -44,12 +45,11 @@ function ThemeSphere({ theme, isSelected, isInView, onSelect, isDefault }: Theme
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    console.log('ThemeSphere clicked:', theme.id) // Debug log
     onSelect(theme.id)
   }
 
   return (
-    <li className="flex-shrink-0 snap-center relative flex justify-center p-4">
+    <li className="relative flex flex-col items-center gap-3 p-4 pb-8 snap-center lg:items-start">
       {isDefault && (
         <div className="liquid-glass-tag absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap z-10">
           Padrão Trendly
@@ -58,7 +58,7 @@ function ThemeSphere({ theme, isSelected, isInView, onSelect, isDefault }: Theme
       <button
         id={`theme-${theme.id}`}
         className={`theme-sphere ${isSelected ? 'is-selected' : ''} ${isInView ? 'is-in-view' : ''}`}
-        style={{ '--sphere-bg': `url(${theme.value})` } as React.CSSProperties}
+        style={{ '--sphere-bg': `url(${theme.value})` } as CSSProperties}
         data-theme-id={theme.id}
         onClick={handleClick}
         aria-label={`Selecionar tema ${theme.name}`}
@@ -68,6 +68,7 @@ function ThemeSphere({ theme, isSelected, isInView, onSelect, isDefault }: Theme
           <Check className="w-8 h-8 text-white" strokeWidth={1.5} />
         </div>
       </button>
+      <span className="text-sm text-white/75 text-center lg:text-left">{theme.name}</span>
     </li>
   )
 }
@@ -116,124 +117,148 @@ export default function OnboardingPage() {
   const [currentSlide, setCurrentSlide] = useState(1)
   const [selectedThemeId, setSelectedThemeId] = useState('default')
   const [themesInitialized, setThemesInitialized] = useState(false)
-  const [visibleThemes, setVisibleThemes] = useState<Set<string>>(new Set(['default']))
+  const [inViewThemeId, setInViewThemeId] = useState<string>('default')
   
   const router = useRouter()
   const { changeBackground } = useBackground()
   const observerRef = useRef<IntersectionObserver | null>(null)
+  const scrollCleanupRef = useRef<(() => void) | null>(null)
+  const scrollAnimationIdRef = useRef<number | null>(null)
   const initializedRef = useRef(false)
   
   const totalSlides = 4
   const transitionSafe = respectReducedMotion({ transition: { duration: MOTION_CONSTANTS.DURATION.normal } }).transition as any
 
   // Setup intersection observer for mobile theme selection - exact from HTML reference
-  const setupIntersectionObserver = useCallback(() => {
-    if (typeof document === 'undefined') return
-    if (observerRef.current) {
-      observerRef.current.disconnect()
+  const setupMobileThemeSync = useCallback(() => {
+    if (typeof window === 'undefined') return
+    if (window.innerWidth >= 1024) {
+      scrollCleanupRef.current?.()
+      observerRef.current?.disconnect()
+      return
     }
 
     const themesGallery = document.getElementById('themes-gallery')
     if (!themesGallery) return
 
-    const options = {
-      root: themesGallery,
-      rootMargin: '0px',
-      threshold: 0.8
-    }
+    scrollCleanupRef.current?.()
+    observerRef.current?.disconnect()
 
-    observerRef.current = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const sphereButton = entry.target.querySelector('.theme-sphere') as HTMLElement
-          if (sphereButton) {
-            const themeId = sphereButton.getAttribute('data-theme-id')
-            if (themeId) {
-              // Auto-select the centered theme on mobile scroll
-              setSelectedThemeId(themeId)
-              setVisibleThemes(prev => new Set([...prev, themeId]))
-              
-              // Update visual state for all spheres
-              if (typeof document !== 'undefined') {
-                document.querySelectorAll('.theme-sphere').forEach(sphere => {
-                  sphere.classList.remove('is-in-view', 'is-selected')
-                })
-                sphereButton.classList.add('is-in-view', 'is-selected')
-              }
-            }
-          }
+    const containers = Array.from(document.querySelectorAll('#themes-track li'))
+    if (containers.length === 0) return
+
+    const calculateClosestTheme = () => {
+      const galleryRect = themesGallery.getBoundingClientRect()
+      const galleryCenter = galleryRect.left + galleryRect.width / 2
+      let closestId: string | null = null
+      let closestDistance = Number.POSITIVE_INFINITY
+
+      containers.forEach((container) => {
+        const button = container.querySelector('.theme-sphere') as HTMLElement | null
+        if (!button) return
+        const rect = container.getBoundingClientRect()
+        const center = rect.left + rect.width / 2
+        const distance = Math.abs(center - galleryCenter)
+        if (distance < closestDistance) {
+          closestDistance = distance
+          closestId = button.dataset.themeId ?? null
         }
       })
-    }, options)
 
-    // Observe all theme sphere containers
-    const sphereContainers = document.querySelectorAll('#themes-track li')
-    sphereContainers.forEach(container => {
-      observerRef.current?.observe(container)
-    })
+      if (closestId) {
+        const nextId = closestId
+        setInViewThemeId((prev) => (prev === nextId ? prev : nextId))
+        setSelectedThemeId((prev) => (prev === nextId ? prev : nextId))
+      }
+    }
+
+    const handleScroll = () => {
+      if (scrollAnimationIdRef.current) {
+        cancelAnimationFrame(scrollAnimationIdRef.current)
+      }
+      scrollAnimationIdRef.current = requestAnimationFrame(calculateClosestTheme)
+    }
+
+    themesGallery.addEventListener('scroll', handleScroll, { passive: true })
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let bestId: string | null = null
+        let bestRatio = 0
+
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return
+          const button = entry.target.querySelector('.theme-sphere') as HTMLElement | null
+          const themeId = button?.dataset.themeId
+          if (themeId && entry.intersectionRatio > bestRatio) {
+            bestRatio = entry.intersectionRatio
+            bestId = themeId
+          }
+        })
+
+        if (bestId) {
+          const nextId = bestId
+          setInViewThemeId((prev) => (prev === nextId ? prev : nextId))
+          setSelectedThemeId((prev) => (prev === nextId ? prev : nextId))
+        }
+      },
+      {
+        root: themesGallery,
+        threshold: [0.5, 0.75]
+      }
+    )
+
+    containers.forEach((container) => observer.observe(container))
+
+    observerRef.current = observer
+    scrollCleanupRef.current = () => {
+      themesGallery.removeEventListener('scroll', handleScroll)
+      if (scrollAnimationIdRef.current) {
+        cancelAnimationFrame(scrollAnimationIdRef.current)
+        scrollAnimationIdRef.current = null
+      }
+      observer.disconnect()
+      observerRef.current = null
+    }
+
+    calculateClosestTheme()
   }, [])
 
   // Handle slide navigation - exact match from HTML reference
   const showSlide = useCallback((slideNumber: number) => {
-    console.log('showSlide called with:', slideNumber) // Debug log
     setCurrentSlide(slideNumber)
-    
+
     // Initialize theme selector on slide 3 - ONLY when actually navegating to slide 3
-    if (slideNumber === 3 && !themesInitialized) {
-      console.log('Initializing theme selector for slide 3') // Debug log
-      setThemesInitialized(true)
-      
-      // Setup intersection observer for mobile
+    if (slideNumber === 3) {
+      if (!themesInitialized) {
+        setThemesInitialized(true)
+      }
+
+      setInViewThemeId((prev) => (prev === selectedThemeId ? prev : selectedThemeId))
+
       setTimeout(() => {
         if (typeof window !== 'undefined' && window.innerWidth < 1024) {
           const selectedElement = document.getElementById(`theme-${selectedThemeId}`)
-          if (selectedElement?.parentElement) {
-            selectedElement.parentElement.scrollIntoView({ 
-              behavior: 'auto', 
-              inline: 'center' 
-            })
-          }
-          setupIntersectionObserver()
-        }
-        
-        // Ensure default theme is selected and visible
-        if (typeof document !== 'undefined') {
-          const defaultSphere = document.getElementById(`theme-${selectedThemeId}`)
-          if (defaultSphere) {
-            defaultSphere.classList.add('is-selected', 'is-in-view')
-          }
+          selectedElement?.parentElement?.scrollIntoView({ behavior: 'auto', inline: 'center' })
+          setupMobileThemeSync()
         }
       }, 100)
+    } else {
+      scrollCleanupRef.current?.()
+      observerRef.current?.disconnect()
     }
-    
+
     // Framer Motion handles entrance animations; no manual CSS restart needed
-  }, [selectedThemeId, themesInitialized, setupIntersectionObserver])
+  }, [selectedThemeId, themesInitialized, setupMobileThemeSync])
 
   // Handle theme selection - CRITICAL: Must NOT trigger slide navigation
   const handleThemeSelect = useCallback((themeId: string) => {
-    console.log('Theme selected:', themeId) // Debug log
     setSelectedThemeId(themeId)
-    
-    // Update visual state for all spheres immediately
-    if (typeof document !== 'undefined') {
-      document.querySelectorAll('.theme-sphere').forEach(sphere => {
-        sphere.classList.remove('is-selected')
-      })
-      const selectedSphere = document.getElementById(`theme-${themeId}`)
-      if (selectedSphere) {
-        selectedSphere.classList.add('is-selected')
-      }
-    }
-    
-    // Scroll to selected theme on mobile
+    setInViewThemeId(themeId)
+
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       const selectedElement = document.getElementById(`theme-${themeId}`)
-      if (selectedElement?.parentElement) {
-        selectedElement.parentElement.scrollIntoView({ 
-          behavior: 'smooth', 
-          inline: 'center' 
-        })
-      }
+      selectedElement?.parentElement?.scrollIntoView({ behavior: 'smooth', inline: 'center' })
     }
   }, [])
 
@@ -242,9 +267,6 @@ export default function OnboardingPage() {
     if (currentSlide < totalSlides) {
       showSlide(currentSlide + 1)
     } else {
-      // Complete onboarding
-      console.log(`Onboarding concluído! Tema selecionado: ${selectedThemeId}`)
-      
       // Persist completion flag (localStorage + cookie for middleware)
       markOnboardingComplete()
       
@@ -258,7 +280,6 @@ export default function OnboardingPage() {
 
   // Handle skip
   const handleSkip = useCallback(() => {
-    console.log("Navegar para a próxima página (pulou)")
     // Mark onboarding as complete when skipping as well
     markOnboardingComplete()
     router.push('/dashboard')
@@ -275,20 +296,16 @@ export default function OnboardingPage() {
   useEffect(() => {
     if (initializedRef.current) return
     initializedRef.current = true
-    console.log('Component mounted, showing slide 1')
     showSlide(1)
   }, [showSlide])
-
-  // Debug effect to catch unwanted showSlide calls
-  useEffect(() => {
-    console.log('Current slide changed to:', currentSlide)
-  }, [currentSlide])
 
   // Cleanup intersection observer
   useEffect(() => {
     return () => {
+      scrollCleanupRef.current?.()
       if (observerRef.current) {
         observerRef.current.disconnect()
+        observerRef.current = null
       }
     }
   }, [])
@@ -374,7 +391,7 @@ export default function OnboardingPage() {
           <div id="slide-3" className={`slide ${currentSlide === 3 ? 'active' : ''}` + " !justify-center"}>
             <div className="slide-content-theme">
               <motion.section
-                className="text-center pt-8 pb-4 flex-shrink-0"
+                className="text-center pt-8 pb-4 flex-shrink-0 lg:pt-10"
                 variants={MOTION_CONSTANTS.VARIANTS.staggerContainer as any}
               >
                 <motion.h2
@@ -392,17 +409,17 @@ export default function OnboardingPage() {
               </motion.section>
 
               <motion.section
-                className="flex-grow flex flex-col items-center justify-center min-h-0 py-8"
+                className="flex-grow flex flex-col items-center justify-center min-h-0 py-8 lg:py-12"
                 variants={MOTION_CONSTANTS.VARIANTS.slideUp as any}
               >
                 <div id="themes-gallery" className="w-full hide-scrollbar overflow-x-auto lg:overflow-x-visible pb-4">
-                  <ol id="themes-track" className="flex items-center gap-6 lg:p-0 lg:grid lg:grid-cols-4 lg:gap-8 lg:max-w-3xl lg:mx-auto">
+                  <ol id="themes-track" className="flex items-center gap-6 lg:grid lg:grid-cols-4 lg:gap-10 lg:max-w-5xl lg:mx-auto lg:px-6">
                     {THEMES.map((theme, index) => (
                       <ThemeSphere
                         key={theme.id}
                         theme={theme}
                         isSelected={selectedThemeId === theme.id}
-                        isInView={visibleThemes.has(theme.id)}
+                        isInView={inViewThemeId === theme.id}
                         onSelect={handleThemeSelect}
                         isDefault={index === 0}
                       />

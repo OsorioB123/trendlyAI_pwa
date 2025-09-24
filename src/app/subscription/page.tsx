@@ -7,6 +7,7 @@ import { ArrowLeft, Gem, Download, PauseCircle, XCircle, ChevronDown } from 'luc
 import { useRouter } from 'next/navigation'
 import { useSubscription } from '../../hooks/useSubscription'
 import { useToastActions } from '../../components/ui/Toast'
+import { useBackground } from '../../contexts/BackgroundContext'
 import { 
   SUBSCRIPTION_STATUS_LABELS,
   BILLING_STATUS_LABELS,
@@ -17,6 +18,7 @@ export default function SubscriptionPage() {
   const router = useRouter()
   const subscription = useSubscription()
   const toast = useToastActions()
+  const { currentBackground } = useBackground()
   
   // UI state
   const [showPlanOptions, setShowPlanOptions] = useState(false)
@@ -30,10 +32,17 @@ export default function SubscriptionPage() {
   const [isPauseLoading, setIsPauseLoading] = useState(false)
   const [isCancelLoading, setIsCancelLoading] = useState(false)
   const transitionSafe = respectReducedMotion({ transition: { duration: 0.35 } }).transition as any
+  const backgroundStyle = {
+    backgroundImage: `url('${currentBackground.value}')`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat'
+  }
 
   if (subscription.isLoading) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] text-white">
+      <div className="relative min-h-screen text-white" style={backgroundStyle}>
+        <div className="absolute inset-0 -z-10 bg-black/70 lg:bg-black/55" aria-hidden />
         <div className="h-20" />
         <main className="max-w-3xl mx-auto px-4 py-8">
           <div className="animate-pulse space-y-6">
@@ -119,9 +128,10 @@ export default function SubscriptionPage() {
 
   if (showCancelView) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] text-white">
+      <div className="relative min-h-screen text-white" style={backgroundStyle}>
+        <div className="absolute inset-0 -z-10 bg-black/70 lg:bg-black/55" aria-hidden />
         <div className="h-20" />
-        
+
         <main className="w-full mx-auto">
           <div className="max-w-3xl relative mr-auto ml-auto px-4 py-8">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={transitionSafe}>
@@ -172,7 +182,8 @@ export default function SubscriptionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white">
+    <div className="relative min-h-screen text-white" style={backgroundStyle}>
+      <div className="absolute inset-0 -z-10 bg-black/70 lg:bg-black/55" aria-hidden />
       <div className="h-20" />
 
       <main className="w-full mx-auto">

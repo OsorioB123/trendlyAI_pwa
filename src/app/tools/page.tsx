@@ -376,17 +376,24 @@ function ToolsPageContent() {
         const userResponse = await supabase.auth.getUser()
         const user = userResponse.data?.user
         if (!user) throw new Error('Usuário não autenticado')
-        const upsertResponse = await (supabase.from('user_tools') as any).upsert({
-          user_id: user.id,
-          tool_id: toolId,
-          is_favorite: willFavorite,
-          last_used: new Date().toISOString()
-        })
+        const upsertResponse = await (supabase.from('user_tools') as any).upsert(
+          {
+            user_id: user.id,
+            tool_id: toolId,
+            is_favorite: willFavorite,
+            last_used: new Date().toISOString()
+          },
+          { onConflict: 'user_id,tool_id' }
+        )
         if (upsertResponse.error) throw upsertResponse.error
         await loadUserFavorites()
-      } catch {
+      } catch (toggleError) {
         setFavorites(previous)
-        setError('Falha ao atualizar favorito')
+        const message =
+          toggleError instanceof Error && toggleError.message === 'Usuário não autenticado'
+            ? 'Você precisa estar autenticado para favoritar ferramentas.'
+            : 'Falha ao atualizar favorito'
+        setError(message)
         setTimeout(() => setError(null), 3000)
       }
     },
@@ -434,12 +441,7 @@ function ToolsPageContent() {
         return bTimestamp - aTimestamp
       })
     } else {
-      result.sort((a, b) => {
-        const aFavorited = favorites.includes(a.id) ? 1 : 0
-        const bFavorited = favorites.includes(b.id) ? 1 : 0
-        if (aFavorited !== bFavorited) return bFavorited - aFavorited
-        return a.title.localeCompare(b.title)
-      })
+      result.sort((a, b) => a.title.localeCompare(b.title))
     }
 
     return result
@@ -799,6 +801,7 @@ function ToolsPageContent() {
           <div
             id="tools-grid"
             className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-6"
+            style={{ gridAutoRows: '1fr' }}
           >
             {displayedTools.map((tool, index) => (
               <div
