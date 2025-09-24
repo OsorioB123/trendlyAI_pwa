@@ -131,7 +131,7 @@ export default function ArsenalSection({
       <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-3xl font-medium text-white tracking-tight">Seu Arsenal</h2>
 
-        <div ref={tabContainerRef} className="relative flex border-b border-white/10">
+        <div ref={tabContainerRef} className="relative flex">
           {TAB_ITEMS.map((tab) => (
             <button
               key={tab.id}
@@ -141,13 +141,17 @@ export default function ArsenalSection({
               type="button"
               onClick={() => onTabChange(tab.id)}
               className={cn(
-                'px-6 py-3 text-sm font-medium transition-colors',
+                'px-6 py-3 text-sm font-medium transition-colors focus-visible:outline-none',
                 activeTab === tab.id ? 'text-white' : 'text-white/60 hover:text-white'
               )}
             >
               {tab.label}
             </button>
           ))}
+          <div
+            className="pointer-events-none absolute bottom-0 left-0"
+            style={{ height: '1px', width: '100%', backgroundColor: 'rgba(255,255,255,0.08)' }}
+          />
           <div
             ref={indicatorRef}
             className="absolute bottom-0 h-[2px] w-0 bg-white transition-all duration-300 ease-out"

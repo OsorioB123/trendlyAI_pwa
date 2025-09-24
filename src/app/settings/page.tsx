@@ -31,7 +31,7 @@ export default function SettingsPage() {
       >
         <BackgroundOverlay />
         <Header />
-        <main className="max-w-4xl mx-auto px-4 pb-32 pt-24">
+        <main className="max-w-4xl mx-auto px-4 pb-24 pt-20 sm:pt-24">
           <div className="mb-10 mt-12">
             <div className="animate-pulse space-y-4">
               <div className="h-8 bg-white/10 rounded w-64" />
@@ -144,11 +144,11 @@ export default function SettingsPage() {
       <BackgroundOverlay />
       <Header />
 
-      <main className="w-full mx-auto pb-32 pt-24">
+      <main className="w-full mx-auto pb-24 pt-20 sm:pt-24">
         <div className="max-w-4xl relative mx-auto px-4">
           {/* Header */}
           <header
-            className="mb-10 mt-12 opacity-0 animate-fade-in"
+            className="mb-10 opacity-0 animate-fade-in"
             style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}
           >
             <h2 className="text-3xl font-semibold tracking-tight font-geist">Configurações</h2>

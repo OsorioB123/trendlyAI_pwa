@@ -127,7 +127,7 @@ export function DashboardHero({
                 aria-label="Enviar comando"
                 disabled={loading || !commandValue.trim()}
               >
-                <span className="absolute inset-0 rounded-full bg-gradient-to-tr from-indigo-500 via-sky-400 to-emerald-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                <span className="absolute inset-0 rounded-full bg-white/25 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
                 <span className="absolute inset-[1px] rounded-full bg-white" />
                 <ArrowUpRight
                   className="relative z-10 h-4 w-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"

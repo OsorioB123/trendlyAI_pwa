@@ -28,8 +28,7 @@ export default function ProfileTab({
   ), [themes])
   const fallbackTheme = studioThemeMap[DEFAULT_STUDIO_THEME_ID]
   const activeThemeId = pendingThemeId ?? profile?.studio_theme ?? fallbackTheme?.id ?? DEFAULT_STUDIO_THEME_ID
-  const selectedTheme = availableThemes.find((theme) => theme.id === activeThemeId) || fallbackTheme
-  const selectedThemeName = selectedTheme?.name || fallbackTheme?.name || 'Padrão'
+  const sphereSize = 96
 
   useEffect(() => {
     if (!pendingThemeId || !profile?.studio_theme) {
@@ -180,7 +179,7 @@ export default function ProfileTab({
           />
         </div>
         {/* Studio Environment Section */}
-        <div className="border-t border-white/10 pt-10">
+        <div className="pt-10">
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-white mb-2">Ambiente do Estúdio</h3>
             <p className="text-sm text-white/70">
@@ -198,7 +197,10 @@ export default function ProfileTab({
                   const isSelected = activeThemeId === theme.id
                   const mappedTheme = studioThemeMap[theme.id] || theme
                   const themeImage = mappedTheme?.imageUrl || theme.imageUrl
-                  const sphereStyle: (CSSProperties & { '--sphere-bg'?: string }) = {}
+                  const sphereStyle: (CSSProperties & { '--sphere-bg'?: string }) = {
+                    width: sphereSize,
+                    height: sphereSize
+                  }
 
                   if (themeImage) {
                     sphereStyle['--sphere-bg'] = `url(${themeImage})`
@@ -209,7 +211,7 @@ export default function ProfileTab({
                   return (
                     <li
                       key={theme.id}
-                      className="flex-shrink-0 snap-center lg:flex lg:justify-center"
+                      className="flex-shrink-0 snap-center px-1 lg:flex lg:justify-center"
                     >
                       <button
                         type="button"
@@ -230,20 +232,11 @@ export default function ProfileTab({
                           <Check size={20} className="text-white" strokeWidth={1.5} />
                         </div>
                       </button>
-                      <p className="mt-3 text-xs font-medium text-white/70 text-center">
-                        {theme.name}
-                      </p>
                     </li>
                   )
                 })}
               </ol>
             </div>
-          </div>
-
-          <div className="lg:hidden mt-4 p-3 bg-white/10 rounded-lg">
-            <p className="text-sm text-white/80 text-center">
-              💡 Deslize horizontalmente para ver todos os temas
-            </p>
           </div>
 
           {isUpdatingTheme && (
@@ -255,30 +248,20 @@ export default function ProfileTab({
 
         {/* Profile Stats */}
         <div className="border-t border-white/5 pt-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-white">
-                {new Date(profile.created_at).toLocaleDateString('pt-BR', { 
-                  month: 'short', 
-                  year: 'numeric' 
+                {new Date(profile.created_at).toLocaleDateString('pt-BR', {
+                  month: 'short',
+                  year: 'numeric'
                 })}
               </div>
               <div className="text-sm text-white/60">Membro desde</div>
             </div>
-            
-            <div className="text-center">
-              <div className="text-2xl font-bold text-white">
-                {selectedThemeName}
-              </div>
-              <div className="text-sm text-white/60">Tema atual</div>
-            </div>
 
             <div className="text-center">
               <div className="text-2xl font-bold text-white">
-                {new Date(profile.updated_at).toLocaleDateString('pt-BR') === new Date().toLocaleDateString('pt-BR') 
-                  ? 'Hoje' 
-                  : 'Ativo'
-                }
+                {new Date(profile.updated_at).toLocaleDateString('pt-BR') === new Date().toLocaleDateString('pt-BR') ? 'Hoje' : 'Ativo'}
               </div>
               <div className="text-sm text-white/60">Última atividade</div>
             </div>

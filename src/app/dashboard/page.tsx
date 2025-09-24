@@ -12,6 +12,7 @@ import { useDashboardData } from '@/hooks/useDashboardData'
 import { useTracks } from '@/hooks/useTracks'
 import TrackCard from '@/components/cards/TrackCard'
 import Carousel from '@/components/common/Carousel'
+import BackgroundOverlay from '@/components/common/BackgroundOverlay'
 import type { DashboardToolSummary, DashboardTrackSummary } from '@/types/dashboard'
 
 const DEFAULT_QUICK_ACTIONS = [
@@ -84,20 +85,24 @@ export default function DashboardPage() {
   const isLoading = loading || tracksLoading
 
   const backgroundStyle = useMemo(() => {
-    const layers = ['radial-gradient(circle at top, rgba(8, 13, 32, 0.75), rgba(5, 8, 18, 0.95) 60%)']
-    if (currentBackground.value) {
-      layers.push(`url(${currentBackground.value}?w=1600&q=80)`)
+    if (currentBackground?.value) {
+      return {
+        backgroundImage: `url(${currentBackground.value}?w=1600&q=80)`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed' as const
+      }
     }
 
     return {
       backgroundColor: '#04060f',
-      backgroundImage: layers.join(', '),
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
-      backgroundAttachment: 'fixed',
-    } as const
-  }, [currentBackground.value])
+      backgroundAttachment: 'fixed' as const
+    }
+  }, [currentBackground?.value])
 
   const handleCommandSubmit = (value: string) => {
     router.push('/chat?message=' + encodeURIComponent(value))
@@ -106,7 +111,7 @@ export default function DashboardPage() {
   return (
     <ProtectedRoute>
       <div className="relative min-h-screen overflow-hidden bg-gray-950 text-white" style={backgroundStyle}>
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[#020415]/78 backdrop-blur-[2px]" />
+        <BackgroundOverlay position="fixed" className="pointer-events-none from-black/70 via-black/25 to-transparent" />
 
         <Header />
 

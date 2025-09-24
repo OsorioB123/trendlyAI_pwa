@@ -9,6 +9,7 @@ import {
   Plus
 } from 'lucide-react'
 import Header from '../../components/layout/Header'
+import BackgroundOverlay from '../../components/common/BackgroundOverlay'
 import TrackCardFull from '../../components/cards/TrackCardFull'
 import FiltersDrawer from '../../components/tracks/FiltersDrawer'
 import { Track, TracksFilters } from '../../types/track'
@@ -180,17 +181,28 @@ export default function TracksPage() {
     return allCategories.slice(0, 5)
   }, [allCategories])
 
-  return (
-    <div 
-      className="relative min-h-screen pt-24 px-4"
-      style={{
-        backgroundImage: `url('${currentBackground.value}')`,
+  const backgroundStyle = currentBackground?.value
+    ? {
+        backgroundImage: `url('${currentBackground.value}?w=1920&q=80')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed' as const
+      }
+    : {
+        backgroundColor: '#04060f',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed' as const
+      }
+
+  return (
+    <div 
+      className="relative min-h-screen pt-24 px-4 text-white"
+      style={backgroundStyle}
     >
-      <div className="absolute inset-0 -z-10 bg-black/65 lg:bg-black/55" aria-hidden />
+      <BackgroundOverlay position="fixed" className="pointer-events-none from-black/70 via-black/30 to-transparent" />
 
       <Header />
 
@@ -233,7 +245,7 @@ export default function TracksPage() {
             <select
               value={filters.sort}
               onChange={(e) => updateFilter('sort', e.target.value as 'top' | 'recent')}
-              className="w-full px-4 py-3 pr-10 rounded-xl backdrop-blur-[20px] bg-white/10 text-white appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
+              className="w-full px-4 py-3 pr-10 rounded-xl backdrop-blur-[20px] bg-white/10 text-white appearance-none cursor-pointer border border-white/15 focus-visible:outline-none focus-visible:border-white/40 transition-all"
             >
               <option value="top" className="bg-gray-800">Mais relevantes</option>
               <option value="recent" className="bg-gray-800">Mais recentes</option>
