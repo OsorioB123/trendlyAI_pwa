@@ -1,4 +1,4 @@
-'use client'
+ï»¿'use client'
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session } from '@supabase/supabase-js'
@@ -183,7 +183,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setProfile({
             id: userId,
             email: '',
-            display_name: 'Usuário',
+            display_name: 'UsuÃ¡rio',
             level: 'Iniciante',
             credits: 0,
             streak_days: 0,
@@ -213,7 +213,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         email: user.email || '',
         display_name: user.user_metadata?.display_name ||
                      user.email?.split('@')[0] ||
-                     'Usuário',
+                     'UsuÃ¡rio',
         is_premium: false,
       }
 
@@ -267,12 +267,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('?? Starting signup process for:', email)
       console.log('?? User data received:', userData)
       
-      // CORREÇÃO: Estruturar corretamente os dados para o Supabase
+      // CORREÃ‡ÃƒO: Estruturar corretamente os dados para o Supabase
       const signUpOptions = {
         email,
         password,
         options: {
-          data: userData // Os dados do usuário devem estar dentro de options.data
+          data: userData // Os dados do usuÃ¡rio devem estar dentro de options.data
         }
       }
       
@@ -485,6 +485,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 }
 
 export default AuthContext
+
 
 
 

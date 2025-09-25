@@ -20,22 +20,29 @@ create index if not exists idx_user_notifications_unread
   on public.user_notifications (user_id)
   where read_at is null;
 
-create trigger set_user_notifications_updated_at
+create trigger if not exists set_user_notifications_updated_at
   before update on public.user_notifications
   for each row
   execute procedure public.update_updated_at_column();
 
 alter table public.user_notifications enable row level security;
 
-create policy if not exists "user_notifications_select_own"
+-- Replace existing policies with the latest version
+set check_function_bodies = off;
+
+drop policy if exists "user_notifications_select_own" on public.user_notifications;
+create policy "user_notifications_select_own"
   on public.user_notifications
   for select
   using (auth.uid() = user_id);
 
-create policy if not exists "user_notifications_update_read"
+drop policy if exists "user_notifications_update_read" on public.user_notifications;
+create policy "user_notifications_update_read"
   on public.user_notifications
   for update
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
+
+reset check_function_bodies;
 
 -- Inserts/maintenance should be performed via service role or backend routines.

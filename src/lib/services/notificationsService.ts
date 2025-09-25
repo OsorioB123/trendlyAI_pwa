@@ -1,4 +1,4 @@
-import { supabase } from '../supabase'
+﻿import { supabase } from '../supabase'
 import type { Database } from '@/types/database'
 import type { Notification } from '@/types/header'
 import { RealtimeChannel } from '@supabase/supabase-js'
@@ -112,3 +112,4 @@ export const NotificationsService = {
 }
 
 export default NotificationsService
+

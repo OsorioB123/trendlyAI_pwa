@@ -1,4 +1,4 @@
-"use client"
+ï»¿"use client"
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { Notification } from '@/types/header'
@@ -36,7 +36,7 @@ export function useNotifications(userId?: string | null): UseNotificationsResult
         setNotifications(result)
       } catch (err) {
         console.error('Failed to fetch notifications', err)
-        if (mounted) setError('Erro ao carregar notificações')
+        if (mounted) setError('Erro ao carregar notificaÃ§Ãµes')
       } finally {
         if (mounted) setLoading(false)
       }
@@ -78,7 +78,7 @@ export function useNotifications(userId?: string | null): UseNotificationsResult
       setNotifications((prev) => prev.map((item) => (item.id === updated.id ? updated : item)))
     } catch (err) {
       console.error('Failed to mark notification as read', err)
-      setError('Erro ao atualizar notificação')
+      setError('Erro ao atualizar notificaÃ§Ã£o')
     }
   }, [userId])
 
@@ -96,7 +96,7 @@ export function useNotifications(userId?: string | null): UseNotificationsResult
       }
     } catch (err) {
       console.error('Failed to mark notifications as read', err)
-      setError('Erro ao atualizar notificações')
+      setError('Erro ao atualizar notificaÃ§Ãµes')
     }
   }, [userId])
 
@@ -116,3 +116,4 @@ export function useNotifications(userId?: string | null): UseNotificationsResult
 }
 
 export default useNotifications
+
