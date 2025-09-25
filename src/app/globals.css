@@ -1492,3 +1492,303 @@ button:active {
 .bg-brand-yellow {
   background-color: #efd135;
 }
+
+
+/* Track journey styling */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1.25rem;
+}
+
+.btn-primary {
+  background-color: #ffffff;
+  color: #000000;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary:hover {
+  transform: scale(1.03);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary:active {
+  transform: scale(0.99);
+}
+
+.btn-secondary {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+  font-weight: 500;
+  border-radius: 0.75rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+.content-card {
+  backdrop-filter: blur(20px);
+  background-color: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.liquid-glass-pill {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9999px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.liquid-glass-pill:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.liquid-glass-pill:active {
+  transform: scale(0.97);
+}
+
+.border-glow {
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.border-glow::before {
+  content: '';
+  position: absolute;
+  inset: -150%;
+  background: conic-gradient(from 180deg at 50% 50%, #efd135, #ffffff, #efd135);
+  animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse-white {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.trilha-container {
+  position: relative;
+  margin: clamp(24px, 5vh, 48px) auto 0;
+  z-index: 2;
+}
+
+.trilha-timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+}
+
+.trilha-etapa {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 120px;
+}
+
+.trilha-etapa:nth-child(odd) {
+  justify-content: flex-start;
+  padding-left: 20px;
+}
+
+.trilha-etapa:nth-child(even) {
+  justify-content: flex-end;
+  padding-right: 20px;
+}
+
+.trilha-etapa:not(:last-child)::before,
+.trilha-etapa:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: calc(50% - 1px);
+  width: 2px;
+  height: 100%;
+  z-index: -1;
+}
+
+.trilha-etapa:not(:last-child)::before {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0.2) 80%,
+    transparent 100%
+  );
+  background-size: 2px 8px;
+}
+
+.trilha-etapa:not(:last-child)::after {
+  background: #ffffff;
+  transform-origin: top;
+  transform: scaleY(0);
+  transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.trilha-etapa--concluida:not(:last-child)::after {
+  transform: scaleY(1);
+}
+
+.trilha-btn {
+  width: clamp(68px, 16vw, 76px);
+  height: clamp(68px, 16vw, 76px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  border-radius: 9999px;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.trilha-btn:hover {
+  transform: scale(1.05);
+}
+
+.trilha-btn:active {
+  transform: scale(0.95);
+}
+
+.trilha-btn:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.trilha-etapa--concluida .trilha-btn {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.trilha-etapa--atual .trilha-btn {
+  animation: pulse-white 2.5s infinite;
+  background-color: rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+.trilha-etapa--bloqueada .trilha-btn {
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: default;
+}
+
+.trilha-etapa--bloqueada .trilha-btn svg {
+  opacity: 0.3;
+}
+
+.trilha-etapa--bloqueada .trilha-btn:hover {
+  transform: scale(1);
+}
+
+.module-action-card {
+  position: absolute;
+  width: 280px;
+  z-index: 100;
+  opacity: 0;
+  transform: translateY(10px) scale(0.95);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.module-action-card.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.module-action-card .card-pointer {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-color: rgba(38, 38, 38, 1);
+  transform: rotate(45deg);
+  z-index: -1;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.module-action-card.on-left .card-pointer {
+  right: -8px;
+  top: calc(50% - 8px);
+}
+
+.module-action-card.on-right .card-pointer {
+  left: -8px;
+  top: calc(50% - 8px);
+}
+
+@media (max-width: 768px) {
+  .trilha-container {
+    margin-top: 16px;
+  }
+
+  .trilha-timeline {
+    max-width: 100%;
+  }
+
+  .module-action-card {
+    position: static;
+    width: 100%;
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .module-action-card .card-pointer {
+    display: none;
+  }
+}
