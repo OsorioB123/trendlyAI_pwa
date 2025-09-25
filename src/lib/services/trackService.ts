@@ -199,6 +199,25 @@ export class TrackService {
     }
   }
 
+  static async setCurrentModule(userId: string, trackId: string, moduleId: string): Promise<boolean> {
+    try {
+      const { error } = await (supabase
+        .from('user_tracks') as any)
+        .upsert({
+          user_id: userId,
+          track_id: trackId,
+          current_module_id: moduleId,
+          started_at: new Date().toISOString(),
+        })
+
+      if (error) throw error
+      return true
+    } catch (error) {
+      console.error('Error setting current module:', error)
+      return false
+    }
+  }
+
   static async startTrack(userId: string, trackId: string): Promise<UserTrackProgress | null> {
     try {
       const { data, error } = await (supabase

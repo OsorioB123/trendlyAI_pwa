@@ -1,6 +1,6 @@
-'use client'
+﻿'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '../../contexts/AuthContext'
 import { optimizeUnsplash } from '../../utils/image'
@@ -37,21 +37,29 @@ function ChatPageContent() {
     setBgUrl(optimizeUnsplash(CURRENT_BACKGROUND.value, target))
   }, [])
 
-  // Handle initial message from dashboard
+  // Handle initial message from dashboard (guard against re-exec)
+  const initialHandledRef = React.useRef(false)
   useEffect(() => {
+    if (initialHandledRef.current) return
     if (!user?.id || conversations.isLoading) return
-
-    const initialMessage = searchParams.get('message')
-    if (initialMessage && initialMessage.trim()) {
-      // Create a new conversation with the initial message
-      conversations.createConversationWithMessage(initialMessage.trim())
-        .then((conversation) => {
-          if (conversation) {
-            chat.setActiveConversation(conversation)
-          }
-        })
+    const initMsg = searchParams.get('message')
+    if (initMsg && initMsg.trim()) {
+      conversations.createConversationWithMessage(initMsg.trim()).then((conversation) => {
+        if (conversation) {
+          chat.setActiveConversation(conversation)
+        }
+      })
+      initialHandledRef.current = true
+      try {
+        const params = new URLSearchParams(searchParams.toString())
+        params.delete('message')
+        const qs = params.toString()
+        const url = qs ? `/chat?${qs}` : '/chat'
+        router.replace(url)
+      } catch {}
     }
-  }, [user?.id, conversations.isLoading, searchParams, conversations, chat])
+  }, [user?.id, conversations.isLoading, searchParams, conversations.createConversationWithMessage, chat.setActiveConversation, router])
+
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -167,7 +175,7 @@ function ChatPageContent() {
           messages={chat.messages}
           isLoading={chat.isLoading}
           isStreaming={chat.isStreaming}
-        />
+         onRegenerate={() => chat.regenerateLast()} />
 
         {/* Chat Input */}
         <ChatInput onMessageSent={handleMessageSent} />
@@ -326,3 +334,8 @@ export default function ChatPage() {
     </Suspense>
   )
 }
+
+
+
+
+

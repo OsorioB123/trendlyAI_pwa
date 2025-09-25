@@ -264,11 +264,13 @@ export function ProfileMenuContent({
         disabled={isLoggingOut}
         className="flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 py-2 text-sm text-red-300 transition-all hover:bg-white/10 disabled:opacity-60 whitespace-nowrap"
       >
-        {isLoggingOut ? 'Saindo...' : (
-          <>
-            <LogOut className="h-4 w-4" />
-            Sair da Conta
-          </>
+        {isLoggingOut ? (
+          'Saindo...'
+        ) : (
+          <span className="flex items-center gap-2">
+            <LogOut className="h-4 w-4 flex-shrink-0" />
+            <span className="whitespace-nowrap">Sair da Conta</span>
+          </span>
         )}
       </Button>
     </div>

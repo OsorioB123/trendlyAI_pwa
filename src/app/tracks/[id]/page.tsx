@@ -8,20 +8,28 @@ import {
   useRef,
 } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { Star, Heart, ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Heart, Star } from 'lucide-react'
+
 import BackgroundOverlay from '../../../components/common/BackgroundOverlay'
 import { TrackService } from '../../../lib/services/trackService'
-import type { TrackWithModules, TrackModule, ModuleState } from '../../../types/track'
+import type { ModuleState, TrackModule, TrackWithModules } from '../../../types/track'
 import { supabase } from '../../../lib/supabase'
-import ModuleModal from '../../../components/tracks/ModuleModal'
 import TrilhaStepper from '@/components/tracks/TrilhaStepper'
 import ModuleActionCard from '@/components/tracks/ModuleActionCard'
-import ModuleTools from '@/components/tracks/ModuleTools'
 import TrackRating from '../../../components/tracks/TrackRating'
+import DossierOverlay from '@/components/tracks/DossierOverlay'
+import LockedModal from '@/components/tracks/LockedModal'
 import { useAuth } from '@/contexts/AuthContext'
 import { usePaywall } from '@/components/paywall/PaywallProvider'
 
 const CARD_HORIZONTAL_OFFSET = 24
+
+interface TriggerRect {
+  top: number
+  left: number
+  width: number
+  height: number
+}
 
 export default function TrackPage() {
   const params = useParams()
@@ -31,22 +39,28 @@ export default function TrackPage() {
   const [track, setTrack] = useState<TrackWithModules | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selectedModule, setSelectedModule] = useState<TrackModule | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const [user, setUser] = useState<any>(null)
   const [favoriteLoading, setFavoriteLoading] = useState(false)
+  const [cardModule, setCardModule] = useState<TrackModule | null>(null)
+  const [cardState, setCardState] = useState<ModuleState>('available')
+  const [cardOrientation, setCardOrientation] = useState<'left' | 'right' | 'center'>('center')
+  const [cardPosition, setCardPosition] = useState<{ top: number; left: number } | null>(null)
+  const [isMobileLayout, setIsMobileLayout] = useState(false)
+  const [activeModule, setActiveModule] = useState<TrackModule | null>(null)
+  const [overlayFocus, setOverlayFocus] = useState<'tools' | 'prompts' | null>(null)
+  const [overlayTriggerRect, setOverlayTriggerRect] = useState<TriggerRect | null>(null)
+  const [lockedModal, setLockedModal] = useState<{ open: boolean; title: string; description: string }>({
+    open: false,
+    title: '',
+    description: '',
+  })
+
   const { profile: authProfile } = useAuth()
   const { open: openPaywall } = usePaywall()
 
   const stepperContainerRef = useRef<HTMLDivElement | null>(null)
   const cardRef = useRef<HTMLDivElement | null>(null)
   const activeStepRef = useRef<HTMLLIElement | null>(null)
-  const [cardModule, setCardModule] = useState<TrackModule | null>(null)
-  const [cardState, setCardState] = useState<ModuleState>('available')
-  const [cardOrientation, setCardOrientation] = useState<'left' | 'right' | 'center'>('center')
-  const [cardPosition, setCardPosition] = useState<{ top: number; left: number } | null>(null)
-  const [showModuleTools, setShowModuleTools] = useState(false)
-  const [isMobileLayout, setIsMobileLayout] = useState(false)
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -92,7 +106,7 @@ export default function TrackPage() {
       const trackData = await TrackService.getTrackWithModules(trackId, user?.id)
 
       if (!trackData) {
-        setError('Trilha não encontrada')
+        setError('Trilha nao encontrada')
         return
       }
 
@@ -130,7 +144,9 @@ export default function TrackPage() {
     const cardHeight = cardElement.offsetHeight
     const cardWidth = cardElement.offsetWidth
 
-    const top = triggerRect.top - containerRect.top + triggerRect.height / 2 - cardHeight / 2
+    const top =
+      triggerRect.top - containerRect.top + triggerRect.height / 2 - cardHeight / 2
+
     const offset = CARD_HORIZONTAL_OFFSET
     let left = 0
 
@@ -149,7 +165,7 @@ export default function TrackPage() {
     requestAnimationFrame(() => {
       updateCardPosition()
     })
-  }, [cardModule, cardOrientation, showModuleTools, updateCardPosition])
+  }, [cardModule, cardOrientation, updateCardPosition])
 
   useEffect(() => {
     if (isMobileLayout) return
@@ -164,48 +180,84 @@ export default function TrackPage() {
     }
   }, [isMobileLayout, updateCardPosition])
 
-  useEffect(() => {
-    if (!track || !cardModule) {
-      return
-    }
-
-    const moduleIndex = track.modules.findIndex((module) => module.id === cardModule.id)
-    if (moduleIndex === -1) {
-      setCardModule(null)
-      return
-    }
-
-    const completed = track.moduleProgress.some(
-      (progress) => progress.moduleId === cardModule.id && progress.isCompleted,
+  const completedModuleIds = useMemo(() => {
+    if (!track) return new Set<string>()
+    return new Set(
+      track.moduleProgress
+        .filter((progress) => progress.isCompleted)
+        .map((progress) => progress.moduleId)
     )
-    const currentId = track.userProgress?.currentModuleId
+  }, [track])
 
-    let nextState: ModuleState
-    if (completed) {
-      nextState = 'completed'
-    } else if (currentId === cardModule.id) {
-      nextState = 'current'
-    } else if (moduleIndex === 0) {
-      nextState = 'available'
-    } else {
-      const previousModule = track.modules[moduleIndex - 1]
-      const previousCompleted = track.moduleProgress.some(
-        (progress) => progress.moduleId === previousModule.id && progress.isCompleted,
-      )
-      nextState = previousCompleted ? 'available' : 'locked'
+  const resolveModuleState = useCallback((module: TrackModule): ModuleState => {
+    if (!track) return 'locked'
+
+    if (completedModuleIds.has(module.id)) {
+      return 'completed'
     }
 
-    if (nextState !== cardState) {
-      setCardState(nextState)
+    if (track.userProgress?.currentModuleId === module.id) {
+      return 'current'
     }
-  }, [track, cardModule, cardState])
 
-  const isCardModuleCompleted = useMemo(() => {
-    if (!track || !cardModule) return false
-    return track.moduleProgress.some(
-      (progress) => progress.moduleId === cardModule.id && progress.isCompleted,
-    )
-  }, [track, cardModule])
+    const index = track.modules.findIndex((item) => item.id === module.id)
+    if (index === 0) {
+      return 'available'
+    }
+
+    const previousModule = track.modules[index - 1]
+    return completedModuleIds.has(previousModule.id) ? 'available' : 'locked'
+  }, [completedModuleIds, track])
+
+  const computeTriggerRect = useCallback((element: HTMLLIElement | null): TriggerRect | null => {
+    if (!element) return null
+    const target = element.querySelector('.trilha-btn') as HTMLElement | null
+    const rect = (target || element).getBoundingClientRect()
+    return {
+      top: rect.top,
+      left: rect.left,
+      width: rect.width,
+      height: rect.height,
+    }
+  }, [])
+
+  const closeOverlay = useCallback(() => {
+    setActiveModule(null)
+    setOverlayFocus(null)
+    setOverlayTriggerRect(null)
+  }, [])
+
+  const handleOpenModule = useCallback(
+    async (module: TrackModule | null, options?: { focus?: 'tools' | 'prompts' | null; triggerRect?: TriggerRect | null }) => {
+      if (!module) return
+
+      if (!user) {
+        router.push('/login')
+        return
+      }
+
+      const access = await TrackService.checkModuleAccess(user.id, trackId, module.id)
+      if (!access.hasAccess) {
+        if (access.reason === 'premium_required') {
+          openPaywall('track')
+        } else {
+          setLockedModal({
+            open: true,
+            title: module.title,
+            description: 'Conclua as etapas anteriores para desbloquear esta etapa.',
+          })
+        }
+        return
+      }
+
+      await TrackService.setCurrentModule(user.id, trackId, module.id)
+
+      setActiveModule(module)
+      setOverlayFocus(options?.focus ?? null)
+      setOverlayTriggerRect(options?.triggerRect ?? null)
+    },
+    [openPaywall, router, trackId, user]
+  )
 
   const handleStepperSelect = useCallback(
     ({
@@ -219,19 +271,30 @@ export default function TrackPage() {
       orientation: 'left' | 'right'
       element: HTMLLIElement | null
     }) => {
+      if (!track) return
+
+      if (state === 'locked') {
+        setLockedModal({
+          open: true,
+          title: module.title,
+          description: 'Conclua as etapas anteriores para desbloquear esta etapa.',
+        })
+        return
+      }
+
       setCardModule(module)
-      setShowModuleTools(false)
-      setCardOrientation(isMobileLayout ? 'center' : orientation)
       setCardState(state)
+      setCardOrientation(isMobileLayout ? 'center' : orientation)
       activeStepRef.current = element
 
       if (isMobileLayout) {
-        setCardPosition(null)
+        const rect = computeTriggerRect(element)
+        handleOpenModule(module, { focus: null, triggerRect: rect })
       } else {
         requestAnimationFrame(() => updateCardPosition())
       }
     },
-    [isMobileLayout, updateCardPosition],
+    [computeTriggerRect, handleOpenModule, isMobileLayout, track, updateCardPosition]
   )
 
   const isE2E = typeof window !== 'undefined' && (window as any).__E2E_TEST__ === true
@@ -256,43 +319,10 @@ export default function TrackPage() {
 
     const firstModule = track?.modules[0]
     if (firstModule) {
-      setSelectedModule(firstModule)
-      setIsModalOpen(true)
-      setCardModule(firstModule)
-      setCardOrientation(isMobileLayout ? 'center' : 'left')
-      setCardState('current')
+      const rect = computeTriggerRect(activeStepRef.current)
+      handleOpenModule(firstModule, { focus: null, triggerRect: rect })
     }
-  }, [user, isE2E, router, track?.isPremium, authProfile?.is_premium, track?.userProgress, track?.modules, trackId, openPaywall, loadTrack, isMobileLayout])
-
-  const handleOpenModule = useCallback(
-    async (module: TrackModule | null) => {
-      if (!module) return
-
-      if (!user) {
-        if (!isE2E) {
-          router.push('/login')
-        }
-        return
-      }
-
-      const moduleAccess = await TrackService.checkModuleAccess(user.id, trackId, module.id)
-      if (!moduleAccess.hasAccess) {
-        if (moduleAccess.reason === 'premium_required') {
-          openPaywall('track')
-        }
-        return
-      }
-
-      if (!track?.userProgress) {
-        await TrackService.startTrack(user.id, trackId)
-        await loadTrack()
-      }
-
-      setSelectedModule(module)
-      setIsModalOpen(true)
-    },
-    [user, isE2E, router, trackId, openPaywall, track?.userProgress, loadTrack],
-  )
+  }, [authProfile?.is_premium, computeTriggerRect, handleOpenModule, isE2E, loadTrack, openPaywall, router, track, trackId, user])
 
   const handleModuleComplete = useCallback(
     async (moduleId: string) => {
@@ -301,7 +331,7 @@ export default function TrackPage() {
       await TrackService.completeModule(user.id, trackId, moduleId)
       await loadTrack()
     },
-    [user, trackId, loadTrack],
+    [loadTrack, trackId, user]
   )
 
   const handleToggleFavorite = useCallback(async () => {
@@ -321,7 +351,7 @@ export default function TrackPage() {
     } finally {
       setFavoriteLoading(false)
     }
-  }, [user, isE2E, router, trackId, loadTrack])
+  }, [isE2E, loadTrack, router, trackId, user])
 
   const handleSubmitRating = useCallback(
     async (rating: number, comment?: string) => {
@@ -331,18 +361,18 @@ export default function TrackPage() {
         user.id,
         trackId,
         rating as 1 | 2 | 3 | 4 | 5,
-        comment,
+        comment
       )
       await loadTrack()
     },
-    [user, trackId, loadTrack],
+    [loadTrack, trackId, user]
   )
 
   const handleChatWithSalina = useCallback(
     (module: TrackModule) => {
       router.push(`/chat?prompt=${encodeURIComponent(module.content.briefing)}`)
     },
-    [router],
+    [router]
   )
 
   const cardStyle = !isMobileLayout && cardPosition
@@ -361,12 +391,12 @@ export default function TrackPage() {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center text-center">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-4">{error || 'Trilha não encontrada'}</h1>
+          <h1 className="text-2xl font-bold text-white mb-4">{error || 'Trilha nao encontrada'}</h1>
           <button
             onClick={() => router.back()}
             className="text-white/80 hover:text-white transition-colors"
           >
-            ← Voltar
+            Voltar
           </button>
         </div>
       </div>
@@ -426,7 +456,7 @@ export default function TrackPage() {
                   />
                 ))}
                 <span className="ml-2 text-white/80">
-                  {track.averageRating?.toFixed(1) || '0.0'} ({track.totalReviews} avaliações)
+                  {track.averageRating?.toFixed(1) || '0.0'} ({track.totalReviews} avaliacoes)
                 </span>
               </div>
               <span className="px-2 py-1 bg-white/10 rounded-full text-sm">{track.level}</span>
@@ -465,7 +495,7 @@ export default function TrackPage() {
                 onClick={handleStartTrack}
                 className="px-6 py-3 bg-white text-black font-medium rounded-xl hover:bg-white/90 transition-colors"
               >
-                Iniciar Trilha
+                Iniciar trilha
               </button>
             )}
           </div>
@@ -481,11 +511,8 @@ export default function TrackPage() {
         )}
 
         <div className="mb-12">
-          <h2 className="text-xl font-bold mb-6">Jornada da Trilha</h2>
-          <div
-            ref={stepperContainerRef}
-            className="relative flex justify-center lg:justify-start"
-          >
+          <h2 className="text-xl font-bold mb-6">Jornada da trilha</h2>
+          <div ref={stepperContainerRef} className="relative flex justify-center lg:justify-start">
             <TrilhaStepper track={track} onSelectModule={handleStepperSelect} />
 
             <ModuleActionCard
@@ -496,13 +523,23 @@ export default function TrackPage() {
               visible={Boolean(cardModule)}
               orientation={cardOrientation}
               style={cardStyle}
-              onStartOrResume={() => handleOpenModule(cardModule)}
+              onStartOrResume={() =>
+                handleOpenModule(cardModule, {
+                  focus: null,
+                  triggerRect: computeTriggerRect(activeStepRef.current),
+                })
+              }
               onComplete={() => {
                 if (cardModule) {
                   handleModuleComplete(cardModule.id)
                 }
               }}
-              onOpenTools={() => setShowModuleTools((prev) => !prev)}
+              onOpenTools={() =>
+                handleOpenModule(cardModule, {
+                  focus: 'tools',
+                  triggerRect: computeTriggerRect(activeStepRef.current),
+                })
+              }
               onChat={() => {
                 if (cardModule) {
                   handleChatWithSalina(cardModule)
@@ -510,41 +547,36 @@ export default function TrackPage() {
               }}
               onClose={() => {
                 setCardModule(null)
-                setShowModuleTools(false)
               }}
-              isModuleCompleted={isCardModuleCompleted}
-              toolsOpen={showModuleTools}
-            >
-              {showModuleTools && cardModule && (
-                <ModuleTools
-                  module={cardModule}
-                  userId={user?.id}
-                  isUserPremium={authProfile?.is_premium}
-                  onClose={() => setShowModuleTools(false)}
-                />
-              )}
-            </ModuleActionCard>
+              isModuleCompleted={cardState === 'completed'}
+            />
           </div>
         </div>
 
-        {user && (
-          <div className="mb-8">
-            <h2 className="text-xl font-bold mb-6">Avalie esta trilha</h2>
-            <TrackRating currentRating={track.userReview} onSubmitRating={handleSubmitRating} />
-          </div>
-        )}
+        <div className="mb-8">
+          <TrackRating currentRating={track.userReview} onSubmitRating={handleSubmitRating} />
+        </div>
       </div>
 
-      <ModuleModal
-        module={selectedModule}
+      <DossierOverlay
+        open={Boolean(activeModule)}
+        module={activeModule}
         track={track}
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false)
-          setSelectedModule(null)
-        }}
+        onClose={closeOverlay}
         onComplete={handleModuleComplete}
-        onChatWithSalina={handleChatWithSalina}
+        onChat={handleChatWithSalina}
+        userId={user?.id}
+        isUserPremium={authProfile?.is_premium}
+        triggerRect={overlayTriggerRect}
+        focusSection={overlayFocus}
+        moduleState={activeModule ? resolveModuleState(activeModule) : 'locked'}
+      />
+
+      <LockedModal
+        open={lockedModal.open}
+        title={lockedModal.title}
+        description={lockedModal.description}
+        onClose={() => setLockedModal({ open: false, title: '', description: '' })}
       />
     </div>
   )

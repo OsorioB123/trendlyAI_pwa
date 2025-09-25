@@ -1,4 +1,4 @@
-// =====================================================
+﻿// =====================================================
 // CHAT MESSAGES COMPONENT
 // Message display with streaming support and animations
 // =====================================================
@@ -21,9 +21,12 @@ interface ChatMessagesProps {
 
 interface MessageBubbleProps {
   message: Message
+  isLastAssistant?: boolean
+  onCopy?: (text: string) => void
+  onRegenerate?: () => void
 }
 
-function MessageBubble({ message }: MessageBubbleProps) {
+function MessageBubble({ message, isLastAssistant, onCopy, onRegenerate }: MessageBubbleProps) {
   const isUser = message.role === 'user'
   const bubbleVariants = {
     initial: { opacity: 0, y: 20 },
@@ -50,6 +53,26 @@ function MessageBubble({ message }: MessageBubbleProps) {
       >
         <div className="markdown-content text-white/95 leading-relaxed">
           <p className="whitespace-pre-wrap break-words">{message.content}</p>
+          <div className="flex gap-2 mt-2 opacity-0 hover:opacity-100 transition-opacity">
+            {onCopy && (
+              <button
+                type="button"
+                className="text-xs text-white/60 hover:text-white/90"
+                onClick={() => onCopy(message.content)}
+              >
+                Copiar
+              </button>
+            )}
+            {isLastAssistant && onRegenerate && (
+              <button
+                type="button"
+                className="text-xs text-white/60 hover:text-white/90"
+                onClick={() => onRegenerate()}
+              >
+                Regenerar
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>
@@ -103,20 +126,29 @@ function EmptyState() {
         Pronto para conversar!
       </h3>
       <p className="text-sm text-white/60 max-w-sm leading-relaxed">
-        Envie uma mensagem para começar nossa conversa. Estou aqui para ajudar com suas ideias e projetos.
+        Envie uma mensagem para comeÃ§ar nossa conversa. Estou aqui para ajudar com suas ideias e projetos.
       </p>
     </div>
   )
 }
 
-export function ChatMessages({ 
-  messages, 
-  isLoading, 
-  isStreaming,
-  className 
-}: ChatMessagesProps) {
+export function ChatMessages({ messages, isLoading, isStreaming, className, onRegenerate }: ChatMessagesProps & { onRegenerate?: () => void }) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const [atBottom, setAtBottom] = React.useState(true)
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const onScroll = () => {
+      const threshold = 80
+      const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - threshold
+      setAtBottom(nearBottom)
+    }
+    el.addEventListener('scroll', onScroll)
+    onScroll()
+    return () => el.removeEventListener('scroll', onScroll)
+  }, [])
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
@@ -156,7 +188,19 @@ export function ChatMessages({
       >
         <EmptyState />
         <div ref={messagesEndRef} />
-      </main>
+      
+      {!atBottom && (
+        <button
+          type="button"
+          onClick={scrollToBottom}
+          className="fixed right-5 bottom-28 md:bottom-24 z-10 px-3 py-2 rounded-full bg-white/15 text-white backdrop-blur-md border border-white/20 hover:bg-white/25 transition"
+          aria-label="Rolar para o fim"
+        >
+          Ir para o fim
+        </button>
+      )}
+
+    </main>
     )
   }
 
@@ -195,8 +239,24 @@ export function ChatMessages({
         </AnimatePresence>
         <div ref={messagesEndRef} />
       </motion.div>
+    
+      {!atBottom && (
+        <button
+          type="button"
+          onClick={scrollToBottom}
+          className="fixed right-5 bottom-28 md:bottom-24 z-10 px-3 py-2 rounded-full bg-white/15 text-white backdrop-blur-md border border-white/20 hover:bg-white/25 transition"
+          aria-label="Rolar para o fim"
+        >
+          Ir para o fim
+        </button>
+      )}
+
     </main>
   )
 }
 
 export default ChatMessages
+
+
+
+

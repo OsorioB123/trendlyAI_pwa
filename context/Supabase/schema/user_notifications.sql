@@ -20,7 +20,18 @@ create index if not exists idx_user_notifications_unread
   on public.user_notifications (user_id)
   where read_at is null;
 
-create trigger if not exists set_user_notifications_updated_at
+-- Ensure the helper function exists (idempotent)
+create or replace function public.update_updated_at_column()
+returns trigger as $$
+begin
+  new.updated_at = timezone('utc', now());
+  return new;
+end;
+$$ language plpgsql;
+
+-- Recreate trigger safely for environments without IF NOT EXISTS support
+drop trigger if exists set_user_notifications_updated_at on public.user_notifications;
+create trigger set_user_notifications_updated_at
   before update on public.user_notifications
   for each row
   execute procedure public.update_updated_at_column();

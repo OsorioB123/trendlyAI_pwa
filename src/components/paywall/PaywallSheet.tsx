@@ -242,7 +242,7 @@ function PaywallSheet({ open, onClose }: PaywallSheetProps) {
           </div>
 
           <div
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-xs sm:text-sm text-white/70 invitation-anim relative z-10 border-t border-white/10 pt-6"
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-xs sm:text-sm text-white/70 invitation-anim relative z-10 pt-6"
             style={{ animationDelay: '600ms' }}
           >
             <div className="flex items-center gap-2">

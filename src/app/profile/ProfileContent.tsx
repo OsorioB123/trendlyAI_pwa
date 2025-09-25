@@ -32,7 +32,8 @@ export default function ProfileContent() {
     editingField,
     setEditingField,
     saveField,
-    uploadAvatar
+    uploadAvatar,
+    refetch
   } = useProfile()
   const { currentBackground } = useBackground()
 
@@ -41,6 +42,8 @@ export default function ProfileContent() {
   const [activeReferralTab, setActiveReferralTab] = useState<ReferralTab>('credits')
   const [successMessage, setSuccessMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  
+  const shouldRefetchRef = useRef(false)
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -62,6 +65,37 @@ export default function ProfileContent() {
 
     return () => clearTimeout(timeout)
   }, [profileError, clearError])
+
+  useEffect(() => {
+    const markDirty = () => {
+      shouldRefetchRef.current = true
+    }
+
+    const handleFocus = () => {
+      if (!shouldRefetchRef.current) return
+      shouldRefetchRef.current = false
+      void refetch()
+    }
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        shouldRefetchRef.current = true
+      } else if (document.visibilityState === 'visible' && shouldRefetchRef.current) {
+        shouldRefetchRef.current = false
+        void refetch()
+      }
+    }
+
+    window.addEventListener('blur', markDirty)
+    window.addEventListener('focus', handleFocus)
+    document.addEventListener('visibilitychange', handleVisibility)
+
+    return () => {
+      window.removeEventListener('blur', markDirty)
+      window.removeEventListener('focus', handleFocus)
+      document.removeEventListener('visibilitychange', handleVisibility)
+    }
+  }, [refetch])
 
   // Show loading state
   if (authLoading || profileLoading || !user || !profile) {

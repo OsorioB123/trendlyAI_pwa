@@ -1,4 +1,4 @@
-// =====================================================
+﻿// =====================================================
 // CHAT INPUT COMPONENT
 // Message input with credit integration and file support
 // =====================================================
@@ -27,8 +27,16 @@ export function ChatInput({ className, onMessageSent }: ChatInputProps) {
     error,
     sendMessage,
     updateInputState,
-    clearInput
+    clearInput,
+    stopGeneration
   } = useChat()
+
+  const handleStop = () => {
+    // stop current generation
+    // this prevents new UI updates from the pending request
+    // (server call may continue but UI is released)
+    stopGeneration()
+  }
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -118,7 +126,7 @@ export function ChatInput({ className, onMessageSent }: ChatInputProps) {
         {!hasCredits && (
           <div className="mb-3 p-3 bg-amber-500/20 border border-amber-500/30 rounded-lg text-amber-200 text-sm text-center">
             <p>
-              Você não tem créditos suficientes para enviar mensagens.{' '}
+              VocÃª nÃ£o tem crÃ©ditos suficientes para enviar mensagens.{' '}
               <button className="font-semibold text-amber-100 hover:underline">
                 Torne-se um Maestro
               </button>{' '}
@@ -149,7 +157,7 @@ export function ChatInput({ className, onMessageSent }: ChatInputProps) {
 
         {/* Input Container */}
         <div 
-          className={`chat-composer-container bg-[#1E1F22] rounded-2xl flex flex-col transition-all duration-200 ${
+          className={`chat-composer-container focus-silent bg-[#1E1F22] rounded-2xl flex flex-col transition-all duration-200 ${
             !hasCredits ? 'opacity-50' : ''}`}
         >
           {/* File Attachments Preview */}
@@ -171,7 +179,7 @@ export function ChatInput({ className, onMessageSent }: ChatInputProps) {
                       }}
                       className="text-white/40 hover:text-white/80 ml-1"
                     >
-                      ×
+                      Ã—
                     </button>
                   </div>
                 ))}
@@ -188,9 +196,9 @@ export function ChatInput({ className, onMessageSent }: ChatInputProps) {
               onFocus={handleFocus}
               onBlur={handleBlur}
               onKeyDown={handleKeyPress}
-              placeholder={hasCredits ? PORTUGUESE_MESSAGES.TYPING_PLACEHOLDER : 'Você precisa de créditos para conversar...'}
+              placeholder={hasCredits ? PORTUGUESE_MESSAGES.TYPING_PLACEHOLDER : 'VocÃª precisa de crÃ©ditos para conversar...'}
               disabled={!hasCredits || isSending}
-              className={`chat-composer-textarea w-full hide-scrollbar p-3 bg-transparent border-none text-white resize-none outline-none leading-6 text-base placeholder-white/50 disabled:cursor-not-allowed ${
+              className={`chat-composer-textarea w-full hide-scrollbar p-3 bg-transparent border-none text-white resize-none outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 leading-6 text-base placeholder-white/50 disabled:cursor-not-allowed ${
                 inputState.value.length > CHAT_CONSTANTS.MAX_MESSAGE_LENGTH ? 'text-red-400' : ''
               }`}
               style={{ 
@@ -241,25 +249,35 @@ export function ChatInput({ className, onMessageSent }: ChatInputProps) {
               </button>
             </div>
             
-            {/* Send Button */}
-            <button
-              onClick={handleSendMessage}
+            {/* Stop / Send Button */}
+            {isSending ? (
+              <button
+                onClick={handleStop}
+                disabled={!hasCredits}
+                className="composer-btn flex items-center justify-center h-9 px-3 rounded-lg bg-white/15 text-white hover:bg-white/20 transition-all"
+              >
+                Parar
+              </button>
+            ) : (
+              <button
+                onClick={handleSendMessage}
               disabled={!canSendMessage || !hasCredits}
               className={`composer-btn flex items-center justify-center w-9 h-9 rounded-lg transition-all ${
                 canSendMessage && hasCredits
                   ? 'active bg-white/15 text-white hover:bg-white/20' 
                   : 'bg-white/8 text-white/60 cursor-not-allowed'
               } ${isSending ? 'animate-pulse' : ''}`}
-            >
+>
               <Send className="w-5 h-5" />
             </button>
+            )}
           </div>
 
           {/* Credits Display */}
           {userCredits && (
             <div className="p-3">
               <div className="flex items-center justify-between text-xs text-white/70">
-                <span>Créditos: {userCredits.current}/{userCredits.total}</span>
+                <span>CrÃ©ditos: {userCredits.current}/{userCredits.total}</span>
                 <div className="flex items-center gap-2">
                   <div className="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden">
                     <div 
@@ -279,3 +297,4 @@ export function ChatInput({ className, onMessageSent }: ChatInputProps) {
 }
 
 export default ChatInput
+

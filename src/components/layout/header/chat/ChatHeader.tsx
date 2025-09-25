@@ -32,7 +32,7 @@ export default function ChatHeader({ onToggleSidebar }: ChatHeaderProps) {
           </button>
           <button onClick={() => router.push('/dashboard')} className="hidden items-center transition-opacity hover:opacity-80 md:flex">
             <Image
-              src="https://i.ibb.co/S4B3GHJN/Sem-nome-Apresenta-o-43-64-x-40-px-180-x-96-px.png"
+              src="https://i.ibb.co/6JghTg2R/Sem-nome-Apresenta-o-43-64-x-40-px-cone-para-You-Tube.png"
               alt="TrendlyAI"
               width={140}
               height={36}

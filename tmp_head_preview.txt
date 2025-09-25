@@ -1,0 +1,120 @@
+'use client'
+
+import React, { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useAuth } from '../../contexts/AuthContext'
+import { optimizeUnsplash } from '../../utils/image'
+import Header from '../../components/layout/Header'
+import BackgroundOverlay from '../../components/common/BackgroundOverlay'
+import ChatSidebar from '../../components/chat/ChatSidebar'
+import ChatMessages from '../../components/chat/ChatMessages'
+import ChatInput from '../../components/chat/ChatInput'
+import DeleteModal from '../../components/chat/DeleteModal'
+import useChat from '../../hooks/useChat'
+import useConversations from '../../hooks/useConversations'
+import { Loader } from 'lucide-react'
+
+// Mock background for now - in production this would come from user settings
+const CURRENT_BACKGROUND = {
+  value: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80'
+}
+
+function ChatPageContent() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const { user, loading: authLoading } = useAuth()
+  
+  // Chat hooks
+  const chat = useChat()
+  const conversations = useConversations()
+
+  // Responsive background optimization for Unsplash
+  const [bgUrl, setBgUrl] = useState(CURRENT_BACKGROUND.value)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const width = window.innerWidth
+    const target = width <= 640 ? 800 : width <= 1280 ? 1280 : 1920
+    setBgUrl(optimizeUnsplash(CURRENT_BACKGROUND.value, target))
+  }, [])
+
+  // Handle initial message from dashboard (guard against re-exec)
+  const initialHandledRef = React.useRef(false)
+  useEffect(() => {
+    if (initialHandledRef.current) return
+    if (!user?.id || conversations.isLoading) return
+    const initMsg = searchParams.get('message')
+    if (initMsg && initMsg.trim()) {
+      conversations.createConversationWithMessage(initMsg.trim()).then((conversation) => {
+        if (conversation) {
+          chat.setActiveConversation(conversation)
+        }
+      })
+      initialHandledRef.current = true
+      try {
+        const params = new URLSearchParams(searchParams.toString())
+        params.delete('message')
+        const qs = params.toString()
+        const url = qs ? /chat? : '/chat'
+        router.replace(url)
+      } catch {}
+    }
+  }, [user?.id, conversations.isLoading, searchParams, conversations.createConversationWithMessage, chat.setActiveConversation, router])
+
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    const isE2E = typeof window !== 'undefined' && (window as any).__E2E_TEST__ === true
+    if (!isE2E && !authLoading && !user) {
+      router.push('/login')
+    }
+  }, [user, authLoading, router])
+
+  // Handle conversation selection
+  const handleConversationSelect = (conversationId: string) => {
+    const conversation = conversations.getConversationById(conversationId)
+    if (conversation) {
+      chat.setActiveConversation(conversation)
+    }
+  }
+
+  // Handle message sent
+  const handleMessageSent = () => {
+    // Scroll to bottom and update conversation list if needed
+    chat.scrollToBottom()
+  }
+
+  // Handle delete confirmation
+  const handleDeleteConfirm = async () => {
+    if (!conversations.conversationToDelete) return
+    
+    const success = await conversations.executeDelete()
+    if (success && chat.activeConversation?.id === conversations.conversationToDelete) {
+      // If deleted conversation was active, clear it
+      chat.setActiveConversation(null)
+    }
+  }
+
+  // Handle outside clicks to close menus
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      
+      // Close conversation menu if clicking outside
+      if (conversations.conversationMenuId && 
+          !target.closest('.relative.group') && 
+          !target.closest('.conversation-dropdown-menu')) {
+        conversations.setConversationMenuId(null)
+      }
+      
+      // Cancel editing if clicking outside input
+      if (conversations.editingConversationId && 
+          !target.closest('input[type="text"]') && 
+          !target.closest('.conversation-item')) {
+        conversations.cancelRename()
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [
+    conversations.conversationMenuId,

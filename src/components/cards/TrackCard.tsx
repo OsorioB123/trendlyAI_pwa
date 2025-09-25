@@ -98,17 +98,26 @@ export default function TrackCard({
           transition={{ type: 'spring', ...MOTION_CONSTANTS.SPRING.smooth }}
         >
         {isLocked && (
-          <button
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation()
+          <div
+            role="button"
+            tabIndex={0}
+            aria-label="Trilha disponível no Maestro"
+            className="absolute inset-0 z-30 flex items-center justify-center bg-black/35"
+            onClick={(e) => {
+              e.stopPropagation()
               openPaywall('track')
             }}
-            className="absolute left-5 top-5 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/60 text-white shadow-[0_12px_32px_rgba(0,0,0,0.45)] transition-colors hover:bg-white/20"
-            aria-label="Trilha disponível no Maestro"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                openPaywall('track')
+              }
+            }}
           >
-            <Lock className="h-4 w-4" strokeWidth={1.5} />
-          </button>
+            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/30 bg-black/50 text-white shadow-[0_12px_32px_rgba(0,0,0,0.45)]">
+              <Lock className="h-5 w-5" strokeWidth={1.5} />
+            </div>
+          </div>
         )}
         {/* Favorite Button */}
         <button 
@@ -190,17 +199,26 @@ export default function TrackCard({
           priority={false}
         />
         {isLocked && (
-          <button
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation()
+          <div
+            role="button"
+            tabIndex={0}
+            aria-label="Trilha disponível no Maestro"
+            className="absolute inset-0 z-30 flex items-center justify-center bg-black/35"
+            onClick={(e) => {
+              e.stopPropagation()
               openPaywall('track')
             }}
-            className="absolute left-4 top-4 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/60 text-white shadow-[0_12px_32px_rgba(0,0,0,0.45)] transition-colors hover:bg-white/20"
-            aria-label="Trilha disponível no Maestro"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                openPaywall('track')
+              }
+            }}
           >
-            <Lock className="h-4 w-4" strokeWidth={1.5} />
-          </button>
+            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/30 bg-black/50 text-white shadow-[0_12px_32px_rgba(0,0,0,0.45)]">
+              <Lock className="h-5 w-5" strokeWidth={1.5} />
+            </div>
+          </div>
         )}
         {/* Favorite Button */}
         <button 

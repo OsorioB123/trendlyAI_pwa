@@ -163,17 +163,26 @@ export default function ToolCard({
         {renderFavoriteButton()}
 
         {isLocked && (
-          <button
-            type="button"
+          <div
+            role="button"
+            tabIndex={0}
+            aria-label="Disponível para assinantes Maestro"
+            className="absolute inset-0 z-20 flex items-center justify-center bg-black/30 backdrop-blur-[4px]"
             onClick={(event) => {
               event.stopPropagation()
               openPaywall('tool')
             }}
-            className="absolute left-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/60 text-white shadow-[0_12px_24px_rgba(0,0,0,0.45)] transition-colors hover:bg-white/20"
-            aria-label="Disponível para assinantes Maestro"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                openPaywall('tool')
+              }
+            }}
           >
-            <Lock className="h-4 w-4" strokeWidth={1.5} />
-          </button>
+            <div className="flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-black/60 text-white shadow-[0_12px_24px_rgba(0,0,0,0.45)]">
+              <Lock className="h-5 w-5" strokeWidth={1.5} />
+            </div>
+          </div>
         )}
 
         <div className="relative z-10 flex h-full flex-col gap-4">

@@ -3,7 +3,7 @@
 import { ArrowRight, CheckCircle2, MessageCircle, Sparkles, Wrench, X } from 'lucide-react'
 import type { ModuleState, TrackModule, TrackWithModules } from '@/types/track'
 import { cn } from '@/lib/utils'
-import { forwardRef, type CSSProperties, type ReactNode } from 'react'
+import { forwardRef, type CSSProperties } from 'react'
 
 export interface ModuleActionCardProps {
   module: TrackModule | null
@@ -18,8 +18,6 @@ export interface ModuleActionCardProps {
   onChat?: () => void
   onClose: () => void
   isModuleCompleted: boolean
-  toolsOpen?: boolean
-  children?: ReactNode
 }
 
 const Button = ({
@@ -54,8 +52,6 @@ export const ModuleActionCard = forwardRef<HTMLDivElement, ModuleActionCardProps
   onChat,
   onClose,
   isModuleCompleted,
-  toolsOpen = false,
-  children,
 }: ModuleActionCardProps, ref) {
   if (!module) {
     return null
@@ -83,7 +79,7 @@ export const ModuleActionCard = forwardRef<HTMLDivElement, ModuleActionCardProps
       )}
       style={style}
     >
-      <div className="card-pointer" aria-hidden="true" />
+      {orientation !== 'center' && <div className="card-pointer" aria-hidden="true" />}
       <div className="p-4 bg-[rgba(38,38,38,1)] rounded-2xl relative">
         <button
           type="button"
@@ -141,7 +137,6 @@ export const ModuleActionCard = forwardRef<HTMLDivElement, ModuleActionCardProps
           )}
         </div>
 
-        {children}
       </div>
     </div>
   )

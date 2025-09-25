@@ -50,13 +50,13 @@ export function CommandHub({ commandValue, onChange, quickActions, savedPrompts,
           <label htmlFor="dashboard-command" className="sr-only">
             Campo de comando do dashboard
           </label>
-          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-inner shadow-black/40 focus-within:border-white/30">
+          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-inner shadow-black/40 focus-within:border-white/20 focus-silent">
             <Input
               id="dashboard-command"
               value={commandValue}
               onChange={(event) => onChange(event.target.value)}
               placeholder="Exemplo: gere um roteiro para lançamento de curso"
-              className="h-14 border-0 bg-transparent text-base text-white placeholder:text-white/50 focus-visible:ring-0"
+              className="h-14 border-0 bg-transparent text-base text-white placeholder:text-white/50 focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-0 focus:ring-offset-0"
             />
             <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
               <Button type="button" variant="ghost" size="icon" className="h-9 w-9 text-white/60 hover:text-white" onClick={() => onChange('')}
@@ -125,3 +125,5 @@ export function CommandHub({ commandValue, onChange, quickActions, savedPrompts,
     </Card>
   )
 }
+
+

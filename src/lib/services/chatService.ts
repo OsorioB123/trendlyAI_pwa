@@ -1,4 +1,4 @@
-// =====================================================
+﻿// =====================================================
 // CHAT SERVICE FOR TRENDLYAI  
 // Complete Supabase integration for chat functionality
 // =====================================================
@@ -484,11 +484,11 @@ class ChatService {
       // This would integrate with your Salina AI service
       // For now, return a simulated response
       const responses = [
-        'Esta é uma resposta simulada da Salina. Integre com sua API de IA para gerar respostas reais.',
-        'Ótima pergunta! Vou te ajudar com isso. Deixe-me pensar nas melhores estratégias para o seu caso...',
-        'Entendo perfeitamente! Baseado no que você mencionou, posso sugerir algumas abordagens interessantes...',
-        'Excelente ideia! Vamos trabalhar juntos para desenvolver isso. Aqui estão algumas sugestões...',
-        'Perfeito! Com base na nossa conversa, vejo que você está indo na direção certa. Aqui está minha análise...'
+        'Esta Ã© uma resposta simulada da Salina. Integre com sua API de IA para gerar respostas reais.',
+        'Ã“tima pergunta! Vou te ajudar com isso. Deixe-me pensar nas melhores estratÃ©gias para o seu caso...',
+        'Entendo perfeitamente! Baseado no que vocÃª mencionou, posso sugerir algumas abordagens interessantes...',
+        'Excelente ideia! Vamos trabalhar juntos para desenvolver isso. Aqui estÃ£o algumas sugestÃµes...',
+        'Perfeito! Com base na nossa conversa, vejo que vocÃª estÃ¡ indo na direÃ§Ã£o certa. Aqui estÃ¡ minha anÃ¡lise...'
       ]
 
       const baseResponse = responses[Math.floor(Math.random() * responses.length)]
@@ -510,7 +510,99 @@ class ChatService {
     }
   }
 
-  // =====================================================
+
+  /**
+   * Get last user message content in a conversation
+   */
+  static async getLastUserMessage(userId: string, conversationId: string): Promise<ChatServiceResponse<Message>> {
+    try {
+      const { data, error } = await (supabase as any)
+        .from('messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: false })
+        .limit(50)
+
+      if (error) {
+        return { success: false, error: error.message }
+      }
+
+      const rows = (data as any[]) || []
+      const lastUser = rows.find((m: any) => m.role === 'user')
+      if (!lastUser) {
+        return { success: false, error: 'Mensagem não encontrada' }
+      }
+
+      const msg: Message = {
+        id: lastUser.id,
+        conversation_id: lastUser.conversation_id,
+        role: lastUser.role,
+        content: lastUser.content,
+        tokens_used: lastUser.tokens_used,
+        created_at: lastUser.created_at,
+        updated_at: lastUser.updated_at,
+      }
+      return { success: true, data: msg }
+    } catch (err) {
+      return { success: false, error: CHAT_ERRORS.NETWORK_ERROR }
+    }
+
+  }
+
+  /**
+   * Regenerate last assistant response based on the last user message
+   */
+  static async regenerateLastResponse(
+    userId: string,
+    conversationId: string,
+    options?: AIResponseOptions
+  ): Promise<ChatServiceResponse<Message>> {
+    try {
+      // Ensure there is a user message to regenerate from
+      const lastUserResult = await this.getLastUserMessage(userId, conversationId)
+      if (!lastUserResult.success || !lastUserResult.data) {
+        return { success: false, error: lastUserResult.error || 'Sem mensagem de usuário para regenerar' }
+      }
+
+      // Check credits
+      const creditsResult = await this.getUserCredits(userId)
+      if (!creditsResult.success) {
+        return { success: false, error: creditsResult.error }
+      }
+      if ((creditsResult.data?.current ?? 0) <= 0) {
+        return { success: false, error: CHAT_ERRORS.INSUFFICIENT_CREDITS }
+      }
+
+      // Generate a new AI response
+      const aiResponse = await this.generateAIResponse(
+        userId,
+        conversationId,
+        lastUserResult.data.content,
+        options
+      )
+      if (!aiResponse.success || !aiResponse.data) {
+        return { success: false, error: aiResponse.error || CHAT_ERRORS.AI_SERVICE_ERROR }
+      }
+
+      // Create new assistant message
+      const aiMessageResult = await this.createMessage(userId, {
+        conversation_id: conversationId,
+        role: 'assistant',
+        content: aiResponse.data.content
+      })
+      if (!aiMessageResult.success || !aiMessageResult.data) {
+        return { success: false, error: aiMessageResult.error || 'Falha ao salvar resposta' }
+      }
+
+      // Deduct credits
+      await this.consumeUserCredits(userId, 1)
+
+      return { success: true, data: aiMessageResult.data }
+    } catch (err) {
+      console.error('Regenerate response error:', err)
+      return { success: false, error: CHAT_ERRORS.AI_SERVICE_ERROR }
+    }
+  }
   // REAL-TIME FEATURES
   // =====================================================
 
@@ -606,7 +698,7 @@ class ChatService {
       console.error('Credits fetch error:', error)
       return {
         success: false,
-        error: 'Erro ao carregar créditos'
+        error: 'Erro ao carregar crÃ©ditos'
       }
     }
   }
@@ -649,7 +741,7 @@ class ChatService {
       console.error('Credits initialization error:', error)
       return {
         success: false,
-        error: 'Erro ao inicializar créditos'
+        error: 'Erro ao inicializar crÃ©ditos'
       }
     }
   }
@@ -675,7 +767,7 @@ class ChatService {
       console.error('Credit consumption error:', error)
       return {
         success: false,
-        error: 'Erro ao consumir créditos'
+        error: 'Erro ao consumir crÃ©ditos'
       }
     }
   }
@@ -753,10 +845,16 @@ class ChatService {
       console.error('Stats fetch error:', error)
       return {
         success: false,
-        error: 'Erro ao carregar estatísticas'
+        error: 'Erro ao carregar estatÃ­sticas'
       }
     }
   }
 }
 
 export default ChatService
+
+
+
+
+
+

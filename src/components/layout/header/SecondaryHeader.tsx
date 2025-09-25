@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Image from 'next/image'
 import { Bell, ChevronLeft } from 'lucide-react'
@@ -35,8 +35,39 @@ export function SecondaryHeader() {
   const [showProfile, setShowProfile] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const { open: openPaywall } = usePaywall()
+  const notificationsRef = useRef<HTMLDivElement>(null)
+  const profileRef = useRef<HTMLDivElement>(null)
 
   useHeaderData(user?.id)
+
+  useEffect(() => {
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node
+      if (notificationsRef.current && !notificationsRef.current.contains(target)) {
+        setShowNotifications(false)
+      }
+      if (profileRef.current && !profileRef.current.contains(target)) {
+        setShowProfile(false)
+      }
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowNotifications(false)
+        setShowProfile(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handlePointerDown)
+    document.addEventListener('touchstart', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown)
+      document.removeEventListener('touchstart', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
 
   const segments = useMemo(() => pathname.split('/').filter(Boolean), [pathname])
   const pageTitle = segments.length ? segments[segments.length - 1] : 'Dashboard'
@@ -67,7 +98,7 @@ export function SecondaryHeader() {
       className="fixed inset-x-0 top-0 z-40 px-4 pt-3"
     >
       <div
-        className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-white/15 bg-white/10 px-5 py-3 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.7)] backdrop-blur-2xl"
+        className="relative mx-auto flex max-w-7xl items-center justify-between rounded-full border border-white/15 bg-white/10 px-5 py-3 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.7)] backdrop-blur-2xl"
         data-testid="secondary-header"
       >
         <div className="flex items-center gap-4">
@@ -81,7 +112,7 @@ export function SecondaryHeader() {
           </button>
           <button onClick={() => router.push('/dashboard')} className="hidden items-center transition-opacity hover:opacity-80 md:flex">
             <Image
-              src="https://i.ibb.co/S4B3GHJN/Sem-nome-Apresenta-o-43-64-x-40-px-180-x-96-px.png"
+              src="https://i.ibb.co/6JghTg2R/Sem-nome-Apresenta-o-43-64-x-40-px-cone-para-You-Tube.png"
               alt="TrendlyAI"
               width={160}
               height={40}
@@ -89,6 +120,16 @@ export function SecondaryHeader() {
             />
           </button>
         </div>
+
+        {!profile?.is_premium && (
+          <button
+            onClick={() => openPaywall('header')}
+            className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full border border-white/20 bg-white/15 px-4 py-2 text-xs font-semibold text-white shadow-[0_10px_30px_rgba(0,0,0,0.2)] transition-transform hover:-translate-y-0.5 hover:bg-white/25 md:hidden"
+            aria-label="Abrir planos Maestro"
+          >
+            Explorar Maestro
+          </button>
+        )}
 
         <div className="hidden flex-1 items-center justify-center md:flex">
           <div className="rounded-full border border-white/10 bg-white/5 px-4 py-1 text-sm uppercase tracking-[0.3em] text-white/50">
@@ -108,7 +149,7 @@ export function SecondaryHeader() {
             </button>
           )}
 
-          <div className="relative">
+          <div ref={notificationsRef} className="relative">
             <button
               onClick={() => {
                 setShowProfile(false)
@@ -186,7 +227,7 @@ export function SecondaryHeader() {
             </NotificationsMenu>
           </div>
 
-          <div className="relative">
+          <div ref={profileRef} className="relative">
             <ProfileButton
               avatarUrl={profile?.avatar_url}
               onClick={() => {

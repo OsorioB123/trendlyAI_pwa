@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import type { ComponentType } from 'react'
 import { Compass, Wrench, Lock } from 'lucide-react'
+import Carousel from '@/components/common/Carousel'
 import type { ArsenalSectionProps, Track, ArsenalTab } from '../../types/profile'
 import { ARSENAL_TABS } from '../../types/profile'
 import { MOTION_CONSTANTS, respectReducedMotion } from '@/lib/motion'
@@ -69,11 +70,11 @@ export default function ArsenalSection({
     if (activeTab === 'trails') {
       if (arsenalData?.tracks && arsenalData.tracks.length > 0) {
         return (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <Carousel id="profile-arsenal-tracks" className="mt-2">
             {arsenalData.tracks.map((track) => (
               <ArsenalTrackCard key={track.id} track={track as Track} onTrackClick={onTrackClick} />
             ))}
-          </div>
+          </Carousel>
         )
       }
 
@@ -90,24 +91,24 @@ export default function ArsenalSection({
 
     if (arsenalData?.tools && arsenalData.tools.length > 0) {
       return (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <Carousel id="profile-arsenal-tools" className="mt-2">
           {arsenalData.tools.map((tool) => (
             <div
               key={tool.id}
-              className="rounded-2xl border border-white/10 bg-white/5 p-5 text-left text-white/80 shadow-[0_10px_50px_rgba(0,0,0,0.4)]"
+              className="rounded-2xl border border-white/10 bg-white/5 p-5 text-left text-white/80 shadow-[0_10px_50px_rgba(0,0,0,0.4)] h-full"
             >
               <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-white">{tool.name}</h3>
-                  <p className="mt-1 text-sm text-white/60">{tool.description}</p>
+                <div className="pr-3">
+                  <h3 className="text-lg font-semibold text-white line-clamp-1">{tool.name}</h3>
+                  <p className="mt-1 text-sm text-white/60 line-clamp-3">{tool.description}</p>
                 </div>
-                <span className="rounded-full bg-white/10 px-3 py-1 text-xs uppercase tracking-wide text-white/60">
+                <span className="rounded-full bg-white/10 px-3 py-1 text-xs uppercase tracking-wide text-white/60 whitespace-nowrap">
                   {tool.category}
                 </span>
               </div>
             </div>
           ))}
-        </div>
+        </Carousel>
       )
     }
 

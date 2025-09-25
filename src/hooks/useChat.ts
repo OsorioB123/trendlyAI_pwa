@@ -38,6 +38,10 @@ export interface UseChatReturn {
   setActiveConversation: (conversation: Conversation | null) => void
   updateInputState: (updates: Partial<ChatInputState>) => void
   clearInput: () => void
+  regenerateLast: () => Promise<boolean>
+  
+  // Control
+  stopGeneration: () => void
   
   // Real-time
   subscribeToMessages: () => void
@@ -79,6 +83,8 @@ export function useChat(): UseChatReturn {
   // Refs for real-time subscriptions
   const messagesSubscriptionRef = useRef<any>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const sendingRef = useRef(false)
+  const canceledRef = useRef(false)
 
   // =====================================================
   // DATA FETCHING
@@ -170,6 +176,10 @@ export function useChat(): UseChatReturn {
    * Send a message and get AI response
    */
   const sendMessage = useCallback(async (content: string): Promise<boolean> => {
+    if (sendingRef.current) {
+      return false
+    }
+    sendingRef.current = true
     if (!user?.id || !activeConversation?.id) {
       setError(CHAT_ERRORS.UNAUTHORIZED)
       return false
@@ -216,6 +226,11 @@ export function useChat(): UseChatReturn {
         content.trim()
       )
 
+      if (canceledRef.current) {
+        // ignore results after user pressed stop
+        return false
+      }
+
       if (response.success) {
         // Remove temp message and reload all messages to get the real ones
         await loadMessages()
@@ -243,6 +258,7 @@ export function useChat(): UseChatReturn {
     } finally {
       setIsSending(false)
       setIsStreaming(false)
+      sendingRef.current = false
     }
   }, [user?.id, activeConversation?.id, userCredits, loadMessages, loadCredits, scrollToBottom])
 
@@ -363,6 +379,58 @@ export function useChat(): UseChatReturn {
     }))
   }, [])
 
+  /**
+   * Stop current generation (client-side abort)
+   */
+  const stopGeneration = useCallback(() => {
+    canceledRef.current = true
+    sendingRef.current = false
+    setIsSending(false)
+    setIsStreaming(false)
+  }, [])
+
+
+  /**
+   * Regenerate last assistant response
+   */
+  const regenerateLast = useCallback(async (): Promise<boolean> => {
+    if (!user?.id || !activeConversation?.id) {
+      setError(CHAT_ERRORS.UNAUTHORIZED)
+      return false
+    }
+    if (sendingRef.current) return false
+
+    try {
+      sendingRef.current = true
+      setIsSending(true)
+      setIsStreaming(false)
+      setError(null)
+
+      const response = await ChatService.regenerateLastResponse(
+        user.id,
+        activeConversation.id
+      )
+
+      if (!response.success) {
+        setError(response.error || CHAT_ERRORS.AI_SERVICE_ERROR)
+        return false
+      }
+      await loadMessages()
+      await loadCredits()
+      setTimeout(() => scrollToBottom(), 100)
+      return true
+    } catch (err) {
+      console.error('Regenerate error:', err)
+      setError('Erro ao regenerar resposta')
+      return false
+    } finally {
+      setIsSending(false)
+      setIsStreaming(false)
+      sendingRef.current = false
+    }
+  }, [user?.id, activeConversation?.id, loadMessages, loadCredits, scrollToBottom])
+
+
   // =====================================================
   // UI UTILITIES
   // =====================================================
@@ -418,6 +486,10 @@ export function useChat(): UseChatReturn {
     setActiveConversation,
     updateInputState,
     clearInput,
+    regenerateLast,
+    
+    // Control
+    stopGeneration,
     
     // Real-time
     subscribeToMessages,
