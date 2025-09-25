@@ -11,6 +11,45 @@ import type { HeaderSharedProps } from './types'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
 
+export function formatRelativeTime(isoDate: string) {
+  const date = new Date(isoDate)
+  const now = Date.now()
+  const diffMs = now - date.getTime()
+
+  if (Number.isNaN(diffMs)) return ''
+
+  const minute = 60 * 1000
+  const hour = 60 * minute
+  const day = 24 * hour
+  const week = 7 * day
+  const month = 30 * day
+  const year = 365 * day
+
+  if (diffMs < minute) return 'agora'
+  if (diffMs < hour) {
+    const minutes = Math.round(diffMs / minute)
+    return `há ${minutes} min`
+  }
+  if (diffMs < day) {
+    const hours = Math.round(diffMs / hour)
+    return `há ${hours} h`
+  }
+  if (diffMs < week) {
+    const days = Math.round(diffMs / day)
+    return `há ${days} dia${days > 1 ? 's' : ''}`
+  }
+  if (diffMs < month) {
+    const weeks = Math.round(diffMs / week)
+    return `há ${weeks} semana${weeks > 1 ? 's' : ''}`
+  }
+  if (diffMs < year) {
+    const months = Math.round(diffMs / month)
+    return `há ${months} mês${months > 1 ? 'es' : ''}`
+  }
+  const years = Math.round(diffMs / year)
+  return `há ${years} ano${years > 1 ? 's' : ''}`
+}
+
 export function useHeaderData(userId?: string) {
   const { setCredits, setCreditsUsedToday } = useHeaderState()
 
@@ -223,7 +262,7 @@ export function ProfileMenuContent({
         variant="ghost"
         onClick={onLogout}
         disabled={isLoggingOut}
-        className="flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 py-2 text-sm text-red-300 transition-all hover:bg-white/10 disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 py-2 text-sm text-red-300 transition-all hover:bg-white/10 disabled:opacity-60 whitespace-nowrap"
       >
         {isLoggingOut ? 'Saindo...' : (
           <>

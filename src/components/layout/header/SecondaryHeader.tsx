@@ -12,14 +12,24 @@ import {
   ProfileMenu,
   ProfileMenuContent,
   NotificationsMenu,
-  useHeaderData
+  useHeaderData,
+  formatRelativeTime
 } from './shared'
 import { usePaywall } from '@/components/paywall/PaywallProvider'
 
 export function SecondaryHeader() {
   const router = useRouter()
   const pathname = usePathname()
-  const { notifications, credits, creditsUsedToday } = useHeaderState()
+  const {
+    notifications,
+    unreadCount,
+    notificationsLoading,
+    notificationsError,
+    markNotificationRead,
+    markAllNotificationsRead,
+    credits,
+    creditsUsedToday
+  } = useHeaderState()
   const { user, profile, signOut } = useAuth()
   const [showNotifications, setShowNotifications] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
@@ -109,22 +119,66 @@ export function SecondaryHeader() {
               data-testid="notifications-button"
             >
               <Bell className="h-5 w-5" />
+              {unreadCount > 0 && (
+                <span className="absolute right-2 top-2 inline-flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                </span>
+              )}
             </button>
             <NotificationsMenu open={showNotifications}>
               <div className="flex items-center justify-between px-2 pb-2">
                 <h4 className="text-sm font-semibold text-white">Notificações</h4>
-                <button className="text-xs text-white/60 transition-colors hover:text-white">Marcar como lidas</button>
+                <button
+                  onClick={() => markAllNotificationsRead()}
+                  className="text-xs text-white/60 transition-colors hover:text-white"
+                >
+                  Marcar como lidas
+                </button>
               </div>
               <div className="space-y-1">
-                {notifications.map((notification) => (
-                  <button
-                    key={notification.id}
-                    className="block w-full rounded-xl px-3 py-2 text-left text-white/80 transition-all hover:bg-white/10"
-                  >
-                    <p className="text-sm text-white">{notification.message}</p>
-                    <span className="text-xs text-white/50">{notification.time}</span>
-                  </button>
-                ))}
+                {notificationsLoading ? (
+                  Array.from({ length: 3 }).map((_, index) => (
+                    <div
+                      key={`notification-skeleton-${index}`}
+                      className="animate-pulse rounded-xl border border-white/10 bg-white/5 px-3 py-3"
+                    >
+                      <div className="h-4 w-3/4 rounded bg-white/20" />
+                      <div className="mt-2 h-3 w-1/3 rounded bg-white/10" />
+                    </div>
+                  ))
+                ) : notifications.length > 0 ? (
+                  notifications.map((notification) => {
+                    const isUnread = !notification.readAt
+                    return (
+                      <button
+                        key={notification.id}
+                        onClick={async () => {
+                          if (isUnread) {
+                            await markNotificationRead(notification.id)
+                          }
+                          if (notification.actionUrl) {
+                            router.push(notification.actionUrl)
+                            setShowNotifications(false)
+                          }
+                        }}
+                        className={`block w-full rounded-xl px-3 py-2 text-left transition-all ${
+                          isUnread ? 'border border-white/15 bg-white/10 text-white' : 'text-white/80 hover:bg-white/10'
+                        }`}
+                      >
+                        <p className="text-sm font-medium text-white">{notification.title}</p>
+                        <p className="text-xs text-white/50">{formatRelativeTime(notification.createdAt)}</p>
+                        {notification.message && (
+                          <p className="mt-1 text-xs text-white/70">{notification.message}</p>
+                        )}
+                      </button>
+                    )
+                  })
+                ) : (
+                  <div className="px-3 py-6 text-center text-xs text-white/60">
+                    {notificationsError ?? 'Nenhuma notificação por aqui ainda.'}
+                  </div>
+                )}
               </div>
               <button className="mt-3 w-full rounded-xl px-3 py-2 text-center text-xs text-white/70 transition-colors hover:bg-white/10">
                 Ver todas

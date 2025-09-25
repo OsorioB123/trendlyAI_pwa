@@ -160,6 +160,21 @@ export interface Database {
         Insert: Partial<Database['public']['Tables']['track_reviews']['Row']>
         Update: Partial<Database['public']['Tables']['track_reviews']['Row']>
       }
+      user_notifications: {
+        Row: {
+          id: string
+          user_id: string
+          type: string | null
+          title: string
+          message: string
+          action_url: string | null
+          read_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: Partial<Database['public']['Tables']['user_notifications']['Row']>
+        Update: Partial<Database['public']['Tables']['user_notifications']['Row']>
+      }
     }
   }
 }

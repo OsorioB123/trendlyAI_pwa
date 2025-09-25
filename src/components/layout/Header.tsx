@@ -6,12 +6,6 @@ import { HeaderProvider } from './header/SharedHeaderContext'
 import { PrimaryHeader } from './header/PrimaryHeader'
 import { SecondaryHeader } from './header/SecondaryHeader'
 import ChatHeader from './header/chat/ChatHeader'
-import type { Notification } from '@/types/header'
-
-const DEFAULT_NOTIFICATIONS: Notification[] = [
-  { id: 1, message: 'Nova trilha de Storytelling disponível!', time: 'há 5 min' },
-  { id: 2, message: 'Seu projeto "Roteiro para Reels" foi salvo.', time: 'há 2 horas' }
-]
 
 interface HeaderProps {
   onToggleSidebar?: () => void
@@ -30,5 +24,5 @@ export default function HeaderWrapper({ onToggleSidebar }: HeaderProps) {
     return <SecondaryHeader />
   }, [pathname, onToggleSidebar])
 
-  return <HeaderProvider initialNotifications={DEFAULT_NOTIFICATIONS}>{header}</HeaderProvider>
+  return <HeaderProvider>{header}</HeaderProvider>
 }

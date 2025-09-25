@@ -16,9 +16,13 @@ export interface UserData {
 }
 
 export interface Notification {
-  id: number
+  id: string
+  title: string
   message: string
-  time: string
+  createdAt: string
+  readAt?: string | null
+  actionUrl?: string
+  type?: string
 }
 
 export const mockUser: UserData = {

@@ -3,9 +3,16 @@
 import { createContext, useContext, useState, ReactNode } from 'react'
 import type { Notification } from '@/types/header'
 import type { UserCredits } from '@/types/chat'
+import { useAuth } from '@/contexts/AuthContext'
+import { useNotifications } from '@/hooks/useNotifications'
 
 interface HeaderState {
   notifications: Notification[]
+  unreadCount: number
+  notificationsLoading: boolean
+  notificationsError: string | null
+  markNotificationRead: (id: string) => Promise<void>
+  markAllNotificationsRead: () => Promise<void>
   credits: UserCredits | null
   creditsUsedToday: number | null
   setCredits: (credits: UserCredits | null) => void
@@ -15,13 +22,19 @@ interface HeaderState {
 const HeaderContext = createContext<HeaderState | undefined>(undefined)
 
 export function HeaderProvider({
-  children,
-  initialNotifications
+  children
 }: {
   children: ReactNode
-  initialNotifications: Notification[]
 }) {
-  const [notifications] = useState(initialNotifications)
+  const { user } = useAuth()
+  const {
+    notifications,
+    unreadCount,
+    loading: notificationsLoading,
+    error: notificationsError,
+    markNotificationRead,
+    markAllNotificationsRead,
+  } = useNotifications(user?.id)
   const [credits, setCredits] = useState<UserCredits | null>(null)
   const [creditsUsedToday, setCreditsUsedToday] = useState<number | null>(null)
 
@@ -29,6 +42,11 @@ export function HeaderProvider({
     <HeaderContext.Provider
       value={{
         notifications,
+        unreadCount,
+        notificationsLoading,
+        notificationsError,
+        markNotificationRead,
+        markAllNotificationsRead,
         credits,
         creditsUsedToday,
         setCredits,
